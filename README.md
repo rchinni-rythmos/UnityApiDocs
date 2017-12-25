@@ -11,7 +11,7 @@ DocWorks Api Docs - C# Parser library - Requirements
     - See sample output file  [GetAllTypes.xml](output/GetAllTypes.xml)
 2. Get Type
     - Gets the documentation for a particular type
-    - sample outputs:  [Object](output/GetType - Object.xml), [BillBoardAsset](output/GetType - BillboardAsset.doc.xml), [PlayState](output/GetType - PlayState.xml)
+    - sample outputs: [Object]("output/GetType - Object.xml"),  [BillBoardAsset](output/GetType - BillboardAsset.doc.xml), [PlayState](output/GetType - PlayState.xml)
         
 3. Set Type
 
