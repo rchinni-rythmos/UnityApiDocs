@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<doc version="1">
+	<types>
+		<type>
+			<name>Object</name>
+			<namespace>UnityEngine</namespace>
+			<relativeFilePaths>
+				<path>Classes/Object.cs</path>
+				<path>PartialClasses/Object.cs</path>
+			</relativeFilePaths>
+		</type>
+		<type>
+			<name>BillboardAsset</name>
+			<namespace>UnityEngine</namespace>
+			<relativeFilePaths>
+				<path>inheritance/BillboardAsset.cs</path>
+			</relativeFilePaths>
+		</type>
+		<type>
+			<name>PlayState</name>
+			<namespace>UnityEngine.Playables</namespace>
+			<relativeFilePaths>
+				<path>Enumerations/PlayState.cs</path>
+			</relativeFilePaths>
+		</type>
+	<types>
+</doc>

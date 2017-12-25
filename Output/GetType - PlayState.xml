@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<doc version="1">
+    <member name="PlayState" type="Enum" namespace="UnityEngine.Playables">
+        <section>
+            <summary>Status of a [[Playable]].</summary>
+        </section>
+        <member name="Paused" type="EnumValue">
+            <section>
+                <summary>The [[Playable]] has been paused. Its local time will not advance.</summary>
+            </section>
+        </member>
+        <member name="Playing" type="EnumValue">
+            <section>
+                <summary>The [[Playable]] is currently Playing.</summary>
+            </section>
+        </member>
+		<member name="Delayed" type="EnumValue">
+            <section>
+                <summary>The [[Playable]] has been delayed, using PlayableExtensions.SetDelay. It will not start until the delay is entirely consumed.</summary>
+            </section>
+        </member>
+    </member>
+</doc>

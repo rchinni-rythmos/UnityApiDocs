@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<doc version="1">
+    <member name="Object" type="Class" namespace="UnityEngine" access="Public">
+        <section>
+            <summary>Base class for all objects Unity can reference.</summary>
+            <description>Any public variable you make that derives from Object gets shown in the inspector as a drop target,
+allowing you to set the value from the GUI.</description>
+        </section>
+		<member name="ctor" type="Constructor">
+            <section>
+				<signature><![CDATA[public Object()]]></signature>
+                <summary>Default constructor</summary>
+            </section>
+        </member>
+		<member name="_hideFlags" type="Property" access="Public">
+            <section>
+				<signature><![CDATA[public bool hideFlags { get; set; }]]></signature>
+                <summary>Should the object be hidden, saved with the scene or modifiable by the user?</summary>
+                <description>SA: HideFlags.</description>
+                <example>
+                    <code><![CDATA[
+using UnityEngine;
+using System.Collections;
+
+public class ExampleClass : MonoBehaviour {
+
+    // Creates a material that is explicitly created & destroyed by the component.
+    // Resources.UnloadUnusedAssets will not unload it, and it will not be editable by the inspector.
+    private Material ownedMaterial;
+    void OnEnable() {
+        ownedMaterial = new Material(Shader.Find("Diffuse"));
+        ownedMaterial.hideFlags = HideFlags.HideAndDontSave;
+        GetComponent<Renderer>().sharedMaterial = ownedMaterial;
+    }
+
+    // Objects created as hide and don't save must be explicitly destroyed by the owner of the 
+    void OnDisable() {
+        DestroyImmediate(ownedMaterial);
+    }
+}
+]]></code>
+                </example>
+            </section>
+        </member>
+        <member name="GetInstanceID" type="Method" access="Public">
+            <section>
+                <signature><![CDATA[public int GetInstanceID()]]></signature>
+                <summary>Returns the instance id of the object.</summary>
+                <description>The instance id of an object is always guaranteed to be unique.</description>
+                <example convertexample="true">
+                    <code lang="js"><![CDATA[print(GetInstanceID());]]></code>
+                </example>
+            </section>
+        </member>
+		<member name="SampleProtectedMethod" type="Method" access="Protected">
+            <section>
+				<signature><![CDATA[protected int SampleProtectedMethod()]]></signature>
+                <summary>This is a Protected method and can be used only by derived types</summary>
+				<returns>An integer</returns>
+            </section>
+        </member>
+		<member name="SampleObsoleteMethod" type="Method" access="Public" obsolete="true">
+            <section>
+				<signature><![CDATA[public void SampleObsoleteMethod()]]></signature>
+                <summary>This is an obsolete method</summary>
+            </section>
+        </member>
+		<member name="SampleMethodWithNoDocumentation" type="Method" access="Public">
+            <section>
+				<signature><![CDATA[public void SampleMethodWithNoDocumentation()]]></signature>
+            </section>
+        </member>
+		<member name="SampleStaticMethod" type="Method" access="Public" static="true">
+            <section>
+				<signature><![CDATA[public static void SampleStaticMethod()]]></signature>
+                <summary>This is a Static Method</summary>
+            </section>
+        </member>
+		<member name="SampleMethodInPartialClass" type="Method" access="Public" >
+            <section>
+				<signature><![CDATA[public void SampleMethodInPartialClass()]]></signature>
+                <summary>This is a method in Partial class</summary>
+            </section>
+        </member>
+		<member name="MyDelegate" type="Delegate" access="Public" >
+            <section>
+				<signature><![CDATA[public delegate int MyDelegate(string s)]]></signature>
+                <summary>This is a delegate.</summary>
+				<param name="s">The input string</param>
+            </section>
+        </member>
+		<member name="SampleOverloadMethod" type="Method" access="Public" >
+            <section>
+				<signature><![CDATA[public void SampleOverloadMethod()]]></signature>
+                <summary>This is a delegate.</summary>
+				<param name="s">The input string</param>
+            </section>
+        </member>
+		<member name="SampleOverloadMethod(int)" type="Method" access="Public" >
+            <section>
+				<signature><![CDATA[public void SampleOverloadMethod(int i)]]></signature>
+                <summary>This is Overloaded Method sample 2.</summary>
+				<param name="i">This is first parameter</param>
+            </section>
+        </member>
+		<member name="SampleOverloadMethod(int, List{string})" type="Method" access="Public" >
+            <section>
+				<signature><![CDATA[public void SampleOverloadMethod(int i, List<string> ls)]]></signature>
+                <summary>This is Overloaded Method sample 3. 
+				Note: The second parameter contains angle brackets. So it cannot be carried as it is to the "Name" attribute of the Member tag. 
+				CData is not valid for an XML attribute.
+				So angle brackets are to be replaced with flower brackets.				
+				</summary>
+				<param name="i">First parameter integer</param>
+				<param name="ls">Second parameter - List of strings</param>
+            </section>
+        </member>
+    </member>
+</doc>

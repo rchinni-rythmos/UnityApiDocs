@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<doc version="3">
+    <member name="BillboardAsset" type="Class" namespace="UnityEngine" inherits="UnityEngine.Object">
+        <section>
+            <summary>BillboardAsset describes how a billboard is rendered.</summary>
+        </section>
+		<member name="BillboardAsset.ctor" type="Constructor">
+            <section>
+                <signature><![CDATA[ctor()]]></signature>
+                <summary>Constructs a new BillboardAsset.</summary>
+            </section>
+        </member>
+		<member name="BillboardAsset.GetIndices" type="Method">
+            <section>
+                <signature><![CDATA[public ushort[] GetIndices()]]></signature>
+                <summary>Get the indices of the billboard mesh.</summary>
+                <description>Billboard meshes are always made of triangles. Specify the index of each vertex (in the vertices array) for each triangle. The second overload guarantees no memory allocation happening if the list capacity is big enough to hold the data.</description>
+				<returns>Index numbers</returns>
+            </section>
+        </member>
+	</member>
+</doc>
