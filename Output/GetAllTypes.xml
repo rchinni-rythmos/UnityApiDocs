@@ -3,6 +3,7 @@
 	<types>
 		<type>
 			<name>Object</name>
+			<type>Class</type>
 			<namespace>UnityEngine</namespace>
 			<relativeFilePaths>
 				<path>Classes/Object.cs</path>
@@ -11,6 +12,7 @@
 		</type>
 		<type>
 			<name>BillboardAsset</name>
+			<type>Class</type>
 			<namespace>UnityEngine</namespace>
 			<relativeFilePaths>
 				<path>inheritance/BillboardAsset.cs</path>
@@ -18,6 +20,7 @@
 		</type>
 		<type>
 			<name>PlayState</name>
+			<type>Enum</type>
 			<namespace>UnityEngine.Playables</namespace>
 			<relativeFilePaths>
 				<path>Enumerations/PlayState.cs</path>
