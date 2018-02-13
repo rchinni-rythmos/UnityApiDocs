@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler", "Unity.DocTool.XMLDocHandler\Unity.DocTool.XMLDocHandler.csproj", "{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler.Driver", "Unity.DocTool.XMLDocHandler.Driver\Unity.DocTool.XMLDocHandler.Driver.csproj", "{C34495C3-D3B5-4191-86E6-A9843EF52106}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler.Tests", "Unity.DocTool.XMLDocHandler.Tests\Unity.DocTool.XMLDocHandler.Tests.csproj", "{00FFCD1C-0BCE-449D-B606-41A02E1AD0F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C34495C3-D3B5-4191-86E6-A9843EF52106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C34495C3-D3B5-4191-86E6-A9843EF52106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C34495C3-D3B5-4191-86E6-A9843EF52106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C34495C3-D3B5-4191-86E6-A9843EF52106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00FFCD1C-0BCE-449D-B606-41A02E1AD0F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00FFCD1C-0BCE-449D-B606-41A02E1AD0F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00FFCD1C-0BCE-449D-B606-41A02E1AD0F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00FFCD1C-0BCE-449D-B606-41A02E1AD0F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {07F46350-3810-4A06-A3B7-4182F8E0CAF5}
+	EndGlobalSection
+EndGlobal
