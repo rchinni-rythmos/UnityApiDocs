@@ -45,16 +45,20 @@
   <ItemGroup>
     <Compile Include="GetTypesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestTypes\GetTypes\AClass.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Compile Include="SaveXmlTests.cs" />
+    <Compile Include="TestTypes\CommonTypes\AClass.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="TestTypes\GetTypes\AFolder\AClass.part2.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Compile Include="TestTypes\CommonTypes\AFolder\AClass.part2.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="TestTypes\GetTypes\AnEnum.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Compile Include="TestTypes\CommonTypes\AnEnum.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="TestTypes\GetTypes\InternalInterface.cs" />
+    <Compile Include="TestTypes\CommonTypes\InternalInterface.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="XmlDocHandlerTestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

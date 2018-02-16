@@ -187,6 +187,11 @@ namespace Unity.DocTool.XMLDocHandler
             }
             return sb.ToString();
         }
+
+        public void SetType(string docXml, params string[] sourcePaths)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

@@ -7,28 +7,12 @@ using NUnit.Framework;
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
     [TestFixture]
-    public class GetTypesTests
+    public class XmlDocHandlerTest : XmlDocHandlerTestBase
     {
-        private string originalCurrentDirectory;
-
-        [SetUp]
-        public void Init()
-        {
-            originalCurrentDirectory = Directory.GetCurrentDirectory();
-            var testRootFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Directory.SetCurrentDirectory(testRootFolder);
-        }
-
-        [TearDown]
-        public void Cleanup()
-        {
-            Directory.SetCurrentDirectory(originalCurrentDirectory);
-        }
-
         [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
-            var testFileDirectory = TestPathFor("TestTypes/GetTypes/");
+            var testFileDirectory = TestPathFor("TestTypes/CommonTypes/");
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -85,18 +69,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         }
 
-        private static CompilationParameters MakeCompilationParameters(string testFileDirectory)
-        {
-            return new CompilationParameters(testFileDirectory, new string[0], new []
-            {
-                typeof(object).Assembly.Location,
-            });
-        }
-
         [Test]
         public void GetType_Documentation_ReturnsCorrectXml()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/GetTypes/"));
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
             string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass",  "AClass.cs", "AFolder/AClass.part2.cs");
             Console.WriteLine(actualXml);
 
@@ -182,7 +158,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Inner_Types()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/GetTypes/"));
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
             string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", "AClass.cs");
             Console.WriteLine(actualXml);
 
@@ -219,15 +195,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         private void AssertXml(string expectedXml, string actualXml)
         {
-            var normalizedExpectedXml = NormalizeXml(expectedXml);
-            var normalizedActualXml = NormalizeXml(actualXml);
+            var normalizedExpectedXml = Normalize(expectedXml);
+            var normalizedActualXml = Normalize(actualXml);
 
             Assert.AreEqual(normalizedExpectedXml, normalizedActualXml, actualXml);
-        }
-
-        private static string NormalizeXml(string xml)
-        {
-            return Regex.Replace(xml, @"\r|\n|\s{2,}", "");
         }
 
         private static string TestPathFor(string path)
