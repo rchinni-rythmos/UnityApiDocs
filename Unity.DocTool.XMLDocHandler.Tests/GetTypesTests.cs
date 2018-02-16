@@ -20,8 +20,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <doc version=""1"">
     <types>
         <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass</id>
+            <parentId></parentId>
             <name>AClass</name>
-            <type>Class</type>
+            <kind>Class</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
             <relativeFilePaths>
                 <path>AClass.cs</path>
@@ -30,8 +32,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <name>AClass.INestedInterface</name>
-            <type>Interface</type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface</id>
+            <parentId>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass</parentId>
+            <name>INestedInterface</name>
+            <kind>Interface</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
             <relativeFilePaths>
                 <path>AClass.cs</path>
@@ -39,8 +43,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AnEnum</id>
+            <parentId></parentId>
             <name>AnEnum</name>
-            <type>Enum</type>
+            <kind>Enum</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
             <relativeFilePaths>
                 <path>AnEnum.cs</path>
@@ -48,8 +54,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <name>AClass.AnEnum</name>
-            <type>Enum</type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.AnEnum</id>
+            <parentId>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass</parentId>
+            <name>AnEnum</name>
+            <kind>Enum</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
             <relativeFilePaths>
                 <path>AFolder\AClass.part2.cs</path>
@@ -71,7 +79,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 Directory.SetCurrentDirectory(testRootFolder);
 
                 var handler = new XMLDocHandler();
-                string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
+                string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", new string[0], "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
                 Console.WriteLine(actualXml);
 
                 var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
@@ -111,7 +119,36 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             {
                 Directory.SetCurrentDirectory(currrentDirectory);
             }
+        }
 
+        [Test]
+        public void Test_Documentation_Under_Conditional_Compilation_Symbols_Works()
+        {
+            Assert.Fail("Not implementated yet");
+        }
+
+        [Test]
+        public void Test_Inner_Types()
+        {
+            Assert.Fail("Not implementated yet");
+        }
+
+        [Test]
+        public void Test_Attributes_Are_Reported()
+        {
+            Assert.Fail("Not implementated yet");
+        }
+
+        [Test]
+        public void Test_Generic_Types()
+        {
+            Assert.Fail("Not implementated yet");
+        }
+
+        [Test]
+        public void Test_Generic_Members()
+        {
+            Assert.Fail("Not implementated yet");
         }
 
         private void AssertXml(string expectedXml, string actualXml)

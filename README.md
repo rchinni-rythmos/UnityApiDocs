@@ -13,7 +13,7 @@ Api Docs - C# Parser library - Requirements
     [ ] Move inner types as top level xml nodes (include parentId node)
     [ ] Add test for inner types
 
-- [ ] Add set of defines to be used
+- [x] Add set of defines to be used
 
 - Add tests for generics
     [ ] Methods

@@ -76,8 +76,9 @@ namespace Unity.DocTool.XMLDocHandler
                     value: $@"
         <type>
             <id>{firstType.Id()}</id>
-            <name>{firstType.FullyQualifiedName(false, false)}</name>
-            <type>{GetKindString(firstType)}</type>
+            <parentId>{firstType.ContainingType?.Id()}</parentId>
+            <name>{firstType.Name}</name>
+            <kind>{GetKindString(firstType)}</kind>
             <namespace>{GetNamespace(firstType)}</namespace>
             <relativeFilePaths>
                 {GetPaths(group)}

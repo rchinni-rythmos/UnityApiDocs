@@ -13,7 +13,7 @@ namespace Unity.DocTool.XMLDocHandler
 {
     public class XMLDocHandler
     {
-        public void UpdateComments(string filePath)
+        public void UpdateComments(string filePath, IEnumerable<string> definedSymbols)
         {
             IEnumerable<string> defines = new string[0];
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
@@ -31,14 +31,12 @@ namespace Unity.DocTool.XMLDocHandler
             Console.WriteLine(x);
         }
 
-        public string GetTypesXml(string directoryPath)
+        public string GetTypesXml(string directoryPath, params string[] definedSymbols)
         {
             if (!Directory.Exists(directoryPath))
                 throw new ArgumentException($"Directory \"{directoryPath}\" does not exist.");
 
-            IEnumerable<string> defines = new string[0];
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
-                SourceCodeKind.Regular, defines);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,SourceCodeKind.Regular, definedSymbols);
             var filePaths = Directory.GetFiles(directoryPath, "*.cs", SearchOption.AllDirectories);
             var syntaxTrees = filePaths.Select(
                 p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(directoryPath.Length))).ToArray();
@@ -57,10 +55,9 @@ namespace Unity.DocTool.XMLDocHandler
             return getTypesVisitor.GetXml();
         }
 
-        public string GetTypeDocumentation(string id, string rootPath, params string[] paths)
+        public string GetTypeDocumentation(string id, IEnumerable<string> definedSymbols, string rootPath, params string[] paths)
         {
-            IEnumerable<string> defines = new string[0];
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, definedSymbols);
 
             var syntaxTrees = paths.Select(p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(Path.Combine(rootPath, p)), parserOptions, p));
 
