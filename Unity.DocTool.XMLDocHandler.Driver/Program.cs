@@ -17,7 +17,8 @@
         /// <param name="args">the args</param>
         static void Main(string[] args)
         {
-            var handler = new XMLDocHandler();
+            var handler = new XMLDocHandler(new CompilationParameters("D:\\scratchpad\\New folder", new string[0], new [] {typeof(object).Assembly.Location}));
+            handler.GetTypesXml();
             var path = @"G:\Work\repo\xmldochandler\Unity.DocTool.XMLDocHandler.Driver\Program.cs";
             //handler.UpdateComments(path);
         }

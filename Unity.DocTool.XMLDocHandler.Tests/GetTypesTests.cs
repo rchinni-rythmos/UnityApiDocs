@@ -28,9 +28,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
-            var handler = new XMLDocHandler();
             var testFileDirectory = TestPathFor("TestTypes/GetTypes/");
-            string xmlActual = handler.GetTypesXml(testFileDirectory);
+            var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
+            string xmlActual = handler.GetTypesXml();
 
             var expected = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""1"">
@@ -85,16 +85,28 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         }
 
+        private static CompilationParameters MakeCompilationParameters(string testFileDirectory)
+        {
+            return new CompilationParameters(testFileDirectory, new string[0], new []
+            {
+                typeof(object).Assembly.Location,
+            });
+        }
+
         [Test]
         public void GetType_Documentation_ReturnsCorrectXml()
         {
-            var handler = new XMLDocHandler();
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", new string[0], "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/GetTypes/"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass",  "AClass.cs", "AFolder/AClass.part2.cs");
             Console.WriteLine(actualXml);
 
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""object"">
+    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+        <interfaces>
+            <interface typeId=""System.Collections.IEnumerable"" typeName=""IEnumerable"" />
+            <interface typeId=""System.ICloneable"" typeName=""ICloneable"" />
+        </interfaces>
         <xmldoc>
             <summary>I have a summary</summary>
             <example>In a partial type...</example>
@@ -103,6 +115,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         <member name = ""Foo"" type=""Method"">
             <signature>
+                <accessibility>Public</accessibility>
                 <return typeId=""System.Int32"" typeName=""int"" />
                 <parameters>
                     <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
@@ -114,8 +127,43 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </xmldoc>                
         </member>
 
+        <member name = ""VoidProtectedMethod"" type=""Method"">
+            <signature>
+                <accessibility>Protected</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters>
+                </parameters>
+            </signature>
+            <xmldoc>
+                some docs
+            </xmldoc>                
+        </member>
+        <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"">
+            <signature>
+                <accessibility>Private</accessibility>
+                <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator"" />
+                <parameters></parameters>
+            </signature>
+            <xmldoc>
+                <summary>
+                Explicit Implementation
+                </summary>
+                <returns></returns>
+            </xmldoc>
+        </member>
+        <member name = ""Clone"" type=""Method"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Object"" typeName=""object"" />
+                <parameters></parameters>
+            </signature>
+            <xmldoc>    
+            </xmldoc>
+        </member>
+
         <member name = "".ctor"" type=""Method"">
             <signature>
+                <accessibility>Public</accessibility>
                 <parameters></parameters>
             </signature>
             <xmldoc></xmldoc>
@@ -134,8 +182,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Inner_Types()
         {
-            var handler = new XMLDocHandler();
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", new string[0], "TestTypes/GetTypes/", "AClass.cs");
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/GetTypes/"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", "AClass.cs");
             Console.WriteLine(actualXml);
 
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>

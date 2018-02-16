@@ -29,5 +29,15 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
         {
             return t.QualifiedName(includeNamespace, useMetadataName);
         }
+
+        internal static bool IsPublicApi(this ISymbol symbol)
+        {
+            var accessibility = symbol.DeclaredAccessibility;
+            var isExplicitImplementation = symbol is IMethodSymbol methodSymbol && methodSymbol.MethodKind == MethodKind.ExplicitInterfaceImplementation;
+            return isExplicitImplementation ||
+                   accessibility == Accessibility.Public ||
+                   accessibility == Accessibility.Protected ||
+                   accessibility == Accessibility.ProtectedAndInternal;
+        }
     }
 }

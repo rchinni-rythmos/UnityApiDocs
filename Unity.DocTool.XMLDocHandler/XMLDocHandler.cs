@@ -11,9 +11,30 @@ using Unity.DocTool.XMLDocHandler.Extensions;
 
 namespace Unity.DocTool.XMLDocHandler
 {
+    public class CompilationParameters
+    {
+        public IEnumerable<string> DefinedSymbols { get; }
+        public string RootPath { get;  }
+        public IEnumerable<string> ReferencedAssemblyPaths { get; }
+
+        public CompilationParameters(string rootPath, IEnumerable<string> definedSymbols, IEnumerable<string> referencedAssemblyPaths)
+        {
+            DefinedSymbols = definedSymbols ?? throw new ArgumentNullException(nameof(definedSymbols));
+            RootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
+            ReferencedAssemblyPaths = referencedAssemblyPaths ?? throw new ArgumentNullException(nameof(referencedAssemblyPaths));
+        }
+    }
+
     public class XMLDocHandler
     {
-        public void UpdateComments(string filePath, IEnumerable<string> definedSymbols)
+        private CompilationParameters compilationParameters;
+
+        public XMLDocHandler(CompilationParameters compilationParameters)
+        {
+            this.compilationParameters = compilationParameters;
+        }
+
+        public void UpdateComments(string filePath)
         {
             IEnumerable<string> defines = new string[0];
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
@@ -31,19 +52,19 @@ namespace Unity.DocTool.XMLDocHandler
             Console.WriteLine(x);
         }
 
-        public string GetTypesXml(string directoryPath, params string[] definedSymbols)
+        public string GetTypesXml()
         {
-            if (!Directory.Exists(directoryPath))
-                throw new ArgumentException($"Directory \"{directoryPath}\" does not exist.");
+            if (!Directory.Exists(compilationParameters.RootPath))
+                throw new ArgumentException($"Directory \"{compilationParameters.RootPath}\" does not exist.");
 
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,SourceCodeKind.Regular, definedSymbols);
-            var filePaths = Directory.GetFiles(directoryPath, "*.cs", SearchOption.AllDirectories);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+            var filePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories);
             var syntaxTrees = filePaths.Select(
-                p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(directoryPath.Length))).ToArray();
+                p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(compilationParameters.RootPath.Length))).ToArray();
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, new MetadataReference[0], compilerOptions);
+            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
 
             var getTypesVisitor = new GetTypesVisitor();
             foreach (var syntaxTree in syntaxTrees)
@@ -55,19 +76,18 @@ namespace Unity.DocTool.XMLDocHandler
             return getTypesVisitor.GetXml();
         }
 
-        public string GetTypeDocumentation(string id, IEnumerable<string> definedSymbols, string rootPath, params string[] paths)
+        public string GetTypeDocumentation(string id, params string[] paths)
         {
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, definedSymbols);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
-            var syntaxTrees = paths.Select(p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(Path.Combine(rootPath, p)), parserOptions, p));
+            var syntaxTrees = paths.Select(p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(Path.Combine(compilationParameters.RootPath, p)), parserOptions, p));
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, new MetadataReference[0], compilerOptions);
+            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
 
             var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
 
-            var getTypesVisitor = new XMLDocExtractVisitor(id);
             foreach (var syntaxTree in compilation.SyntaxTrees)
             {
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -80,13 +100,16 @@ namespace Unity.DocTool.XMLDocHandler
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-     <doc version=""3"">
-         <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{typeSymbol.BaseType}"">
+    <doc version=""3"">
+        <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
+        {InterfaceList(typeSymbol)}
         <xmldoc>
         { extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}
         </xmldoc>");
 
-                        var members = typeSymbol.GetMembers().Where(m => m.Kind != SymbolKind.NamedType);
+                        var members = typeSymbol.GetMembers()
+                            .Where(m => m.Kind != SymbolKind.NamedType && 
+                                        m.IsPublicApi());
                         foreach (var member in members)
                         {
                             xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}"">
@@ -111,6 +134,30 @@ namespace Unity.DocTool.XMLDocHandler
             throw new Exception($"Type not found Id={id}");
         }
 
+        private IEnumerable<PortableExecutableReference> GetMetadataReferences()
+        {
+            return compilationParameters.ReferencedAssemblyPaths.Select(p => MetadataReference.CreateFromFile(p));
+        }
+
+        private static string BaseType(INamedTypeSymbol typeSymbol)
+        {
+            return typeSymbol.BaseType.TypeKind == TypeKind.Interface ? "Object" : typeSymbol.BaseType.Name;
+        }
+
+        private string InterfaceList(INamedTypeSymbol typeSymbol)
+        {
+            List<INamedTypeSymbol> interfaces = new List<INamedTypeSymbol>(typeSymbol.Interfaces);
+            if (typeSymbol.BaseType.TypeKind == TypeKind.Interface)
+                interfaces.Add(typeSymbol.BaseType);
+
+            if (interfaces.Count == 0)
+                return String.Empty;
+
+            return $@"<interfaces>
+{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{i.Name}"" />"))}
+</interfaces>";
+        }
+
         private string SignatureFor(ISymbol member)
         {
             switch (member.Kind)
@@ -119,8 +166,11 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Method:
                 {
                     var method = (IMethodSymbol) member;
-                    var returnXmlDoc = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
-                    return $"{returnXmlDoc}<parameters>{ParametersSignature(method)}</parameters>";
+                    var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
+                    return $@"
+<accessibility>{member.DeclaredAccessibility}</accessibility>
+{returnXml}
+<parameters>{ParametersSignature(method)}</parameters>";
                 }
 
                 default:

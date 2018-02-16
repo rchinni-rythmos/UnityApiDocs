@@ -48,10 +48,7 @@ namespace Unity.DocTool.XMLDocHandler
         private bool AddTypeIfPublicAPI(BaseTypeDeclarationSyntax node)
         {
             var symbol = semanticModel.GetDeclaredSymbol(node);
-            var accessibility = symbol.DeclaredAccessibility;
-            if (accessibility == Accessibility.Public ||
-                accessibility == Accessibility.Protected ||
-                accessibility == Accessibility.ProtectedAndInternal)
+            if (symbol.IsPublicApi())
             {
                 types.Add(symbol);
                 return true;
