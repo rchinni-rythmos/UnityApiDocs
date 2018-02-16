@@ -7,7 +7,7 @@ Api Docs - C# Parser library - Requirements
     [x] type attr in member node
     [x] remove extra member node in AClass
     [x] Use structure xml instead of plain signature
-    [ ] Test inner type documentation
+    [x] Test inner type documentation
 
 - Fix GetTypesXml()
     [ ] Move inner types as top level xml nodes (include parentId node)

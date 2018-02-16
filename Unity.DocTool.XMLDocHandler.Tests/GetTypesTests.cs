@@ -9,6 +9,22 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     [TestFixture]
     public class GetTypesTests
     {
+        private string originalCurrentDirectory;
+
+        [SetUp]
+        public void Init()
+        {
+            originalCurrentDirectory = Directory.GetCurrentDirectory();
+            var testRootFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Directory.SetCurrentDirectory(testRootFolder);
+        }
+
+        [TearDown]
+        public void Cleanup()
+        {
+            Directory.SetCurrentDirectory(originalCurrentDirectory);
+        }
+
         [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
@@ -72,17 +88,11 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetType_Documentation_ReturnsCorrectXml()
         {
-            var currrentDirectory = Directory.GetCurrentDirectory();
-            try
-            {
-                var testRootFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                Directory.SetCurrentDirectory(testRootFolder);
+            var handler = new XMLDocHandler();
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", new string[0], "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
+            Console.WriteLine(actualXml);
 
-                var handler = new XMLDocHandler();
-                string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", new string[0], "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
-                Console.WriteLine(actualXml);
-
-                var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+            var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""object"">
         <xmldoc>
@@ -112,13 +122,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </member>
     </member>
 </doc>";
-                AssertXml(expectedXml, actualXml);
-
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(currrentDirectory);
-            }
+            AssertXml(expectedXml, actualXml);
         }
 
         [Test]
@@ -130,7 +134,21 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Inner_Types()
         {
-            Assert.Fail("Not implementated yet");
+            var handler = new XMLDocHandler();
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", new string[0], "TestTypes/GetTypes/", "AClass.cs");
+            Console.WriteLine(actualXml);
+
+            var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""INestedInterface"" type = ""Interface"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+        <xmldoc>
+            <summary>
+            I am a nested interface
+            </summary>
+        </xmldoc>
+    </member>
+</doc>";
+            AssertXml(expectedXml, actualXml);
         }
 
         [Test]

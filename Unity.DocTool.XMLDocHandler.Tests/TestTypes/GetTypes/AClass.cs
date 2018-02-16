@@ -9,6 +9,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
     /// </summary>
     public partial class AClass
     {
+        /// <summary>
+        /// I am a nested interface
+        /// </summary>
         public interface INestedInterface
         {
             
