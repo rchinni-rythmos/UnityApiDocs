@@ -62,7 +62,7 @@ namespace Unity.DocTool.XMLDocHandler
 
         public string GetXml()
         {
-            var groups = types.GroupBy(t => FullyQualifiedName(t, true, false));
+            var groups = types.GroupBy(t => t.FullyQualifiedName(true, false));
             StringBuilder output = new StringBuilder();
 
             output.Append(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
@@ -75,8 +75,8 @@ namespace Unity.DocTool.XMLDocHandler
                 output.Append(
                     value: $@"
         <type>
-            <id>{IdFor(firstType)}</id>
-            <name>{FullyQualifiedName(firstType, false, false)}</name>
+            <id>{firstType.Id()}</id>
+            <name>{firstType.FullyQualifiedName(false, false)}</name>
             <type>{GetKindString(firstType)}</type>
             <namespace>{GetNamespace(firstType)}</namespace>
             <relativeFilePaths>
@@ -88,16 +88,6 @@ namespace Unity.DocTool.XMLDocHandler
             output.Append("</types></doc>");
 
             return output.ToString();
-        }
-
-        private string IdFor(INamedTypeSymbol symbol)
-        {
-            return FullyQualifiedName(symbol, true, true);
-        }
-        
-        private static string FullyQualifiedName(ISymbol t, bool includeNamespace, bool useMetadataName)
-        {
-            return t.QualifiedName(includeNamespace, useMetadataName);
         }
 
         private static string GetKindString(INamedTypeSymbol typeSymbol)
@@ -113,7 +103,7 @@ namespace Unity.DocTool.XMLDocHandler
 
         private string GetNamespace(INamespaceOrTypeSymbol t)
         {
-            return FullyQualifiedName(t.ContainingNamespace, true, false);
+            return t.ContainingNamespace.FullyQualifiedName(true, false);
         }
 
         internal void Visit(SyntaxNode syntaxNode, SemanticModel semanticModel)

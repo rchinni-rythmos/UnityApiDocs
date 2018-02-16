@@ -1,6 +1,28 @@
 Api Docs - C# Parser library - Requirements
 --------------------------------------------
 
+# Goals
+
+- Fix GetTypeDocumentation() output xml
+    [x] type attr in member node
+    [x] remove extra member node in AClass
+    [x] Use structure xml instead of plain signature
+    [ ] Test inner type documentation
+
+- Fix GetTypesXml()
+    [ ] Move inner types as top level xml nodes (include parentId node)
+    [ ] Add test for inner types
+
+- [ ] Add set of defines to be used
+
+- Add tests for generics
+    [ ] Methods
+    [ ] Types
+
+- [ ] Collect attribute
+
+
+
 # Contents of the Repo
 - The solution contains sample "Unity API" code. With sample code covering the scenarios listed in detailed requirements listed below
 - And the output folder contains sample API responses, given the sample "Unity API" code

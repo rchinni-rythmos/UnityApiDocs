@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,23 +13,6 @@ namespace Unity.DocTool.XMLDocHandler
 {
     public class XMLDocHandler
     {
-        public void GetComments(string filePath)
-        {
-            IEnumerable<string> defines = new string[0];
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
-                SourceCodeKind.Regular, defines);
-
-            var syntaxTree =
-                SyntaxFactory.ParseSyntaxTree(File.ReadAllText(filePath), parserOptions, Path.GetFileName(filePath));
-
-            //var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            //compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            //var compilation = CSharpCompilation.Create("Test", new[] {syntaxTree}, new MetadataReference[0], compilerOptions);
-
-            var visitor = new XMLDocExtractVisitor("");
-            visitor.Visit(syntaxTree.GetRoot());
-        }
-
         public void UpdateComments(string filePath)
         {
             IEnumerable<string> defines = new string[0];
@@ -84,6 +68,8 @@ namespace Unity.DocTool.XMLDocHandler
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
             var compilation = CSharpCompilation.Create("Test", syntaxTrees, new MetadataReference[0], compilerOptions);
 
+            var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
+
             var getTypesVisitor = new XMLDocExtractVisitor(id);
             foreach (var syntaxTree in compilation.SyntaxTrees)
             {
@@ -99,18 +85,18 @@ namespace Unity.DocTool.XMLDocHandler
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
      <doc version=""3"">
          <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{typeSymbol.BaseType}"">
-        <section>
-        {typeSymbol.GetDocumentationCommentXml()}
-        </section>");
+        <xmldoc>
+        { extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}
+        </xmldoc>");
 
-                        var members = typeSymbol.GetMembers();
+                        var members = typeSymbol.GetMembers().Where(m => m.Kind != SymbolKind.NamedType);
                         foreach (var member in members)
                         {
                             xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}"">
-            <section>
-                <signature><![CDATA[{member.ToDisplayString()}]]></signature>
-                {member.GetDocumentationCommentXml()}
-            </section>
+            <signature>{SignatureFor(member)}</signature>
+            <xmldoc>
+                { extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}
+            </xmldoc>
         </member>
 ");
                         }
@@ -126,6 +112,33 @@ namespace Unity.DocTool.XMLDocHandler
 
             //return getTypesVisitor.GetXml();
             throw new Exception($"Type not found Id={id}");
+        }
+
+        private string SignatureFor(ISymbol member)
+        {
+            switch (member.Kind)
+            {
+                case SymbolKind.Field: return member.Name;
+                case SymbolKind.Method:
+                {
+                    var method = (IMethodSymbol) member;
+                    var returnXmlDoc = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
+                    return $"{returnXmlDoc}<parameters>{ParametersSignature(method)}</parameters>";
+                }
+
+                default:
+                    throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
+            }
+        }
+
+        private string ParametersSignature(IMethodSymbol method)
+        {
+            var sb = new StringBuilder();
+            foreach (var parameter in method.Parameters)
+            {
+                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\" />");
+            }
+            return sb.ToString();
         }
     }
 

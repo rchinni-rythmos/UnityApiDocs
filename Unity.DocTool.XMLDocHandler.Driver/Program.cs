@@ -19,7 +19,6 @@
         {
             var handler = new XMLDocHandler();
             var path = @"G:\Work\repo\xmldochandler\Unity.DocTool.XMLDocHandler.Driver\Program.cs";
-            handler.GetComments(path);
             //handler.UpdateComments(path);
         }
 

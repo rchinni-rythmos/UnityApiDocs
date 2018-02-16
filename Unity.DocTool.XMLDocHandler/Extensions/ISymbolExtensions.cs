@@ -19,5 +19,15 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
 
             return prefix != null ? prefix + "." + name : name;
         }
+
+        internal static string Id(this ISymbol symbol)
+        {
+            return FullyQualifiedName(symbol, true, true);
+        }
+
+        internal static string FullyQualifiedName(this ISymbol t, bool includeNamespace, bool useMetadataName)
+        {
+            return t.QualifiedName(includeNamespace, useMetadataName);
+        }
     }
 }

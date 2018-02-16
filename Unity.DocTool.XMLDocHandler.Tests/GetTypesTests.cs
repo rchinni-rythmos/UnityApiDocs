@@ -71,8 +71,41 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 Directory.SetCurrentDirectory(testRootFolder);
 
                 var handler = new XMLDocHandler();
-                string xmlActual = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
-                Console.WriteLine(xmlActual);
+                string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", "TestTypes/GetTypes/",  "AClass.cs", "AFolder/AClass.part2.cs");
+                Console.WriteLine(actualXml);
+
+                var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""object"">
+        <xmldoc>
+            <summary>I have a summary</summary>
+            <example>In a partial type...</example>
+            Here is some more docs
+        </xmldoc>
+
+        <member name = ""Foo"" type=""Method"">
+            <signature>
+                <return typeId=""System.Int32"" typeName=""int"" />
+                <parameters>
+                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
+                </parameters>
+            </signature>
+            <xmldoc>
+                <summary>So do I</summary>
+                <returns>whatever you want.</returns>
+            </xmldoc>                
+        </member>
+
+        <member name = "".ctor"" type=""Method"">
+            <signature>
+                <parameters></parameters>
+            </signature>
+            <xmldoc></xmldoc>
+        </member>
+    </member>
+</doc>";
+                AssertXml(expectedXml, actualXml);
+
             }
             finally
             {
@@ -91,7 +124,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         private static string NormalizeXml(string xml)
         {
-            return Regex.Replace(xml, @"\r|\n|\t|\s", "");
+            return Regex.Replace(xml, @"\r|\n|\s{2,}", "");
         }
 
         private static string TestPathFor(string path)
