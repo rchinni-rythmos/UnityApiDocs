@@ -143,13 +143,16 @@ namespace Unity.DocTool.XMLDocHandler
 
         private static string BaseType(INamedTypeSymbol typeSymbol)
         {
+            if (typeSymbol.TypeKind == TypeKind.Interface)
+                return null;
+
             return typeSymbol.BaseType.TypeKind == TypeKind.Interface ? "Object" : typeSymbol.BaseType.Name;
         }
 
         private string InterfaceList(INamedTypeSymbol typeSymbol)
         {
             List<INamedTypeSymbol> interfaces = new List<INamedTypeSymbol>(typeSymbol.Interfaces);
-            if (typeSymbol.BaseType.TypeKind == TypeKind.Interface)
+            if (typeSymbol.BaseType?.TypeKind == TypeKind.Interface)
                 interfaces.Add(typeSymbol.BaseType);
 
             if (interfaces.Count == 0)
