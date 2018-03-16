@@ -175,6 +175,18 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             AssertXml(expectedXml, actualXml);
         }
 
+
+        //TODO: Test indexers
+        [Test]
+        public void Test_Properties_Are_Reported()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", "AClass.cs");
+            Console.WriteLine(actualXml);
+
+            Assert.That(actualXml, Contains.Substring("-----"), actualXml);
+        }
+
         [Test]
         public void Test_Attributes_Are_Reported()
         {

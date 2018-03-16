@@ -57,7 +57,7 @@ namespace Unity.DocTool.XMLDocHandler
             if (!Directory.Exists(compilationParameters.RootPath))
                 throw new ArgumentException($"Directory \"{compilationParameters.RootPath}\" does not exist.");
 
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
             var filePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories);
             var syntaxTrees = filePaths.Select(
                 p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(compilationParameters.RootPath.Length))).ToArray();
@@ -108,8 +108,9 @@ namespace Unity.DocTool.XMLDocHandler
         </xmldoc>");
 
                         var members = typeSymbol.GetMembers()
-                            .Where(m => m.Kind != SymbolKind.NamedType && 
+                            .Where(m => m.Kind != SymbolKind.NamedType &&
                                         m.IsPublicApi());
+
                         foreach (var member in members)
                         {
                             xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}"">
@@ -164,24 +165,49 @@ namespace Unity.DocTool.XMLDocHandler
             {
                 case SymbolKind.Field: return member.Name;
                 case SymbolKind.Method:
-                {
-                    var method = (IMethodSymbol) member;
-                    var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
-                    return $@"
+                    {
+                        var method = (IMethodSymbol)member;
+                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
+                        return $@"
 <accessibility>{member.DeclaredAccessibility}</accessibility>
 {returnXml}
-<parameters>{ParametersSignature(method)}</parameters>";
-                }
+<parameters>{ParametersSignature(method.Parameters)}</parameters>";
+                    }
+
+                case SymbolKind.Property:
+                    {
+                        var property = (IPropertySymbol)member;
+                        var returnXml = $"<type typeId=\"{property.Type.Id()}\" typeName=\"{property.Type.ToDisplayString()}\" />";
+                        var accessorsXml = string.Empty;
+
+                        if (property.GetMethod != null)
+                        {
+                            accessorsXml = $"<get><accessibility>{property.GetMethod.DeclaredAccessibility}</accessibility></get>";
+                        }
+
+                        if (property.SetMethod != null)
+                        {
+                            accessorsXml += $"<set><accessibility>{property.SetMethod.DeclaredAccessibility}</accessibility></set>";
+                        }
+
+
+                        return $@"
+<accessibility>{member.DeclaredAccessibility}</accessibility>
+{returnXml}
+<parameters>{ParametersSignature(property.Parameters)}</parameters>";
+
+                        return returnXml;
+                    }
 
                 default:
                     throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
             }
         }
 
-        private string ParametersSignature(IMethodSymbol method)
+        private string ParametersSignature(IEnumerable<IParameterSymbol> parameters)
         {
             var sb = new StringBuilder();
-            foreach (var parameter in method.Parameters)
+            foreach (var parameter in parameters)
             {
                 sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\" />");
             }
