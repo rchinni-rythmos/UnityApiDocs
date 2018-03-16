@@ -15,19 +15,19 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitClassDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitEnumDeclaration(node);
         }
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitInterfaceDeclaration(node);
         }
 
@@ -41,11 +41,11 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitStructDeclaration(node);
         }
 
-        private bool AddTypeIfPublicAPI(BaseTypeDeclarationSyntax node)
+        private bool AddTypeIfPublicApi(BaseTypeDeclarationSyntax node)
         {
             var symbol = semanticModel.GetDeclaredSymbol(node);
             if (symbol.IsPublicApi())

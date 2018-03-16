@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Unity.DocTool.XMLDocHandler.Tests.TestTypes;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
@@ -136,14 +137,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <xmldoc>    
             </xmldoc>
         </member>
-
-        <member name = "".ctor"" type=""Method"">
-            <signature>
-                <accessibility>Public</accessibility>
-                <parameters></parameters>
-            </signature>
-            <xmldoc></xmldoc>
-        </member>
     </member>
 </doc>";
             AssertXml(expectedXml, actualXml);
@@ -178,13 +171,65 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         //TODO: Test indexers
         [Test]
-        public void Test_Properties_Are_Reported()
+        public void Test_Property_Is_Reported()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass", "AClass.cs");
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty", "ClassWithProperty.cs");
             Console.WriteLine(actualXml);
 
-            Assert.That(actualXml, Contains.Substring("-----"), actualXml);
+            string expectedXml = @"<member name = ""Value"" type=""Property"">
+<signature>
+    <accessibility>Public</accessibility>
+    <type typeId=""System.Int32"" typeName=""int"" />
+    <get><accessibility>Public</accessibility></get>
+    <parameters></parameters>
+</signature>
+<xmldoc>
+                
+    <summary>
+    Value property
+    </summary>
+
+
+</xmldoc>
+</member>";
+
+            Assert.That(Normalize(actualXml), Contains.Substring(Normalize(expectedXml)), actualXml);
+        }
+        [Test]
+        public void Test_PropertyWithIndexer_IsReported()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithIndexer", "ClassWithIndexer.cs");
+            Console.WriteLine(actualXml);
+
+            string expectedXml = @"  <?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""ClassWithIndexer"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        
+        <xmldoc>
+        
+        </xmldoc><member name = ""this[]"" type=""Property"">
+            <signature>
+<accessibility>Public</accessibility>
+<type typeId=""System.Int32"" typeName=""int"" />
+
+<get><accessibility>Public</accessibility></get>
+<set><accessibility>Protected</accessibility></set>
+<parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int"" />
+</parameters></signature>
+            <xmldoc>
+                
+    <summary>
+    Indexer property
+    </summary>
+
+
+            </xmldoc>
+        </member>
+</member></doc>";
+            
+            AssertXml(expectedXml, actualXml);
         }
 
         [Test]

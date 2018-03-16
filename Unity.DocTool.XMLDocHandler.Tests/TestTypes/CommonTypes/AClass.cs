@@ -22,16 +22,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
         {
         }
 
-
-        /// <summary>
-        /// Value property
-        /// </summary>
-        public int Value
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// So do I
         /// </summary>

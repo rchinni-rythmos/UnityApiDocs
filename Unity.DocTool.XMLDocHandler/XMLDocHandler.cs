@@ -75,7 +75,7 @@ namespace Unity.DocTool.XMLDocHandler
 
             return getTypesVisitor.GetXml();
         }
-
+        
         public string GetTypeDocumentation(string id, params string[] paths)
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
@@ -109,7 +109,8 @@ namespace Unity.DocTool.XMLDocHandler
 
                         var members = typeSymbol.GetMembers()
                             .Where(m => m.Kind != SymbolKind.NamedType &&
-                                        m.IsPublicApi());
+                                        m.MayHaveXmlDoc() &&
+                                        !m.IsImplicitlyDeclared);
 
                         foreach (var member in members)
                         {
@@ -180,23 +181,22 @@ namespace Unity.DocTool.XMLDocHandler
                         var returnXml = $"<type typeId=\"{property.Type.Id()}\" typeName=\"{property.Type.ToDisplayString()}\" />";
                         var accessorsXml = string.Empty;
 
-                        if (property.GetMethod != null)
+                        if (property.GetMethod != null && property.GetMethod.IsPublicApi())
                         {
-                            accessorsXml = $"<get><accessibility>{property.GetMethod.DeclaredAccessibility}</accessibility></get>";
+                            accessorsXml = $"\n<get><accessibility>{property.GetMethod.DeclaredAccessibility}</accessibility></get>";
                         }
 
-                        if (property.SetMethod != null)
+                        if (property.SetMethod != null && property.SetMethod.IsPublicApi())
                         {
-                            accessorsXml += $"<set><accessibility>{property.SetMethod.DeclaredAccessibility}</accessibility></set>";
+                            accessorsXml += $"\n<set><accessibility>{property.SetMethod.DeclaredAccessibility}</accessibility></set>";
                         }
 
 
                         return $@"
 <accessibility>{member.DeclaredAccessibility}</accessibility>
 {returnXml}
+{accessorsXml}
 <parameters>{ParametersSignature(property.Parameters)}</parameters>";
-
-                        return returnXml;
                     }
 
                 default:
