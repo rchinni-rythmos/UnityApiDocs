@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Unity.DocTool.XMLDocHandler.Tests.TestTypes;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
@@ -179,8 +177,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             AssertXml(expectedXml, actualXml);
         }
 
-
-        //TODO: Test indexers
         [Test]
         public void Test_Property_Is_Reported()
         {
@@ -207,6 +203,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
             Assert.That(Normalize(actualXml), Contains.Substring(Normalize(expectedXml)), actualXml);
         }
+
         [Test]
         public void Test_PropertyWithIndexer_IsReported()
         {

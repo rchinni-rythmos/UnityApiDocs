@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using NUnit.Framework;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
@@ -15,7 +10,18 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         public void SavesBackToSource()
         {
             var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-            string newDocXml = "";
+            string newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
+    <doc version=""3"">
+        <member name=""AnEnum"" type = ""Enum"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Enum"">
+        
+        <xmldoc>
+<![CDATA[
+/// <summary>
+/// Some Docs
+/// </summary>
+]]>
+        </xmldoc></member></doc>
+";
             handler.SetType(newDocXml, "AnEnum.cs");
             var actualSource = File.ReadAllText("TestTypes/CommonTypes/AnEnum.cs");
             var expectedSource = @"
