@@ -93,9 +93,9 @@ namespace Unity.DocTool.XMLDocHandler
             return typeSymbol.TypeKind.ToString();
         }
 
-        private string GetPaths(IGrouping<string, INamedTypeSymbol> group)
+        private string GetPaths(IGrouping<string, INamedTypeSymbol> groupTypes)
         {
-            var paths = group.SelectMany(t => t.Locations).Select(l => l.SourceTree.FilePath).Distinct();
+            var paths = groupTypes.SelectMany(t => t.Locations).Select(l => l.SourceTree.FilePath).Distinct();
             return paths.Aggregate("", (acc, curr) => acc + $"<path>{curr}</path>\r\n");
         }
 

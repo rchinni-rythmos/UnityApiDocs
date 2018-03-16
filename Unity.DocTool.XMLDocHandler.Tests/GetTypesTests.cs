@@ -11,6 +11,17 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     public class XmlDocHandlerTest : XmlDocHandlerTestBase
     {
         [Test]
+        public void GetTypes_Returns_Relative_Path_When_Given_Path_Without_Trailing_Slash()
+        {
+            var testFileDirectory = TestPathFor("TestTypes/CommonTypes");
+            var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
+            string xmlActual = handler.GetTypesXml();
+
+            Assert.That(xmlActual, Contains.Substring("<path>AClass.cs</path>"));
+            Assert.That(xmlActual, Contains.Substring(@"<path>AFolder\AClass.part2.cs</path>"));
+        }
+
+        [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
             var testFileDirectory = TestPathFor("TestTypes/CommonTypes/");
@@ -145,7 +156,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Documentation_Under_Conditional_Compilation_Symbols_Works()
         {
-            Assert.Fail("Not implementated yet");
+            Assert.Inconclusive("Not implementated yet");
         }
 
         [Test]
@@ -235,19 +246,19 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Attributes_Are_Reported()
         {
-            Assert.Fail("Not implementated yet");
+            Assert.Inconclusive("Not implementated yet");
         }
 
         [Test]
         public void Test_Generic_Types()
         {
-            Assert.Fail("Not implementated yet");
+            Assert.Inconclusive("Not implementated yet");
         }
 
         [Test]
         public void Test_Generic_Members()
         {
-            Assert.Fail("Not implementated yet");
+            Assert.Inconclusive("Not implementated yet");
         }
 
         private void AssertXml(string expectedXml, string actualXml)

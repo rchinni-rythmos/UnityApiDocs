@@ -59,8 +59,12 @@ namespace Unity.DocTool.XMLDocHandler
 
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
             var filePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories);
+            var startIndex = compilationParameters.RootPath.Length + (compilationParameters.RootPath.EndsWith("\\") || compilationParameters.RootPath.EndsWith("/") ? 0 : 1);
             var syntaxTrees = filePaths.Select(
-                p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(compilationParameters.RootPath.Length))).ToArray();
+                p =>
+                {
+                    return SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p.Substring(startIndex));
+                }).ToArray();
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
