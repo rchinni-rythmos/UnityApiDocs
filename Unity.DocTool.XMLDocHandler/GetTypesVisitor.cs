@@ -101,6 +101,9 @@ namespace Unity.DocTool.XMLDocHandler
 
         private string GetNamespace(INamespaceOrTypeSymbol t)
         {
+            if (t.ContainingNamespace.IsGlobalNamespace)
+                return string.Empty;
+
             return t.ContainingNamespace.FullyQualifiedName(true, false);
         }
 
