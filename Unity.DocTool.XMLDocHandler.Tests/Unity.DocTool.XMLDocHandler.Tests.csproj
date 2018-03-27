@@ -64,6 +64,9 @@
     <Compile Include="TestTypes\CommonTypes\InternalInterface.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\SimpleClassWithXmlDoc.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="XmlDocHandlerTestBase.cs" />
   </ItemGroup>
   <ItemGroup>

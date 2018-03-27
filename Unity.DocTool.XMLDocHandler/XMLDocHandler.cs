@@ -326,66 +326,77 @@ namespace Unity.DocTool.XMLDocHandler
         /// 
         public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            var enumDef = _semanticModel.GetDeclaredSymbol(node);
-            if (enumDef != null)
-            {
-                //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
-                var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}']");
-                if (docNode != null)
-                {
-                    var docTrivia = node.GetLeadingTrivia();
-                    var docT = docTrivia.FirstOrDefault(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
-
-                    if (docT.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
-                    {
-                        // update
-                    }
-                    else
-                    {
-                        // add
-                        var comment = string.Join("\n", docNode.InnerText.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Select(item => "/// " + item ));
-                        var syntaxTree = CSharpSyntaxTree.ParseText(comment);
-                        var xmlDocumentNode = syntaxTree.GetRoot(); //.WithTrailingTrivia(SyntaxTriviaList.Create(SyntaxFactory.LineFeed));
-
-                        return node.WithLeadingTrivia(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
-                    }
-                }
+            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
+            if (withLeadingTrivia != null)
+                return withLeadingTrivia;
                 
-                //var t = CSharpSyntaxTree.ParseText($"/// <example>{documentationTarget.Kind()}</example>");
+            //    //var t = CSharpSyntaxTree.ParseText($"/// <example>{documentationTarget.Kind()}</example>");
 
-                //return SyntaxFactory.DocumentationCommentTrivia(SyntaxKind.SingleLineDocumentationCommentTrivia)
-                //                    .WithLeadingTrivia(root.GetLeadingTrivia());
+            //    //return SyntaxFactory.DocumentationCommentTrivia(SyntaxKind.SingleLineDocumentationCommentTrivia)
+            //    //                    .WithLeadingTrivia(root.GetLeadingTrivia());
 
-            }
+            //}
             return base.VisitEnumDeclaration(node);
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            throw new NotSupportedException($"Classes are not supported: {node.Identifier}");
-            //return base.VisitClassDeclaration(node);
+            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
+            if (withLeadingTrivia != null)
+                return withLeadingTrivia;
+
+            return base.VisitClassDeclaration(node);
         }
 
-        public override SyntaxNode VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node)
+        private SyntaxNode AddOrUpdateXmlDoc(BaseTypeDeclarationSyntax node)
         {
-            var documentationTarget = node.ParentTrivia.Token.Parent;
-            var typeSymbol = _semanticModel.GetSymbolInfo(documentationTarget);
-
-            if (typeSymbol.Symbol.Kind == SymbolKind.NamedType)
+            var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
+            if (typeSymbol == null)
+                return null;
+            
+            //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
+            var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}']");
+            if (docNode != null)
             {
-                var typeXmlDocNode = _xmlDoc.SelectSingleNode($"/doc/member[@name='{documentationTarget}'"); //TODO: Check namespace
-                if (typeXmlDocNode != null)
+                var docTrivia = node.GetLeadingTrivia();
+                var docT = docTrivia.FirstOrDefault(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
+
+                if (docT.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
                 {
+                    // if we are updating the documentation on a node, just remove the existing one.
+                    node = node.WithoutLeadingTrivia();
                 }
+
+                var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Select(item => "/// " + item));
+                var syntaxTree = CSharpSyntaxTree.ParseText(comment);
+                var xmlDocumentNode = syntaxTree.GetRoot();
+
+                return node.WithLeadingTrivia(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
             }
 
-            var t = CSharpSyntaxTree.ParseText(
-                $"///");
-
-            var root = t.GetRoot();
-            return SyntaxFactory.DocumentationCommentTrivia(
-                                SyntaxKind.SingleLineDocumentationCommentTrivia).WithLeadingTrivia(root.GetLeadingTrivia());
-
+            return null;
         }
+
+        //public override SyntaxNode VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node)
+        //{
+        //    var documentationTarget = node.ParentTrivia.Token.Parent;
+        //    var typeSymbol = _semanticModel.GetSymbolInfo(documentationTarget);
+
+        //    if (typeSymbol.Symbol.Kind == SymbolKind.NamedType)
+        //    {
+        //        var typeXmlDocNode = _xmlDoc.SelectSingleNode($"/doc/member[@name='{documentationTarget}'"); //TODO: Check namespace
+        //        if (typeXmlDocNode != null)
+        //        {
+        //        }
+        //    }
+
+        //    var t = CSharpSyntaxTree.ParseText(
+        //        $"///");
+
+        //    var root = t.GetRoot();
+        //    return SyntaxFactory.DocumentationCommentTrivia(
+        //                        SyntaxKind.SingleLineDocumentationCommentTrivia).WithLeadingTrivia(root.GetLeadingTrivia());
+
+        //}
     }
 }

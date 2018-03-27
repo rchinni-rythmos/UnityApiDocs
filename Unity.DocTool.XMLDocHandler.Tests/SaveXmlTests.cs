@@ -7,7 +7,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     class SaveXmlTests : XmlDocHandlerTestBase
     {
         [Test]
-        public void SavesBackToSource()
+        public void Add_New_Comment_Works()
         {
             var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
 
@@ -32,6 +32,35 @@ Some Docs
     public enum AnEnum
     {
     }";
+            AssertSourceContains(expectedSource, actualSource);
+        }
+
+        [Test]
+        public void Update_Comments_Works()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
+
+            string newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
+    <doc version=""3"">
+        <member name=""SimpleClassWithXmlDoc"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+        <xmldoc>
+<![CDATA[
+<summary>Updated Doc</summary>
+]]>
+        </xmldoc></member></doc>
+";
+            handler.SetType(newDocXml, "SimpleClassWithXmlDoc.cs");
+
+            var actualSource = File.ReadAllText("TestTypes/SimpleClassWithXmlDoc.cs");
+            var expectedSource = @"
+    /// <summary>Updated Doc</summary>
+    public class SimpleClassWithXmlDoc
+    {
+        /// <summary>
+        /// Foo XmlDoc
+        /// </summary>
+        public void Foo() {}
+}";
             AssertSourceContains(expectedSource, actualSource);
         }
 
