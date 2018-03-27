@@ -228,7 +228,10 @@ namespace Unity.DocTool.XMLDocHandler
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var result = docUpdater.Visit(syntaxTree.GetRoot(), semanticModel);
 
-                Console.WriteLine(result.ToFullString());
+                if (result != syntaxTree.GetRoot())
+                {
+                    File.WriteAllText(syntaxTree.FilePath, result.ToFullString());
+                }
             }
 
             //var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -316,7 +319,11 @@ namespace Unity.DocTool.XMLDocHandler
             //return base.VisitInterfaceDeclaration(node);
             throw new NotSupportedException($"Interfaces are not supported: {node.Identifier}");
         }
-        
+
+        ///
+        /// <summary>teste</summary>
+        /// <example>what</example>
+        /// 
         public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
             var enumDef = _semanticModel.GetDeclaredSymbol(node);
@@ -336,9 +343,11 @@ namespace Unity.DocTool.XMLDocHandler
                     else
                     {
                         // add
+                        var comment = string.Join("\n", docNode.InnerText.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Select(item => "/// " + item ));
+                        var syntaxTree = CSharpSyntaxTree.ParseText(comment);
+                        var xmlDocumentNode = syntaxTree.GetRoot(); //.WithTrailingTrivia(SyntaxTriviaList.Create(SyntaxFactory.LineFeed));
 
-                        var t = CSharpSyntaxTree.ParseText(docNode.InnerText);
-                        return node.WithLeadingTrivia(t.GetRoot().GetLeadingTrivia());
+                        return node.WithLeadingTrivia(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
                     }
                 }
                 
