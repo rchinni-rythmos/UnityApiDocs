@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
 {
     /// <example>
     /// In a partial type...

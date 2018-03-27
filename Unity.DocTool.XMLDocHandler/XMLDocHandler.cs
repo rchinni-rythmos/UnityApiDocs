@@ -348,14 +348,24 @@ namespace Unity.DocTool.XMLDocHandler
             return base.VisitClassDeclaration(node);
         }
 
-        private SyntaxNode AddOrUpdateXmlDoc(BaseTypeDeclarationSyntax node)
+
+        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            var updatedNode = AddOrUpdateXmlDoc(node);
+            if (updatedNode != null)
+                return updatedNode;
+
+            return base.VisitPropertyDeclaration(node);
+        }
+
+        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node)
         {
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
             if (typeSymbol == null)
                 return null;
             
             //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
-            var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}']");
+            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
             if (docNode != null)
             {
                 var docTrivia = node.GetLeadingTrivia();
@@ -367,7 +377,7 @@ namespace Unity.DocTool.XMLDocHandler
                     node = node.WithoutLeadingTrivia();
                 }
 
-                var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Select(item => "/// " + item));
+                var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Where(x => !string.IsNullOrWhiteSpace(x)).Select(item => "/// " + item));
                 var syntaxTree = CSharpSyntaxTree.ParseText(comment);
                 var xmlDocumentNode = syntaxTree.GetRoot();
 
