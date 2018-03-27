@@ -29,9 +29,11 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
+            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
+            if (withLeadingTrivia != null)
+                return withLeadingTrivia;
 
-            //return base.VisitInterfaceDeclaration(node);
-            throw new NotSupportedException($"Interfaces are not supported: {node.Identifier}");
+            return base.VisitInterfaceDeclaration(node);
         }
 
         ///
@@ -43,13 +45,7 @@ namespace Unity.DocTool.XMLDocHandler
             var withLeadingTrivia = AddOrUpdateXmlDoc(node);
             if (withLeadingTrivia != null)
                 return withLeadingTrivia;
-                
-            //    //var t = CSharpSyntaxTree.ParseText($"/// <example>{documentationTarget.Kind()}</example>");
 
-            //    //return SyntaxFactory.DocumentationCommentTrivia(SyntaxKind.SingleLineDocumentationCommentTrivia)
-            //    //                    .WithLeadingTrivia(root.GetLeadingTrivia());
-
-            //}
             return base.VisitEnumDeclaration(node);
         }
 

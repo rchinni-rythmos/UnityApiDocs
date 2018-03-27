@@ -93,11 +93,11 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <interface typeId=""System.Collections.IEnumerable"" typeName=""IEnumerable"" />
             <interface typeId=""System.ICloneable"" typeName=""ICloneable"" />
         </interfaces>
-        <xmldoc>
+        <xmldoc><![CDATA[
             <summary>I have a summary</summary>
             <example>In a partial type...</example>
             Here is some more docs
-        </xmldoc>
+        ]]></xmldoc>
 
         <member name = ""Foo"" type=""Method"">
             <signature>
@@ -107,10 +107,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
                 </parameters>
             </signature>
-            <xmldoc>
+            <xmldoc><![CDATA[
                 <summary>So do I</summary>
                 <returns>whatever you want.</returns>
-            </xmldoc>                
+            ]]></xmldoc>                
         </member>
 
         <member name = ""VoidProtectedMethod"" type=""Method"">
@@ -120,9 +120,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <parameters>
                 </parameters>
             </signature>
-            <xmldoc>
+            <xmldoc><![CDATA[
                 some docs
-            </xmldoc>                
+            ]]></xmldoc>                
         </member>
         <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"">
             <signature>
@@ -130,12 +130,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator"" />
                 <parameters></parameters>
             </signature>
-            <xmldoc>
+            <xmldoc><![CDATA[
                 <summary>
                 Explicit Implementation
                 </summary>
                 <returns></returns>
-            </xmldoc>
+            ]]></xmldoc>
         </member>
         <member name = ""Clone"" type=""Method"">
             <signature>
@@ -143,8 +143,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <return typeId=""System.Object"" typeName=""object"" />
                 <parameters></parameters>
             </signature>
-            <xmldoc>    
-            </xmldoc>
+            <xmldoc><![CDATA[    
+            ]]></xmldoc>
         </member>
     </member>
 </doc>";
@@ -167,11 +167,11 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
-        <xmldoc>
+        <xmldoc><![CDATA[
             <summary>
             I am a nested interface
             </summary>
-        </xmldoc>
+        ]]></xmldoc>
     </member>
 </doc>";
             AssertXml(expectedXml, actualXml);
@@ -191,14 +191,14 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     <get><accessibility>Public</accessibility></get>
     <parameters></parameters>
 </signature>
-<xmldoc>
+<xmldoc><![CDATA[
                 
     <summary>
     Value property
     </summary>
 
 
-</xmldoc>
+]]></xmldoc>
 </member>";
 
             Assert.That(Normalize(actualXml), Contains.Substring(Normalize(expectedXml)), actualXml);
@@ -215,9 +215,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     <doc version=""3"">
         <member name=""ClassWithIndexer"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         
-        <xmldoc>
+        <xmldoc><![CDATA[
         
-        </xmldoc><member name = ""this[]"" type=""Property"">
+        ]]></xmldoc><member name = ""this[]"" type=""Property"">
             <signature>
 <accessibility>Public</accessibility>
 <type typeId=""System.Int32"" typeName=""int"" />
@@ -226,14 +226,14 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <set><accessibility>Protected</accessibility></set>
 <parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int"" />
 </parameters></signature>
-            <xmldoc>
+            <xmldoc><![CDATA[
                 
     <summary>
     Indexer property
     </summary>
 
 
-            </xmldoc>
+            ]]></xmldoc>
         </member>
 </member></doc>";
             

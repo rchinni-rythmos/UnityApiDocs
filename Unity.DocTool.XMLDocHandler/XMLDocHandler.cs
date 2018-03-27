@@ -94,7 +94,7 @@ namespace Unity.DocTool.XMLDocHandler
         <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
         {InterfaceList(typeSymbol)}
         <xmldoc>
-        { extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}
+            <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
         </xmldoc>");
 
                         var members = typeSymbol.GetMembers()
@@ -107,7 +107,7 @@ namespace Unity.DocTool.XMLDocHandler
                             xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}"">
             <signature>{SignatureFor(member)}</signature>
             <xmldoc>
-                { extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}
+                <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
             </xmldoc>
         </member>
 ");

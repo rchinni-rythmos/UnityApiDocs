@@ -97,12 +97,37 @@ Some Docs
     }",
                     sourcePath = "TestTypes/CommonTypes/AnEnum.cs"
                 }).SetName("Add_To_Enum");
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+        <xmldoc>
+            <![CDATA[<summary>
+Updated Docs
+</summary>]]>
+        </xmldoc>
+    </member>
+</doc>",
+                    expectedSource = @"    /// <summary>
+    /// I have a summary
+    /// </summary>
+    public partial class AClass : IEnumerable, ICloneable
+    {
+        /// <summary>
+        /// Updated Docs
+        /// </summary>
+        public interface INestedInterface
+        {",
+                    sourcePath = "TestTypes/CommonTypes/AClass.cs"
+                }).SetName("Update_Nested_Interface");
         }
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
         //TODO: Add tests for: Enuns, Interfaces, Delegates, Structs
-        //TODO: Add tests for: Inner Types, Namespaces, generics of same name
+        //TODO: Add tests for: generics of same name
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
