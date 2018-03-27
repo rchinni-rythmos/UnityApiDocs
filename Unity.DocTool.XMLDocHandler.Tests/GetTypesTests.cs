@@ -342,7 +342,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void Test_Generic_Types_With_Constraints()
         {
-            Assert.Inconclusive("Not implementated yet");
+            Assert.Inconclusive("Not implementated yet. Should expose enough information to produce consumer docs.");
         }
 
         [Test]
