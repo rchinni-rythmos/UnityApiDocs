@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -86,9 +85,13 @@ namespace Unity.DocTool.XMLDocHandler
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
+                        var containingType = typeSymbol.ContainingType != null ? 
+                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
+                            string.Empty;
+
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
+        <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
         {InterfaceList(typeSymbol)}
         <xmldoc>
         { extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}
@@ -293,120 +296,6 @@ namespace Unity.DocTool.XMLDocHandler
         //{
         //    base.VisitXmlElement(node);
         //    Console.WriteLine($"----\r\n{node}");
-        //}
-    }
-
-    internal class XmlDocReplacerVisitor : CSharpSyntaxRewriter
-    {
-        private SemanticModel _semanticModel;
-        private XmlDocument _xmlDoc;
-
-        public XmlDocReplacerVisitor(string docXml) : base(true)
-        {
-            _xmlDoc = new XmlDocument();
-            _xmlDoc.LoadXml(docXml);
-        }
-
-        internal SyntaxNode Visit(SyntaxNode rootNode, SemanticModel semanticModel)
-        {
-            _semanticModel = semanticModel;
-            return Visit(rootNode);
-        }
-
-        public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
-        {
-
-            //return base.VisitInterfaceDeclaration(node);
-            throw new NotSupportedException($"Interfaces are not supported: {node.Identifier}");
-        }
-
-        ///
-        /// <summary>teste</summary>
-        /// <example>what</example>
-        /// 
-        public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
-        {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-                
-            //    //var t = CSharpSyntaxTree.ParseText($"/// <example>{documentationTarget.Kind()}</example>");
-
-            //    //return SyntaxFactory.DocumentationCommentTrivia(SyntaxKind.SingleLineDocumentationCommentTrivia)
-            //    //                    .WithLeadingTrivia(root.GetLeadingTrivia());
-
-            //}
-            return base.VisitEnumDeclaration(node);
-        }
-
-        public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-
-            return base.VisitClassDeclaration(node);
-        }
-
-
-        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-        {
-            var updatedNode = AddOrUpdateXmlDoc(node);
-            if (updatedNode != null)
-                return updatedNode;
-
-            return base.VisitPropertyDeclaration(node);
-        }
-
-        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node)
-        {
-            var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
-            if (typeSymbol == null)
-                return null;
-            
-            //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
-            if (docNode != null)
-            {
-                var docTrivia = node.GetLeadingTrivia();
-                var docT = docTrivia.FirstOrDefault(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
-
-                if (docT.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
-                {
-                    // if we are updating the documentation on a node, just remove the existing one.
-                    node = node.WithoutLeadingTrivia();
-                }
-
-                var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Where(x => !string.IsNullOrWhiteSpace(x)).Select(item => "/// " + item));
-                var syntaxTree = CSharpSyntaxTree.ParseText(comment);
-                var xmlDocumentNode = syntaxTree.GetRoot();
-
-                return node.WithLeadingTrivia(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
-            }
-
-            return null;
-        }
-
-        //public override SyntaxNode VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node)
-        //{
-        //    var documentationTarget = node.ParentTrivia.Token.Parent;
-        //    var typeSymbol = _semanticModel.GetSymbolInfo(documentationTarget);
-
-        //    if (typeSymbol.Symbol.Kind == SymbolKind.NamedType)
-        //    {
-        //        var typeXmlDocNode = _xmlDoc.SelectSingleNode($"/doc/member[@name='{documentationTarget}'"); //TODO: Check namespace
-        //        if (typeXmlDocNode != null)
-        //        {
-        //        }
-        //    }
-
-        //    var t = CSharpSyntaxTree.ParseText(
-        //        $"///");
-
-        //    var root = t.GetRoot();
-        //    return SyntaxFactory.DocumentationCommentTrivia(
-        //                        SyntaxKind.SingleLineDocumentationCommentTrivia).WithLeadingTrivia(root.GetLeadingTrivia());
-
         //}
     }
 }

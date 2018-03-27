@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
@@ -6,77 +7,20 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     [TestFixture]
     class SaveXmlTests : XmlDocHandlerTestBase
     {
-        //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
-        //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
-        //TODO: Add tests for: Enuns, Interfaces, Delegates, Structs
 
-        [Test]
-        public void Add_New_Comment_Works()
+        public struct UpdateTestData
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-
-            string newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
-    <doc version=""3"">
-        <member name=""AnEnum"" type = ""Enum"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Enum"">
-        
-        <xmldoc>
-<![CDATA[
-<summary>
-Some Docs
-</summary>
-]]>
-        </xmldoc></member></doc>
-";
-            handler.SetType(newDocXml, "AnEnum.cs");
-            var actualSource = File.ReadAllText("TestTypes/CommonTypes/AnEnum.cs");
-            var expectedSource = @"
-    /// <summary>
-    /// Some Docs
-    /// </summary>
-    public enum AnEnum
-    {
-    }";
-            AssertSourceContains(expectedSource, actualSource);
+            public string newDocXml;
+            public string expectedSource;
+            public string sourcePath;
         }
 
-
-        [Test]
-        public void Update_Comments_On_Class_Works()
+        public static IEnumerable<TestCaseData> UpdateTestCases()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
-
-            string newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
-    <doc version=""3"">
-        <member name=""SimpleClassWithXmlDoc"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
-        <xmldoc>
-<![CDATA[
-<summary>Updated Doc</summary>
-]]>
-        </xmldoc></member></doc>
-";
-            handler.SetType(newDocXml, "SimpleClassWithXmlDoc.cs");
-
-            var actualSource = File.ReadAllText("TestTypes/SimpleClassWithXmlDoc.cs");
-            var expectedSource = @"
-    /// <summary>Updated Doc</summary>
-    public class SimpleClassWithXmlDoc
-    {
-        /// <summary>
-        /// Foo XmlDoc
-        /// </summary>
-        public void Foo() {}
-}";
-            AssertSourceContains(expectedSource, actualSource);
-        }
-
-        [Test]
-        public void Update_Comments_On_Property_Works()
-        {
-            var testFilePath = Path.GetTempFileName();
-            File.Copy("TestTypes/ClassWithProperty.cs", testFilePath, true);
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath)));
-
-            string newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""ClassWithProperty"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
             <member name = ""Value"" type=""Property"">
@@ -93,12 +37,8 @@ Some Docs
 ]]>
             </xmldoc>
         </member>
-</member></doc>";
-
-            handler.SetType(newDocXml, Path.GetFileName(testFilePath));
-
-            var actualSource = File.ReadAllText(testFilePath);
-            var expectedSource = @"
+</member></doc>",
+                    expectedSource = @"
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {    
     class ClassWithProperty
@@ -107,8 +47,74 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
     ///New Value Propery
     ///</summary>
         public int Value
-";
-            AssertSourceContains(expectedSource, actualSource);
+",
+                    sourcePath = "TestTypes/ClassWithProperty.cs"
+                }).SetName("Update_Property");
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
+    <doc version=""3"">
+        <member name=""SimpleClassWithXmlDoc"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+<![CDATA[
+<summary>Updated Doc</summary>
+]]>
+        </xmldoc></member></doc>
+",
+                    expectedSource = @"
+    /// <summary>Updated Doc</summary>
+    public class SimpleClassWithXmlDoc
+    {
+        /// <summary>
+        /// Foo XmlDoc
+        /// </summary>
+        public void Foo() {}
+}",
+                    sourcePath = "TestTypes/SimpleClassWithXmlDoc.cs"
+                }).SetName("Update_Class");
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
+    <doc version=""3"">
+        <member name=""AnEnum"" type = ""Enum"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Enum"">
+        
+        <xmldoc>
+<![CDATA[
+<summary>
+Some Docs
+</summary>
+]]>
+        </xmldoc></member></doc>
+",
+                    expectedSource = @"
+    /// <summary>
+    /// Some Docs
+    /// </summary>
+    public enum AnEnum
+    {
+    }",
+                    sourcePath = "TestTypes/CommonTypes/AnEnum.cs"
+                }).SetName("Add_To_Enum");
+        }
+
+        //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
+        //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
+        //TODO: Add tests for: Enuns, Interfaces, Delegates, Structs
+        //TODO: Add tests for: Inner Types, Namespaces, generics of same name
+        [Test]
+        [TestCaseSource(nameof(UpdateTestCases))]
+        public void Update(UpdateTestData data)
+        {
+            var testFilePath = Path.GetTempFileName();
+            File.Copy(data.sourcePath, testFilePath, true);
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath)));
+
+            handler.SetType(data.newDocXml, Path.GetFileName(testFilePath));
+
+            var actualSource = File.ReadAllText(testFilePath);
+            AssertSourceContains(data.expectedSource, actualSource);
         }
 
         private void AssertSourceContains(string expectedSource, string actualSource, bool normalize = true)

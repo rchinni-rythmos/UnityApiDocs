@@ -166,7 +166,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type = ""Interface"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
         <xmldoc>
             <summary>
             I am a nested interface
