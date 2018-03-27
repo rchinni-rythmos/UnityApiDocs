@@ -64,6 +64,9 @@
     <Compile Include="TestTypes\CommonTypes\InternalInterface.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\Generics\GenericClass.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\SimpleClassWithXmlDoc.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

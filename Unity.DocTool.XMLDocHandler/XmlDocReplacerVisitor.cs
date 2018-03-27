@@ -75,7 +75,7 @@ namespace Unity.DocTool.XMLDocHandler
                 return null;
 
             //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
-            StringBuilder selector = new StringBuilder($"@name='{typeSymbol.Name}' and @namespace='{typeSymbol.ContainingNamespace}'");
+            StringBuilder selector = new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
             if (typeSymbol.ContainingType != null)
                 selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
             

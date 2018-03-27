@@ -88,10 +88,10 @@ namespace Unity.DocTool.XMLDocHandler
                         var containingType = typeSymbol.ContainingType != null ? 
                             $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
                             string.Empty;
-
+                        
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""{typeSymbol.Name}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
+        <member name=""{typeSymbol.MetadataName}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
         {InterfaceList(typeSymbol)}
         <xmldoc>
             <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
@@ -236,13 +236,6 @@ namespace Unity.DocTool.XMLDocHandler
                     File.WriteAllText(syntaxTree.FilePath, result.ToFullString());
                 }
             }
-
-            //var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            //compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            //var compilation = CSharpCompilation.Create("Test", new[] {syntaxTree}, new MetadataReference[0], compilerOptions);
-
-            //xmlDoc.SelectNodes("/doc/member/member/xmldoc"); // for the members
-
         }
     }
 

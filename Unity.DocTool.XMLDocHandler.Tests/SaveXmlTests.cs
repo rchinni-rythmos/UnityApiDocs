@@ -122,11 +122,49 @@ Updated Docs
         {",
                     sourcePath = "TestTypes/CommonTypes/AClass.cs"
                 }).SetName("Update_Nested_Interface");
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>
+Overidden Docs
+</summary>]]>
+        </xmldoc>
+</member></doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+{
+    /// <summary>
+    /// Existing Docs for GenericClass
+    /// </summary>
+    public class GenericClass
+    {
+        /// <summary>
+        /// Existing Docs for GenericClass.Foo
+        /// </summary>
+        public void Foo()
+        {}
+    }
+    /// <summary>
+    /// Overidden Docs
+    /// </summary>
+    public class GenericClass<T>
+    {
+        /// <summary>
+        /// Existing GenericClass-T.Foo
+        /// </summary>
+        public void Foo()
+        {}
+    }",
+                    sourcePath = "TestTypes/Generics/GenericClass.cs"
+                }).SetName("Update_Generic");
         }
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
-        //TODO: Add tests for: Enuns, Interfaces, Delegates, Structs
+        //TODO: Add tests for: Delegates, Structs
         //TODO: Add tests for: generics of same name
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]

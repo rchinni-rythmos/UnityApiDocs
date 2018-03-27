@@ -80,6 +80,64 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         }
 
         [Test]
+        public void GetTypes_Generics_ReturnsCorrectXml()
+        {
+            var testFileDirectory = TestPathFor("TestTypes/Generics/");
+            var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
+            string xmlActual = handler.GetTypesXml();
+
+            var expected = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""1"">
+    <types>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass</id>
+            <parentId></parentId>
+            <name>GenericClass</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericClass.cs</path>
+
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1</id>
+            <parentId></parentId>
+            <name>GenericClass</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericClass.cs</path>
+
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClassWithConstraints`1</id>
+            <parentId></parentId>
+            <name>GenericClassWithConstraints</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericClass.cs</path>
+
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.ExtendsInterface</id>
+            <parentId></parentId>
+            <name>ExtendsInterface</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericClass.cs</path>
+
+            </relativeFilePaths>
+        </type></types></doc>";
+
+            AssertXml(expected, xmlActual);
+        }
+
+        [Test]
         public void GetType_Documentation_ReturnsCorrectXml()
         {
             var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
@@ -248,6 +306,41 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         [Test]
         public void Test_Generic_Types()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/Generics"));
+            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1", "GenericClass.cs");
+            Console.WriteLine(actualXml);
+
+            string expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[
+    <summary>
+    Existing Docs for GenericClass-T
+    </summary>
+
+]]>
+        </xmldoc><member name = ""Foo"" type=""Method"">
+            <signature>
+<accessibility>Public</accessibility>
+<return typeId=""System.Void"" typeName=""void"" />
+<parameters></parameters></signature>
+            <xmldoc>
+                <![CDATA[
+    <summary>
+    Existing GenericClass-T.Foo
+    </summary>
+
+]]>
+            </xmldoc>
+        </member>
+</member></doc>";
+            AssertXml(expectedXml, actualXml);
+        }
+
+        [Test]
+        public void Test_Generic_Types_With_Constraints()
         {
             Assert.Inconclusive("Not implementated yet");
         }

@@ -59,7 +59,7 @@ namespace Unity.DocTool.XMLDocHandler
 
         public string GetXml()
         {
-            var groups = types.GroupBy(t => t.FullyQualifiedName(true, false));
+            var groups = types.GroupBy(t => t.FullyQualifiedName(true, true));
             StringBuilder output = new StringBuilder();
 
             output.Append(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
