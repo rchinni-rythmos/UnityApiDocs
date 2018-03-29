@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -223,8 +224,15 @@ namespace Unity.DocTool.XMLDocHandler
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
             var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
 
-            var docUpdater = new XmlDocReplacerVisitor(docXml);
 
+            var partialInfoCollector = new PartialTypeInfoCollectorVisitor(docXml);
+            foreach (var syntaxTree in syntaxTrees)
+            {
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                partialInfoCollector.Visit(syntaxTree.GetRoot(), semanticModel);
+            }
+
+            var docUpdater = new XmlDocReplacerVisitor(docXml);
             foreach (var syntaxTree in syntaxTrees)
             {
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -235,6 +243,48 @@ namespace Unity.DocTool.XMLDocHandler
                     File.WriteAllText(syntaxTree.FilePath, result.ToFullString());
                 }
             }
+        }
+    }
+
+    public class PartialTypeInfoCollectorVisitor : CSharpSyntaxVisitor
+    {
+
+        /**
+         * 1) Find the right SyntaxNode should be updated (a)
+         * 2) Add all other partial SyntaxNode into a list (b)
+         * 3) In the *Updater Visitor* take that list and
+         *      3.1) When visiting node *a* update the documentation
+         *      3.2) When visiting node from *b* just wipe out the xml comments
+         */
+        private readonly XmlDocument _xmlDoc;
+        private SemanticModel _semanticModel;
+
+        public PartialTypeInfoCollectorVisitor(string content)
+        {
+            _xmlDoc = new XmlDocument();
+            _xmlDoc.LoadXml(content);
+        }
+
+        internal void Visit(SyntaxNode syntaxNode, SemanticModel semanticModel)
+        {
+            _semanticModel = semanticModel;
+            Visit(syntaxNode);
+        }
+
+
+        public override void VisitClassDeclaration(ClassDeclarationSyntax node)
+        {
+            base.VisitClassDeclaration(node);
+
+            var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
+            if (typeSymbol == null)
+                return;
+
+            var selector = new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
+            if (typeSymbol.ContainingType != null)
+                selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
+
+            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]/xmldoc");
         }
     }
 
