@@ -118,11 +118,8 @@ namespace Unity.DocTool.XMLDocHandler
                         return xml.ToString();
                     }
                 }
-
-                //getTypesVisitor.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
-            //return getTypesVisitor.GetXml();
             throw new Exception($"Type not found Id={id}");
         }
 
@@ -209,6 +206,8 @@ namespace Unity.DocTool.XMLDocHandler
 
         public void SetType(string docXml, params string[] sourcePaths)
         {
+            //TODO: Check if we need to visit newly instantiated AST nodes
+            //TODO: Extract common roslyn initializion code.
             IEnumerable<string> defines = new string[0];
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
 

@@ -361,7 +361,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         private static string TestPathFor(string path)
         {
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), path);
+            //TODO: Inline
+            return path;
         }
     }
 }

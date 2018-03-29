@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Unity.DocTool.XMLDocHandler.Extensions;
-using CSharpExtensions = Microsoft.CodeAnalysis.CSharpExtensions;
 
 namespace Unity.DocTool.XMLDocHandler
 {
@@ -100,7 +99,9 @@ namespace Unity.DocTool.XMLDocHandler
 
         private static SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node, XmlNode docNode)
         {
+            //TODO: check if we can get a null ref here. Does it make sense?
             if (docNode == null) return null;
+
             var docTrivia = node.GetLeadingTrivia();
             var docT = docTrivia.FirstOrDefault(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
 

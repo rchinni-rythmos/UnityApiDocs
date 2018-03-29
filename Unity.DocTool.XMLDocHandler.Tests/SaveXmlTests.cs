@@ -7,7 +7,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     [TestFixture]
     class SaveXmlTests : XmlDocHandlerTestBase
     {
-
         public struct UpdateTestData
         {
             public string newDocXml;
@@ -50,6 +49,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 ",
                     sourcePath = "TestTypes/ClassWithProperty.cs"
                 }).SetName("Update_Property");
+
             yield return new TestCaseData(
                 new UpdateTestData
                 {
@@ -97,6 +97,7 @@ Some Docs
     }",
                     sourcePath = "TestTypes/CommonTypes/AnEnum.cs"
                 }).SetName("Add_To_Enum");
+
             yield return new TestCaseData(
                 new UpdateTestData
                 {
@@ -122,6 +123,7 @@ Updated Docs
         {",
                     sourcePath = "TestTypes/CommonTypes/AClass.cs"
                 }).SetName("Update_Nested_Interface");
+
             yield return new TestCaseData(
                 new UpdateTestData
                 {
@@ -165,12 +167,12 @@ Overidden Docs
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
         //TODO: Add tests for: Delegates, Structs
-        //TODO: Add tests for: generics of same name
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
         {
             var testFilePath = Path.GetTempFileName();
+
             File.Copy(data.sourcePath, testFilePath, true);
             var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath)));
 
