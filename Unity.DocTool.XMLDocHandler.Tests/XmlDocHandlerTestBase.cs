@@ -13,8 +13,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         public void Init()
         {
             originalCurrentDirectory = Directory.GetCurrentDirectory();
-            var testRootFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Directory.SetCurrentDirectory(testRootFolder);
+            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
         }
 
         [TearDown]

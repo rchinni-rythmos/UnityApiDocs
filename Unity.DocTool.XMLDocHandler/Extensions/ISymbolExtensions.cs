@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 
 namespace Unity.DocTool.XMLDocHandler.Extensions
 {
@@ -30,12 +32,57 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             return t.QualifiedName(includeNamespace, useMetadataName);
         }
 
-        internal static bool IsPublicApi(this ISymbol symbol)
+        private static HashSet<MethodKind> implicitMethodKinds = new HashSet<MethodKind>
+            {
+                MethodKind.AnonymousFunction,
+                MethodKind.EventAdd,
+                MethodKind.EventRemove,
+                MethodKind.EventRaise,
+                MethodKind.PropertyGet,
+                MethodKind.PropertySet,
+                MethodKind.LocalFunction,
+                MethodKind.DelegateInvoke
+            };
+
+        internal static bool MayHaveXmlDoc(this ISymbol symbol)
         {
+            if (symbol is IMethodSymbol methodSymbol)
+            {
+                switch (methodSymbol.MethodKind)
+                {
+                    case MethodKind.StaticConstructor:
+                    case MethodKind.Ordinary:
+                    case MethodKind.UserDefinedOperator:
+                    case MethodKind.Destructor:
+                    case MethodKind.Constructor:
+                    case MethodKind.Conversion:
+                        break;
+                    case MethodKind.EventAdd:
+                    case MethodKind.EventRemove:
+                    case MethodKind.EventRaise:
+                    case MethodKind.PropertyGet:
+                    case MethodKind.PropertySet:
+                        return false;
+                    case MethodKind.ExplicitInterfaceImplementation:
+                        return true;
+                    case MethodKind.AnonymousFunction:
+                    case MethodKind.LocalFunction:
+                    case MethodKind.DelegateInvoke:
+                    case MethodKind.BuiltinOperator:
+                    case MethodKind.ReducedExtension:
+                    case MethodKind.DeclareMethod:
+                        throw new NotSupportedException($"Unsupported MethodKind: {methodSymbol.MethodKind}");
+                }
+            }
+
+            return IsPublicApi(symbol);
+        }
+
+        public static bool IsPublicApi(this ISymbol symbol)
+        {
+            //TODO: Take nested types into account.           
             var accessibility = symbol.DeclaredAccessibility;
-            var isExplicitImplementation = symbol is IMethodSymbol methodSymbol && methodSymbol.MethodKind == MethodKind.ExplicitInterfaceImplementation;
-            return isExplicitImplementation ||
-                   accessibility == Accessibility.Public ||
+            return accessibility == Accessibility.Public ||
                    accessibility == Accessibility.Protected ||
                    accessibility == Accessibility.ProtectedAndInternal;
         }

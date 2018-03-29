@@ -15,19 +15,19 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitClassDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitEnumDeclaration(node);
         }
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitInterfaceDeclaration(node);
         }
 
@@ -41,11 +41,11 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (AddTypeIfPublicAPI(node))
+            if (AddTypeIfPublicApi(node))
                 base.VisitStructDeclaration(node);
         }
 
-        private bool AddTypeIfPublicAPI(BaseTypeDeclarationSyntax node)
+        private bool AddTypeIfPublicApi(BaseTypeDeclarationSyntax node)
         {
             var symbol = semanticModel.GetDeclaredSymbol(node);
             if (symbol.IsPublicApi())
@@ -59,7 +59,7 @@ namespace Unity.DocTool.XMLDocHandler
 
         public string GetXml()
         {
-            var groups = types.GroupBy(t => t.FullyQualifiedName(true, false));
+            var groups = types.GroupBy(t => t.FullyQualifiedName(true, true));
             StringBuilder output = new StringBuilder();
 
             output.Append(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
@@ -93,14 +93,17 @@ namespace Unity.DocTool.XMLDocHandler
             return typeSymbol.TypeKind.ToString();
         }
 
-        private string GetPaths(IGrouping<string, INamedTypeSymbol> group)
+        private string GetPaths(IGrouping<string, INamedTypeSymbol> groupTypes)
         {
-            var paths = group.SelectMany(t => t.Locations).Select(l => l.SourceTree.FilePath).Distinct();
+            var paths = groupTypes.SelectMany(t => t.Locations).Select(l => l.SourceTree.FilePath).Distinct();
             return paths.Aggregate("", (acc, curr) => acc + $"<path>{curr}</path>\r\n");
         }
 
         private string GetNamespace(INamespaceOrTypeSymbol t)
         {
+            if (t.ContainingNamespace.IsGlobalNamespace)
+                return string.Empty;
+
             return t.ContainingNamespace.FullyQualifiedName(true, false);
         }
 
