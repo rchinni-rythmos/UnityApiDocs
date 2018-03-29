@@ -118,7 +118,7 @@ namespace Unity.DocTool.XMLDocHandler
                 else if (updated == false)
                 {
                     updated = true;
-                    newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia());
+                    newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
                 }
             }
 

@@ -207,7 +207,27 @@ Updated Docs
     public class ClassWithXmlDocsAndNormalComments
     {",
                     sourcePath = "TestTypes/ClassWithXmlDocsAndNormalComments.cs"
-                }).SetName("Update_Type_With_Non_Xml_Docs");
+                }).SetName("Update_With_Non_Xml_Docs");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""ClassWithMultipleXmlDocs"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>Only the summary</summary>]]>
+        </xmldoc>
+</member></doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>Only the summary</summary> 
+    // after summary
+    // after remarks
+    public class ClassWithMultipleXmlDocs
+    {",
+                    sourcePath = "TestTypes/ClassWithMultipleXmlDocs.cs"
+                }).SetName("Update_Multiple_Xml_Docs");
         }
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods

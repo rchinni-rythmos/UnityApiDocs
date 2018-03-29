@@ -49,6 +49,9 @@
     <Compile Include="TestTypes\ClassWithIndexer.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithMultipleXmlDocs.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithProperty.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
