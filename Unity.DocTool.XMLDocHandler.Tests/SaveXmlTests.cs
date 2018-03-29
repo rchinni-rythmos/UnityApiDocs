@@ -231,7 +231,7 @@ Updated Docs
         }
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
-        //TODO: Add tests for: Partials, Formating
+        //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates, Structs
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
@@ -246,6 +246,50 @@ Updated Docs
 
             var actualSource = File.ReadAllText(testFilePath);
             AssertSourceContains(data.expectedSource, actualSource);
+        }
+
+        //TODO: Partials: 
+        //          1) Udating comment on single partial, 
+        //          2) Updating comments in multiple partials (we should remove the comment in all but one partial)
+        //          3) Adding comments in multiple partials (ensure that comment end up in only one of the partials)
+        [Test]
+        public void Test_Update_Partials()
+        {
+            var testFilePath1 = Path.GetTempFileName();
+            var testFilePath2 = Path.GetTempFileName();
+
+            File.Copy("TestTypes/CommonTypes/AClass.cs", testFilePath1, true);
+            File.Copy("TestTypes/CommonTypes/AFolder/AClass.part2.cs", testFilePath2, true);
+
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath1)));
+
+            var newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+        <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
+    </member>
+</doc>
+";
+
+            handler.SetType(newContent, Path.GetFileName(testFilePath1), Path.GetFileName(testFilePath2));
+
+            var actualSource1 = File.ReadAllText(testFilePath1);
+            AssertSourceContains(@"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+{
+    public partial class AClass { }
+
+    /// <summary>new doc</summary>
+    public partial class AClass : IEnumerable, ICloneable
+    {
+", actualSource1);
+
+            var actualSource2 = File.ReadAllText(testFilePath2);
+            AssertSourceContains(@"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+{
+    //Here is a partial for implementation details...
+    public partial class AClass
+    {
+", actualSource2);
         }
 
         private void AssertSourceContains(string expectedSource, string actualSource, bool normalize = true)

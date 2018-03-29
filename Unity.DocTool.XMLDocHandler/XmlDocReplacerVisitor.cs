@@ -106,7 +106,6 @@ namespace Unity.DocTool.XMLDocHandler
             var xmlDocumentNode = syntaxTree.GetRoot();
 
             var newTrivia = SyntaxFactory.TriviaList();
-            //TODO: Test multiple XML docs in single type/member
 
             var updated = false;
             foreach (var trivia in docTrivia)

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
 {
+    public partial class AClass { }
+
     /// <summary>
     /// I have a summary
     /// </summary>
@@ -53,10 +53,5 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
         /// </summary>
         private void DoNotReport()
         {}
-    }
-
-    public partial class AClass
-    {
-
     }
 }
