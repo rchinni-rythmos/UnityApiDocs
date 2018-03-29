@@ -52,6 +52,9 @@
     <Compile Include="TestTypes\ClassWithProperty.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithXmlDocsAndNormalComments.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\CommonTypes\AClass.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

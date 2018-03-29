@@ -162,10 +162,56 @@ Overidden Docs
     }",
                     sourcePath = "TestTypes/Generics/GenericClass.cs"
                 }).SetName("Update_Generic");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+        <xmldoc>
+            <![CDATA[<summary>
+Updated Docs
+</summary>]]>
+        </xmldoc>
+    </member>
+</doc>",
+                    expectedSource = @"    /// <summary>
+    /// I have a summary
+    /// </summary>
+    public partial class AClass : IEnumerable, ICloneable
+    {
+        /// <summary>
+        /// Updated Docs
+        /// </summary>
+        public interface INestedInterface
+        {",
+                    sourcePath = "TestTypes/CommonTypes/AClass.cs"
+                }).SetName("Update_Nested_Interface");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""ClassWithXmlDocsAndNormalComments"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>Only the summary</summary>]]>
+        </xmldoc>
+</member></doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    // Type-Prefix
+    /// <summary>Only the summary</summary>
+    // Type-Sufix
+    public class ClassWithXmlDocsAndNormalComments
+    {",
+                    sourcePath = "TestTypes/ClassWithXmlDocsAndNormalComments.cs"
+                }).SetName("Update_Type_With_Non_Xml_Docs");
         }
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
-        //TODO: Add tests for: Partials, Formating, Ensure that we are not deleting non xmldoc
+        //TODO: Add tests for: Partials, Formating
         //TODO: Add tests for: Delegates, Structs
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
