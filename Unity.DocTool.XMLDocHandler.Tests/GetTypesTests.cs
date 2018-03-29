@@ -11,7 +11,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Returns_Relative_Path_When_Given_Path_Without_Trailing_Slash()
         {
-            var testFileDirectory = TestPathFor("TestTypes/CommonTypes");
+            var testFileDirectory = "TestTypes/CommonTypes";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -22,7 +22,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
-            var testFileDirectory = TestPathFor("TestTypes/CommonTypes/");
+            var testFileDirectory = "TestTypes/CommonTypes/";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -82,7 +82,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Generics_ReturnsCorrectXml()
         {
-            var testFileDirectory = TestPathFor("TestTypes/Generics/");
+            var testFileDirectory = "TestTypes/Generics/";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -357,12 +357,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             var normalizedActualXml = Normalize(actualXml);
 
             Assert.AreEqual(normalizedExpectedXml, normalizedActualXml, actualXml);
-        }
-
-        private static string TestPathFor(string path)
-        {
-            //TODO: Inline
-            return path;
         }
     }
 }
