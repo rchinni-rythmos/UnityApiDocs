@@ -111,6 +111,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CecilUtility.cs" />
     <Compile Include="Extensions\ISymbolExtensions.cs" />
     <Compile Include="GetTypesVisitor.cs" />
     <Compile Include="XMLDocHandler.cs" />

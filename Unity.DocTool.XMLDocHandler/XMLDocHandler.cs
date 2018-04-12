@@ -155,13 +155,23 @@ namespace Unity.DocTool.XMLDocHandler
         {
             switch (member.Kind)
             {
-                case SymbolKind.Field: return member.Name;
+                case SymbolKind.Field:
+                    {
+
+                        var field = (IFieldSymbol) member;
+                        var typeXml = TypeXml(field.Type);
+                        var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
+                        return $@"
+{accessibilityXml}
+{typeXml}";
+                    }
                 case SymbolKind.Method:
                     {
                         var method = (IMethodSymbol)member;
                         var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
+                        var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
-<accessibility>{member.DeclaredAccessibility}</accessibility>
+{accessibilityXml}
 {returnXml}
 <parameters>{ParametersSignature(method.Parameters)}</parameters>";
                     }
@@ -169,7 +179,8 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Property:
                     {
                         var property = (IPropertySymbol)member;
-                        var returnXml = $"<type typeId=\"{property.Type.Id()}\" typeName=\"{property.Type.ToDisplayString()}\" />";
+                        var propertyType = property.Type;
+                        var typeXml = TypeXml(propertyType);
                         var accessorsXml = string.Empty;
 
                         if (property.GetMethod != null && property.GetMethod.IsPublicApi())
@@ -184,8 +195,8 @@ namespace Unity.DocTool.XMLDocHandler
 
 
                         return $@"
-<accessibility>{member.DeclaredAccessibility}</accessibility>
-{returnXml}
+{AccessibilityXml(member.DeclaredAccessibility)}
+{typeXml}
 {accessorsXml}
 <parameters>{ParametersSignature(property.Parameters)}</parameters>";
                     }
@@ -193,6 +204,16 @@ namespace Unity.DocTool.XMLDocHandler
                 default:
                     throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
             }
+        }
+
+        private static string AccessibilityXml(Accessibility accessibility)
+        {
+            return $@"<accessibility>{accessibility}</accessibility>";
+        }
+
+        private static string TypeXml(ITypeSymbol typeSymbol)
+        {
+            return $"<type typeId=\"{typeSymbol.Id()}\" typeName=\"{typeSymbol.ToDisplayString()}\" />";
         }
 
         private string ParametersSignature(IEnumerable<IParameterSymbol> parameters)
@@ -290,35 +311,59 @@ namespace Unity.DocTool.XMLDocHandler
             DecidePriority(node);
         }
 
-        private void DecidePriority(BaseTypeDeclarationSyntax node)
+        public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
+        {
+            base.VisitEnumDeclaration(node);
+            DecidePriority(node);
+        }
+
+        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            base.VisitPropertyDeclaration(node);
+            DecidePriority(node);
+        }
+
+        private bool isVisitingField = false;
+        public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
+        {
+            isVisitingField = true;
+            try
+            {
+                DecidePriority(node, _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]));
+                base.VisitFieldDeclaration(node);
+            }
+            finally
+            {
+                isVisitingField = false;
+            }
+        }
+
+        public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        {
+            if (isVisitingField)
+                DecidePriority(node);
+        }
+
+        private void DecidePriority(SyntaxNode node)
         {
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
             if (typeSymbol == null)
                 return;
 
+            DecidePriority(node, typeSymbol);
+        }
+
+        private void DecidePriority(SyntaxNode node, ISymbol typeSymbol)
+        {
             var id = typeSymbol.Id();
             SyntaxNode existingTargetNode;
             if (_documentationTargetTypeNodes.TryGetValue(id, out existingTargetNode))
             {
-                if (HasXmlDocs(node) && !HasXmlDocs(existingTargetNode))
+                if (CecilUtility.HasXmlDocs(node) && !CecilUtility.HasXmlDocs(existingTargetNode))
                     _documentationTargetTypeNodes[id] = node;
             }
             else
                 _documentationTargetTypeNodes[id] = node;
-        }
-
-        private bool HasXmlDocs(SyntaxNode node)
-        {
-            if (!node.HasLeadingTrivia)
-                return false;
-
-            foreach (var trivia in node.GetLeadingTrivia())
-            {
-                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
-                    return true;
-            }
-
-            return false;
         }
 
         public bool ShouldThisNodeBeDocumented(SyntaxNode node, ISymbol symbol)

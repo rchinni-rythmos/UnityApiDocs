@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -31,84 +32,103 @@ namespace Unity.DocTool.XMLDocHandler
 
         public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-
-            return base.VisitInterfaceDeclaration(node);
+            var updatedNode = (InterfaceDeclarationSyntax)base.VisitInterfaceDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
         }
 
         public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-
-            return base.VisitEnumDeclaration(node);
+            var updatedNode = (EnumDeclarationSyntax)base.VisitEnumDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-
-            return base.VisitClassDeclaration(node);
+            var updatedNode = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
         }
 
         public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
-            if (withLeadingTrivia != null)
-                return withLeadingTrivia;
-
-            return base.VisitStructDeclaration(node);
+            var updatedNode = (StructDeclarationSyntax)base.VisitStructDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
         }
-
 
         public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            var updatedNode = AddOrUpdateXmlDoc(node);
-            if (updatedNode != null)
-                return updatedNode;
-
-            return base.VisitPropertyDeclaration(node);
+            var updatedNode = (PropertyDeclarationSyntax)base.VisitPropertyDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
         }
 
-        private SyntaxNode AddOrUpdateXmlDoc(BaseTypeDeclarationSyntax node)
+        private bool isVisitingField = false;
+        public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
+            //for Field declarations, the Xml may be on the field itself or on the variable declarator.
+            // ex. on the field
+            //   ///<summary>Docs</summary>
+            //   int value;
+            // ex. on the variable declarator
+            //   int
+            //      ///<summary>Docs</summary>
+            //      value;
+            // ex. with two declarations
+            //   int value,
+            //      ///<summary>Docs</summary>
+            //      value2;
+
+            // We handle this by visiting the Field declaration and the variable declarations, treating them the same way we treat partial classes.
+            isVisitingField = true;
+            try
+            {
+                var symbol = _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]);
+                var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{symbol.Name}']/xmldoc");
+                var updatedNode = base.VisitFieldDeclaration(node);
+                return AddOrUpdateXmlDoc(node, updatedNode, docNode, symbol);
+            }
+            finally
+            {
+                isVisitingField = false;
+            }
+        }
+
+        public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        {
+            if (!isVisitingField)
+                return node;
+
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
-            if (typeSymbol == null)
-                return null;
+            Debug.Assert(typeSymbol != null, "No symbol found for field");
+
+            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
+
+            var updatedNode = AddOrUpdateXmlDoc(node, node, docNode, typeSymbol);
+            return updatedNode;
+        }
+
+        private SyntaxNode AddOrUpdateXmlDoc(BaseTypeDeclarationSyntax originalNode, BaseTypeDeclarationSyntax nodeToUpdate)
+        {
+            var typeSymbol = _semanticModel.GetDeclaredSymbol(originalNode);
 
             var selector = new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
             if (typeSymbol.ContainingType != null)
                 selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
             
             var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]/xmldoc");
-
-            return AddOrUpdateXmlDoc(node, docNode, typeSymbol);
+            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
         }
 
-        private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax node)
+        private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax originalNode, MemberDeclarationSyntax nodeToUpdate)
         {
-            var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
-            if (typeSymbol == null)
-                return null;
-
-            //typeSymbol.ContainingType
-            
-            //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
+            var typeSymbol = _semanticModel.GetDeclaredSymbol(originalNode);
             var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
-
-            return AddOrUpdateXmlDoc(node, docNode, typeSymbol);
+            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
         }
 
-        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node, XmlNode docNode, ISymbol typeSymbol)
+        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNode docNode, ISymbol symbol)
         {
-            if (docNode == null) return null;
+            if (docNode == null) return nodeToBeUpdated;
 
-            var docTrivia = node.GetLeadingTrivia();
+            var docTrivia = nodeToBeUpdated.GetLeadingTrivia();
 
             var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -119,7 +139,7 @@ namespace Unity.DocTool.XMLDocHandler
 
             var newTrivia = SyntaxFactory.TriviaList();
 
-            var shouldUpdate = _partialTypeInfoCollector.ShouldThisNodeBeDocumented(node, typeSymbol);
+            var shouldUpdate = _partialTypeInfoCollector.ShouldThisNodeBeDocumented(originalNode, symbol);
             foreach (var trivia in docTrivia)
             {
                 if (!trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
@@ -138,7 +158,7 @@ namespace Unity.DocTool.XMLDocHandler
                 newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
             }
 
-            return node.WithLeadingTrivia(newTrivia);
+            return nodeToBeUpdated.WithLeadingTrivia(newTrivia);
         }
     }
 }

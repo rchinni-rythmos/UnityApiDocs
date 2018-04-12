@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
-    public class XmlDocHandlerTestBase
+    internal class XmlDocHandlerTestBase
     {
         private string originalCurrentDirectory;
 

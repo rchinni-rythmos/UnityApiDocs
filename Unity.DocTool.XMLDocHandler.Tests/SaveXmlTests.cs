@@ -228,9 +228,103 @@ Updated Docs
     {",
                     sourcePath = "TestTypes/ClassWithMultipleXmlDocs.cs"
                 }).SetName("Update_Multiple_Xml_Docs");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithField"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name = ""value"" type=""Field"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Int32"" typeName=""int"" />
+            </signature>
+            <xmldoc>
+                <![CDATA[<summary>New Docs</summary>]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    class ClassWithField
+    {
+        /// <summary>New Docs</summary>
+        public int value;
+    }
+}",
+                    sourcePath = "TestTypes/ClassWithField.cs"
+                }).SetName("Update_Field");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithMultipleFieldsOnDeclaration"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name = ""value2"" type=""Field"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Object"" typeName=""System.Object"" />
+            </signature>
+            <xmldoc>
+                <![CDATA[<summary>New Docs</summary>]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    class ClassWithMultipleFieldsOnDeclaration
+    {
+        /// <summary>
+        /// Value field 1
+        /// </summary>
+        public System.Object value1,
+
+            /// <summary>New Docs</summary>
+            value2;
+    }
+}
+",
+                    sourcePath = "TestTypes/ClassWithMultipleFieldsOnDeclaration.cs"
+                }).SetName("Update_Second_Field_On_Declaration");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithField"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New ClassWithField Docs</summary>]]>
+        </xmldoc>
+        <member name = ""value"" type=""Field"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Int32"" typeName=""int"" />
+            </signature>
+            <xmldoc>
+                <![CDATA[<summary>New value Docs</summary>]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>New ClassWithField Docs</summary>
+    class ClassWithField
+    {
+        /// <summary>New value Docs</summary>
+        public int value;
+    }
+}",
+                    sourcePath = "TestTypes/ClassWithField.cs"
+                }).SetName("Update_Field_And_Enclosing_Class");
         }
 
-        //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
+        //TODO: Add tests for: Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates
         [Test]

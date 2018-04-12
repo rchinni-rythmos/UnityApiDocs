@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -6,7 +7,7 @@ using NUnit.Framework;
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
     [TestFixture]
-    public class XmlDocHandlerTest : XmlDocHandlerTestBase
+    class XmlDocHandlerTest : XmlDocHandlerTestBase
     {
         [Test]
         public void GetTypes_Returns_Relative_Path_When_Given_Path_Without_Trailing_Slash()
@@ -214,104 +215,40 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         {
             Assert.Inconclusive("Not implementated yet");
         }
-
-        [Test]
-        public void Test_Inner_Types()
+        
+        public struct TestIsReportedData
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", "AClass.cs");
-            Console.WriteLine(actualXml);
-
-            var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-<doc version=""3"">
-    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
-        <xmldoc><![CDATA[
-            <summary>
-            I am a nested interface
-            </summary>
-        ]]></xmldoc>
-    </member>
-</doc>";
-            AssertXml(expectedXml, actualXml);
+            public string typeId;
+            public string sourceFile;
+            public string expectedXml;
+            public bool exact;
         }
 
-        [Test]
-        public void Test_Property_Is_Reported()
+        static IEnumerable<TestCaseData> TestIsReportedTestCases()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty", "ClassWithProperty.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"<member name = ""Value"" type=""Property"">
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithField.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithField",
+                    expectedXml = @"<member name = ""value"" type=""Field"">
 <signature>
     <accessibility>Public</accessibility>
     <type typeId=""System.Int32"" typeName=""int"" />
-    <get><accessibility>Public</accessibility></get>
-    <parameters></parameters>
 </signature>
 <xmldoc><![CDATA[
-                
     <summary>
-    Value property
+    Value field
     </summary>
-
-
 ]]></xmldoc>
-</member>";
-
-            Assert.That(Normalize(actualXml), Contains.Substring(Normalize(expectedXml)), actualXml);
-        }
-
-        [Test]
-        public void Test_PropertyWithIndexer_IsReported()
-        {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithIndexer", "ClassWithIndexer.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"  <?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""ClassWithIndexer"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
-        
-        <xmldoc><![CDATA[
-        
-        ]]></xmldoc><member name = ""this[]"" type=""Property"">
-            <signature>
-<accessibility>Public</accessibility>
-<type typeId=""System.Int32"" typeName=""int"" />
-
-<get><accessibility>Public</accessibility></get>
-<set><accessibility>Protected</accessibility></set>
-<parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int"" />
-</parameters></signature>
-            <xmldoc><![CDATA[
-                
-    <summary>
-    Indexer property
-    </summary>
-
-
-            ]]></xmldoc>
-        </member>
-</member></doc>";
-            
-            AssertXml(expectedXml, actualXml);
-        }
-
-        [Test]
-        public void Test_Attributes_Are_Reported()
-        {
-            Assert.Inconclusive("Not implementated yet");
-        }
-
-        [Test]
-        public void Test_Generic_Types()
-        {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/Generics"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1", "GenericClass.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+</member>"
+                }).SetName("Field_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
         <xmldoc>
@@ -335,8 +272,100 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 ]]>
             </xmldoc>
         </member>
-</member></doc>";
-            AssertXml(expectedXml, actualXml);
+</member></doc>",
+                    exact = true
+                }).SetName("Generic_Types");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithProperty.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty",
+                    expectedXml = @"<member name = ""Value"" type=""Property"">
+<signature>
+    <accessibility>Public</accessibility>
+    <type typeId=""System.Int32"" typeName=""int"" />
+    <get><accessibility>Public</accessibility></get>
+    <parameters></parameters>
+</signature>
+<xmldoc><![CDATA[
+                
+    <summary>
+    Value property
+    </summary>
+
+
+]]></xmldoc>
+</member>"
+                }).SetName("Property");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithIndexer.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithIndexer",
+                    expectedXml = @"  <?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+    <doc version=""3"">
+        <member name=""ClassWithIndexer"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        
+        <xmldoc><![CDATA[
+        
+        ]]></xmldoc><member name = ""this[]"" type=""Property"">
+            <signature>
+<accessibility>Public</accessibility>
+<type typeId=""System.Int32"" typeName=""int"" />
+
+<get><accessibility>Public</accessibility></get>
+<set><accessibility>Protected</accessibility></set>
+<parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int"" />
+</parameters></signature>
+            <xmldoc><![CDATA[
+                
+    <summary>
+    Indexer property
+    </summary>
+
+
+            ]]></xmldoc>
+        </member>
+</member></doc>",
+                    exact = true
+                }).SetName("Property_With_Indexer");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/AClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+        <xmldoc><![CDATA[
+            <summary>
+            I am a nested interface
+            </summary>
+        ]]></xmldoc>
+    </member>
+</doc>",
+                    exact = true
+                }).SetName("Inner_Types");
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestIsReportedTestCases))]
+        public void Test_Is_Reported(TestIsReportedData data)
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(data.sourceFile)));
+            string actualXml = handler.GetTypeDocumentation(data.typeId, Path.GetFileName(data.sourceFile));
+            Console.WriteLine(actualXml);
+
+            if (data.exact)
+                AssertXml(data.expectedXml, actualXml);
+            else
+                Assert.That(Normalize(actualXml), Contains.Substring(Normalize(data.expectedXml)), actualXml);
+        }
+
+        [Test]
+        public void Test_Attributes_Are_Reported()
+        {
+            Assert.Inconclusive("Not implementated yet");
         }
 
         [Test]
