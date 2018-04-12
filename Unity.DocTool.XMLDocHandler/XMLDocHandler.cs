@@ -232,7 +232,7 @@ namespace Unity.DocTool.XMLDocHandler
                 partialInfoCollector.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
-            var docUpdater = new XmlDocReplacerVisitor(docXml);
+            var docUpdater = new XmlDocReplacerVisitor(docXml, partialInfoCollector);
             foreach (var syntaxTree in syntaxTrees)
             {
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -246,7 +246,7 @@ namespace Unity.DocTool.XMLDocHandler
         }
     }
 
-    public class PartialTypeInfoCollectorVisitor : CSharpSyntaxVisitor
+    public class PartialTypeInfoCollectorVisitor : CSharpSyntaxWalker
     {
 
         /**
@@ -258,6 +258,7 @@ namespace Unity.DocTool.XMLDocHandler
          */
         private readonly XmlDocument _xmlDoc;
         private SemanticModel _semanticModel;
+        private Dictionary<string, SyntaxNode> _documentationTargetTypeNodes = new Dictionary<string, SyntaxNode>();
 
         public PartialTypeInfoCollectorVisitor(string content)
         {
@@ -271,20 +272,65 @@ namespace Unity.DocTool.XMLDocHandler
             Visit(syntaxNode);
         }
 
-
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             base.VisitClassDeclaration(node);
+            DecidePriority(node);
+        }
 
+        public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        {
+            base.VisitInterfaceDeclaration(node);
+            DecidePriority(node);
+        }
+
+        public override void VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            base.VisitStructDeclaration(node);
+            DecidePriority(node);
+        }
+
+        private void DecidePriority(BaseTypeDeclarationSyntax node)
+        {
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
             if (typeSymbol == null)
                 return;
 
-            var selector = new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
-            if (typeSymbol.ContainingType != null)
-                selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
+            var id = typeSymbol.Id();
+            SyntaxNode existingTargetNode;
+            if (_documentationTargetTypeNodes.TryGetValue(id, out existingTargetNode))
+            {
+                if (HasXmlDocs(node) && !HasXmlDocs(existingTargetNode))
+                    _documentationTargetTypeNodes[id] = node;
+            }
+            else
+                _documentationTargetTypeNodes[id] = node;
+        }
 
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]/xmldoc");
+        private bool HasXmlDocs(SyntaxNode node)
+        {
+            if (!node.HasLeadingTrivia)
+                return false;
+
+            foreach (var trivia in node.GetLeadingTrivia())
+            {
+                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool ShouldThisNodeBeDocumented(SyntaxNode node, ISymbol symbol)
+        {
+            if (symbol == null)
+                return false;
+
+            SyntaxNode targetTypeNode;
+            if (!_documentationTargetTypeNodes.TryGetValue(symbol.Id(), out targetTypeNode))
+                throw new NotImplementedException("This type of node has not been prioritized yet.");
+
+            return targetTypeNode == node;
         }
     }
 

@@ -73,6 +73,18 @@
     <Compile Include="TestTypes\Generics\GenericClass.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\PartialStructWithDocs.part2.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestTypes\PartialStructWithDocs.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestTypes\PartialInterfaceNoDocs.part2.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestTypes\PartialInterfaceNoDocs.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\SimpleClassWithXmlDoc.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -87,6 +99,9 @@
       <Project>{A5967F93-9F26-45BF-9E6F-77A90D45B8B6}</Project>
       <Name>Unity.DocTool.XMLDocHandler</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

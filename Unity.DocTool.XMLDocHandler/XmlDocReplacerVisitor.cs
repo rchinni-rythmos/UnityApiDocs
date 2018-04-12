@@ -13,11 +13,14 @@ namespace Unity.DocTool.XMLDocHandler
     {
         private SemanticModel _semanticModel;
         private XmlDocument _xmlDoc;
+        private PartialTypeInfoCollectorVisitor _partialTypeInfoCollector;
 
-        public XmlDocReplacerVisitor(string docXml) : base(true)
+        public XmlDocReplacerVisitor(string docXml, PartialTypeInfoCollectorVisitor partialInfoCollector) : base(true)
         {
+            _partialTypeInfoCollector = partialInfoCollector;
             _xmlDoc = new XmlDocument();
             _xmlDoc.LoadXml(docXml);
+
         }
 
         internal SyntaxNode Visit(SyntaxNode rootNode, SemanticModel semanticModel)
@@ -53,6 +56,15 @@ namespace Unity.DocTool.XMLDocHandler
             return base.VisitClassDeclaration(node);
         }
 
+        public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            var withLeadingTrivia = AddOrUpdateXmlDoc(node);
+            if (withLeadingTrivia != null)
+                return withLeadingTrivia;
+
+            return base.VisitStructDeclaration(node);
+        }
+
 
         public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
@@ -75,7 +87,7 @@ namespace Unity.DocTool.XMLDocHandler
             
             var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]/xmldoc");
 
-            return AddOrUpdateXmlDoc(node, docNode);
+            return AddOrUpdateXmlDoc(node, docNode, typeSymbol);
         }
 
         private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax node)
@@ -89,10 +101,10 @@ namespace Unity.DocTool.XMLDocHandler
             //var docNode = _xmlDoc.SelectSingleNode($"doc/member[@name='{node.Identifier}' && @namespace='{enumDef.ContainingNamespace}']");
             var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
 
-            return AddOrUpdateXmlDoc(node, docNode);
+            return AddOrUpdateXmlDoc(node, docNode, typeSymbol);
         }
 
-        private static SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node, XmlNode docNode)
+        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode node, XmlNode docNode, ISymbol typeSymbol)
         {
             if (docNode == null) return null;
 
@@ -107,21 +119,21 @@ namespace Unity.DocTool.XMLDocHandler
 
             var newTrivia = SyntaxFactory.TriviaList();
 
-            var updated = false;
+            var shouldUpdate = _partialTypeInfoCollector.ShouldThisNodeBeDocumented(node, typeSymbol);
             foreach (var trivia in docTrivia)
             {
                 if (!trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
                 {
                     newTrivia = newTrivia.Add(trivia);
                 }
-                else if (updated == false)
+                else if (shouldUpdate)
                 {
-                    updated = true;
+                    shouldUpdate = false;
                     newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
                 }
             }
 
-            if (!updated)
+            if (shouldUpdate)
             {
                 newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
             }

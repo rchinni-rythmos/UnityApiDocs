@@ -232,7 +232,7 @@ Updated Docs
 
         //TODO: Add tests for: Fields, Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Formating
-        //TODO: Add tests for: Delegates, Structs
+        //TODO: Add tests for: Delegates
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
@@ -248,48 +248,128 @@ Updated Docs
             AssertSourceContains(data.expectedSource, actualSource);
         }
 
-        //TODO: Partials: 
+        // Partials: 
         //          1) Udating comment on single partial, 
         //          2) Updating comments in multiple partials (we should remove the comment in all but one partial)
         //          3) Adding comments in multiple partials (ensure that comment end up in only one of the partials)
-        [Test]
-        public void Test_Update_Partials()
+
+        public struct UpdatePartialsTestData
         {
-            var testFilePath1 = Path.GetTempFileName();
-            var testFilePath2 = Path.GetTempFileName();
+            public string filename1, filename2;
+            public string newContent;
+            public string expectedFile1Source;
+            public string expectedFile2Source;
+        }
 
-            File.Copy("TestTypes/CommonTypes/AClass.cs", testFilePath1, true);
-            File.Copy("TestTypes/CommonTypes/AFolder/AClass.part2.cs", testFilePath2, true);
-
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath1)));
-
-            var newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+        public static IEnumerable<TestCaseData> UpdatePartialsTestCases()
+        {
+            yield return new TestCaseData(
+                new UpdatePartialsTestData
+                {
+                    filename1 = "TestTypes/CommonTypes/AClass.cs",
+                    filename2 = "TestTypes/CommonTypes/AFolder/AClass.part2.cs",
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
     </member>
 </doc>
-";
-
-            handler.SetType(newContent, Path.GetFileName(testFilePath1), Path.GetFileName(testFilePath2));
-
-            var actualSource1 = File.ReadAllText(testFilePath1);
-            AssertSourceContains(@"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+",
+                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
 {
     public partial class AClass { }
 
     /// <summary>new doc</summary>
     public partial class AClass : IEnumerable, ICloneable
     {
-", actualSource1);
-
-            var actualSource2 = File.ReadAllText(testFilePath2);
-            AssertSourceContains(@"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+",
+                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
 {
     //Here is a partial for implementation details...
     public partial class AClass
     {
-", actualSource2);
+"
+                }).SetName("Update_Partial_Class_With_Existing_Doc");
+            yield return new TestCaseData(
+                new UpdatePartialsTestData
+                {
+                    filename1 = "TestTypes/PartialInterfaceNoDocs.cs",
+                    filename2 = "TestTypes/PartialInterfaceNoDocs.part2.cs",
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""PartialInterfaceNoDocs"" type = ""Interface"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+        <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
+    </member>
+</doc>
+",
+                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>new doc</summary>
+    partial interface PartialInterfaceNoDocs
+    {
+    }
+}
+",
+                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    partial interface PartialInterfaceNoDocs
+    {
+    }
+}
+"
+                }).SetName("Update_Partial_Interface_With_No_Existing_Doc");
+            yield return new TestCaseData(
+                new UpdatePartialsTestData
+                {
+                    filename1 = "TestTypes/PartialStructWithDocs.cs",
+                    filename2 = "TestTypes/PartialStructWithDocs.part2.cs",
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""PartialStructWithDocs"" type = ""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+        <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
+    </member>
+</doc>
+",
+                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    partial struct PartialStructWithDocs
+    {
+    }
+    /// <summary>new doc</summary>
+    partial struct PartialStructWithDocs
+    {
+    }
+}
+",
+                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    partial struct PartialStructWithDocs
+    {
+    }
+}
+"
+                }).SetName("Update_Partial_Struct_With_Multiple_Existing_Doc");
+        }
+
+        [Test]
+        [TestCaseSource(nameof(UpdatePartialsTestCases))]
+        public void Test_Update_Partials(UpdatePartialsTestData testData)
+        {
+            var testFilePath1 = Path.GetTempFileName();
+            var testFilePath2 = Path.GetTempFileName();
+
+            File.Copy(testData.filename1, testFilePath1, true);
+            File.Copy(testData.filename2, testFilePath2, true);
+
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath1)));
+
+            handler.SetType(testData.newContent, Path.GetFileName(testFilePath1), Path.GetFileName(testFilePath2));
+
+            var actualSource1 = File.ReadAllText(testFilePath1);
+            AssertSourceContains(testData.expectedFile1Source, actualSource1);
+
+            var actualSource2 = File.ReadAllText(testFilePath2);
+            AssertSourceContains(testData.expectedFile2Source, actualSource2);
         }
 
         private void AssertSourceContains(string expectedSource, string actualSource, bool normalize = true)
