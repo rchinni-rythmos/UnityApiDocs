@@ -322,9 +322,53 @@ Updated Docs
 }",
                     sourcePath = "TestTypes/ClassWithField.cs"
                 }).SetName("Update_Field_And_Enclosing_Class");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        
+        <member name = ""Foo"" type=""Method"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Int32"" typeName=""int"" />
+                <parameters>
+                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
+                </parameters>
+            </signature>
+            <xmldoc><![CDATA[<summary>New method docs</summary>]]></xmldoc>                
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"
+    /// <summary>New class docs</summary>
+    public partial class AClass : IEnumerable, ICloneable
+    {
+        /// <summary>
+        /// I am a nested interface
+        /// </summary>
+        public interface INestedInterface
+        {
+            
         }
 
-        //TODO: Add tests for: Methods, Events, Operators, Ctors, Static / Instance / Generics, Extension methods
+        private class APrivateClass
+        {
+        }
+
+        /// <summary>New method docs</summary>
+        public int Foo(int i)
+        {",
+                    sourcePath = "TestTypes/CommonTypes/AClass.cs"
+                }).SetName("Update_Method");
+        }
+
+        //TODO: Add tests for: Events, Operators, Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates
         [Test]

@@ -317,6 +317,12 @@ namespace Unity.DocTool.XMLDocHandler
             DecidePriority(node);
         }
 
+        public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            base.VisitMethodDeclaration(node);
+            DecidePriority(node);
+        }
+
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
             base.VisitPropertyDeclaration(node);

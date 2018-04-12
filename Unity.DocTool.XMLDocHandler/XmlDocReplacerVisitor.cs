@@ -54,6 +54,12 @@ namespace Unity.DocTool.XMLDocHandler
             return AddOrUpdateXmlDoc(node, updatedNode);
         }
 
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            var updatedNode = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node);
+            return AddOrUpdateXmlDoc(node, updatedNode);
+        }
+
         public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
             var updatedNode = (PropertyDeclarationSyntax)base.VisitPropertyDeclaration(node);
