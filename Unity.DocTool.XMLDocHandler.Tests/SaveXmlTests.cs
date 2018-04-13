@@ -366,6 +366,83 @@ Updated Docs
         {",
                     sourcePath = "TestTypes/CommonTypes/AClass.cs"
                 }).SetName("Update_Method");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithEvent"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        <member name = ""anEvent"" type=""Event"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Action`1"" typeName=""System.Action&lt;bool&gt;"">
+                    <typeArguments>
+                        <type typeId=""System.Boolean"" typeName=""bool"" />
+                    </typeArguments>
+                </type>
+            </signature>
+            <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>New class docs</summary>
+    class ClassWithEvent
+    {
+        /// <summary>new docs</summary>
+        public event System.Action<bool> anEvent;
+    }
+}
+",
+                    sourcePath = "TestTypes/ClassWithEvent.cs"
+                }).SetName("Update_Event");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithEventAddRemove"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        <member name = ""anEvent"" type=""Event"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Action`1"" typeName=""System.Action&lt;System.Func&lt;bool&gt;&gt;"">
+                    <typeArguments>
+                        <type typeId=""System.Func`1"" typeName=""System.Func&lt;bool&gt;"">
+                            <typeArguments>
+                                <type typeId=""System.Boolean"" typeName=""bool"" />
+                            </typeArguments>
+                        </type>
+                    </typeArguments>
+                </type>
+            </signature>
+            <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>New class docs</summary>
+    class ClassWithEventAddRemove
+    {
+        /// <summary>new docs</summary>
+        public event System.Action<System.Func<bool>> anEvent
+        {
+            add { }
+            remove { }
+        }
+    }
+}",
+                    sourcePath = "TestTypes/ClassWithEventAddRemove.cs"
+                }).SetName("Update_Event_With_Add_Remove");
         }
 
         //TODO: Add tests for: Events, Operators, Ctors, Static / Instance / Generics, Extension methods

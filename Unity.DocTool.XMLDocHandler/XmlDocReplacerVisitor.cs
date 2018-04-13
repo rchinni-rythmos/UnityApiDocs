@@ -30,44 +30,23 @@ namespace Unity.DocTool.XMLDocHandler
             return Visit(rootNode);
         }
 
-        public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        public override SyntaxNode Visit(SyntaxNode node)
         {
-            var updatedNode = (InterfaceDeclarationSyntax)base.VisitInterfaceDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
-        }
+            var updatedNode = base.Visit(node);
+            if (node is BaseTypeDeclarationSyntax baseTypeDeclarationSyntax)
+                return AddOrUpdateXmlDoc(baseTypeDeclarationSyntax, (BaseTypeDeclarationSyntax)updatedNode);
 
-        public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
-        {
-            var updatedNode = (EnumDeclarationSyntax)base.VisitEnumDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
-        }
+            if (node is BaseFieldDeclarationSyntax baseFieldDeclarationSyntax)
+                return VisitBaseFieldDeclaration(baseFieldDeclarationSyntax);
 
-        public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            var updatedNode = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
-        }
+            if (node is MemberDeclarationSyntax memberDeclarationSyntax)
+                return AddOrUpdateXmlDoc(memberDeclarationSyntax, (MemberDeclarationSyntax)updatedNode);
 
-        public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
-        {
-            var updatedNode = (StructDeclarationSyntax)base.VisitStructDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
-        }
-
-        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
-        {
-            var updatedNode = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
-        }
-
-        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-        {
-            var updatedNode = (PropertyDeclarationSyntax)base.VisitPropertyDeclaration(node);
-            return AddOrUpdateXmlDoc(node, updatedNode);
+            return updatedNode;
         }
 
         private bool isVisitingField = false;
-        public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
+        private SyntaxNode VisitBaseFieldDeclaration(BaseFieldDeclarationSyntax node)
         {
             //for Field declarations, the Xml may be on the field itself or on the variable declarator.
             // ex. on the field
@@ -88,7 +67,7 @@ namespace Unity.DocTool.XMLDocHandler
             {
                 var symbol = _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]);
                 var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{symbol.Name}']/xmldoc");
-                var updatedNode = base.VisitFieldDeclaration(node);
+                var updatedNode = base.Visit(node);
                 return AddOrUpdateXmlDoc(node, updatedNode, docNode, symbol);
             }
             finally

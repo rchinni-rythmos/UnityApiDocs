@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 using NUnit.Framework;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
@@ -346,6 +347,54 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 </doc>",
                     exact = true
                 }).SetName("Inner_Types");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithEvent.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEvent",
+                    expectedXml =
+@"<member name = ""anEvent"" type=""Event"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Action`1"" typeName=""System.Action&lt;bool&gt;"">
+            <typeArguments>
+                <type typeId=""System.Boolean"" typeName=""bool"" />
+            </typeArguments>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[
+    <summary>
+    anEvent
+    </summary>
+    ]]></xmldoc>
+</member>"
+                }).SetName("Event_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithEventAddRemove.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEventAddRemove",
+                    expectedXml =
+                        @"<member name = ""anEvent"" type=""Event"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Action`1"" typeName=""System.Action&lt;System.Func&lt;bool&gt;&gt;"">
+            <typeArguments>
+                <type typeId=""System.Func`1"" typeName=""System.Func&lt;bool&gt;"">
+                    <typeArguments>
+                        <type typeId=""System.Boolean"" typeName=""bool"" />
+                    </typeArguments>
+                </type>
+            </typeArguments>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[
+    <summary>
+    anEvent
+    </summary>
+    ]]></xmldoc>
+</member>"
+                }).SetName("Event_With_Add_Remove_Is_Reported");
         }
 
         [Test]
@@ -356,10 +405,18 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             string actualXml = handler.GetTypeDocumentation(data.typeId, Path.GetFileName(data.sourceFile));
             Console.WriteLine(actualXml);
 
+            AssertValidXml(actualXml);
             if (data.exact)
                 AssertXml(data.expectedXml, actualXml);
             else
                 Assert.That(Normalize(actualXml), Contains.Substring(Normalize(data.expectedXml)), actualXml);
+        }
+
+        private void AssertValidXml(string actualXml)
+        {
+            var doc = new XmlDocument();
+            Assert.DoesNotThrow(() => doc.LoadXml(actualXml), $@"Xml parse error. Xml:
+{actualXml}");
         }
 
         [Test]

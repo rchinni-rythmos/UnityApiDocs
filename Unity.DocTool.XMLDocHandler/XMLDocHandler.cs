@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -179,8 +180,7 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Property:
                     {
                         var property = (IPropertySymbol)member;
-                        var propertyType = property.Type;
-                        var typeXml = TypeXml(propertyType);
+                        var typeXml = TypeXml(property.Type);
                         var accessorsXml = string.Empty;
 
                         if (property.GetMethod != null && property.GetMethod.IsPublicApi())
@@ -201,6 +201,12 @@ namespace Unity.DocTool.XMLDocHandler
 <parameters>{ParametersSignature(property.Parameters)}</parameters>";
                     }
 
+                case SymbolKind.Event:
+                    {
+                        return $@"
+{AccessibilityXml(member.DeclaredAccessibility)}
+{TypeXml(((IEventSymbol)member).Type)}";
+                    }
                 default:
                     throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
             }
@@ -213,7 +219,35 @@ namespace Unity.DocTool.XMLDocHandler
 
         private static string TypeXml(ITypeSymbol typeSymbol)
         {
-            return $"<type typeId=\"{typeSymbol.Id()}\" typeName=\"{typeSymbol.ToDisplayString()}\" />";
+            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+            Debug.Assert(namedTypeSymbol != null, "Unsupported type");
+            var typeTagAttributes = $"typeId=\"{typeSymbol.Id()}\" typeName=\"{EscapeXml(typeSymbol.ToDisplayString())}\"";
+
+            if (namedTypeSymbol.IsGenericType)
+            {
+                string typeArguments = "";
+                foreach (var typeArgument in namedTypeSymbol.TypeArguments)
+                    typeArguments += TypeXml(typeArgument);
+
+                return 
+$@"<type {typeTagAttributes}>
+<typeArguments>
+{typeArguments}
+</typeArguments>
+</type>";
+            }
+            else
+                return $"<type {typeTagAttributes} />";
+        }
+
+        private static string EscapeXml(string xmlString)
+        {
+            return xmlString
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;")
+                .Replace("\"", "&quot;")
+                .Replace("'", "&apos;");
         }
 
         private string ParametersSignature(IEnumerable<IParameterSymbol> parameters)
@@ -329,25 +363,32 @@ namespace Unity.DocTool.XMLDocHandler
             DecidePriority(node);
         }
 
+
+        public override void Visit(SyntaxNode node)
+        {
+            base.Visit(node);
+
+            if (node is BaseFieldDeclarationSyntax baseFieldDeclarationSyntax)
+                VisitBaseFieldDeclaration(baseFieldDeclarationSyntax);
+            else if (node is BaseTypeDeclarationSyntax 
+                     || node is MemberDeclarationSyntax
+                     || (node is VariableDeclaratorSyntax && isVisitingField))
+                DecidePriority(node);
+        }
+
         private bool isVisitingField = false;
-        public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
+        public void VisitBaseFieldDeclaration(BaseFieldDeclarationSyntax node)
         {
             isVisitingField = true;
             try
             {
                 DecidePriority(node, _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]));
-                base.VisitFieldDeclaration(node);
+                base.Visit(node);
             }
             finally
             {
                 isVisitingField = false;
             }
-        }
-
-        public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
-        {
-            if (isVisitingField)
-                DecidePriority(node);
         }
 
         private void DecidePriority(SyntaxNode node)

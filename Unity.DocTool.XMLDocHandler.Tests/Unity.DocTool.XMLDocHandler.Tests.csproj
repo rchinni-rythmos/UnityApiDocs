@@ -59,6 +59,12 @@
     <Compile Include="TestTypes\ClassWithField.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithEvent.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestTypes\ClassWithEventAddRemove.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithProperty.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
