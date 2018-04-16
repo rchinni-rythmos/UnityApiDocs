@@ -106,7 +106,11 @@ namespace Unity.DocTool.XMLDocHandler
 
                         foreach (var member in members)
                         {
-                            xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}"">
+                            string methodKind = "";
+                            if (member.Kind == SymbolKind.Method)
+                                methodKind = $@" methodKind=""{((IMethodSymbol)member).MethodKind}""";
+
+                            xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}""{methodKind}>
             <signature>{SignatureFor(member)}</signature>
             <xmldoc>
                 <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>

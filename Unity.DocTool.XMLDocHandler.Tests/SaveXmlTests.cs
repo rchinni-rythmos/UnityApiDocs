@@ -443,9 +443,46 @@ Updated Docs
 }",
                     sourcePath = "TestTypes/ClassWithEventAddRemove.cs"
                 }).SetName("Update_Event_With_Add_Remove");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithOperator"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        <member name = ""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Int32"" typeName=""int"" />
+                <parameters>
+                    <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
+                    <parameter name=""other"" typeId=""System.Int32"" typeName=""int"" />
+                </parameters>
+            </signature>
+            <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>New class docs</summary>
+    class ClassWithOperator
+    {
+        /// <summary>new docs</summary>
+        public static int operator +(ClassWithOperator classWithOperator, int other)
+        {
+            return 1;
+        }
+    }
+}",
+                    sourcePath = "TestTypes/ClassWithOperator.cs"
+                }).SetName("Update_Operator");
         }
 
-        //TODO: Add tests for: Events, Operators, Ctors, Static / Instance / Generics, Extension methods
+        //TODO: Add tests for: Ctors, Static / Instance / Generics, Extension methods
         //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates
         [Test]

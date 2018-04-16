@@ -395,6 +395,27 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     ]]></xmldoc>
 </member>"
                 }).SetName("Event_With_Add_Remove_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithOperator.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator",
+                    expectedXml =
+                        @"<member name = ""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int"" />
+        <parameters>
+            <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
+            <parameter name=""other"" typeId=""System.Int32"" typeName=""int"" />
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        Plus Operator
+        </summary>]]></xmldoc>
+</member>"
+                }).SetName("Operator_Is_Reported");
         }
 
         [Test]

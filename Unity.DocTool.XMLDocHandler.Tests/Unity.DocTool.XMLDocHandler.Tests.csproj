@@ -47,6 +47,9 @@
     <Compile Include="GetTypesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveXmlTests.cs" />
+    <Compile Include="TestTypes\ClassWithOperator.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithMultipleFieldsOnDeclaration.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
