@@ -480,6 +480,35 @@ Updated Docs
 }",
                     sourcePath = "TestTypes/ClassWithOperator.cs"
                 }).SetName("Update_Operator");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithConstructor"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        <member name = "".ctor"" type=""Method"" methodKind=""Constructor"">
+            <signature>
+                <accessibility>Public</accessibility>
+            </signature>
+            <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// <summary>New class docs</summary>
+    class ClassWithConstructor
+    {
+        /// <summary>new docs</summary>
+        public ClassWithConstructor() { }
+    }
+}",
+                    sourcePath = "TestTypes/ClassWithConstructor.cs"
+                }).SetName("Update_Constructor");
         }
 
         //TODO: Add tests for: Ctors, Static / Instance / Generics, Extension methods

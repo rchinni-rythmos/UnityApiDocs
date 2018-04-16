@@ -159,7 +159,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Here is some more docs
         ]]></xmldoc>
 
-        <member name = ""Foo"" type=""Method"">
+        <member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Int32"" typeName=""int"" />
@@ -173,7 +173,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             ]]></xmldoc>                
         </member>
 
-        <member name = ""VoidProtectedMethod"" type=""Method"">
+        <member name = ""VoidProtectedMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Protected</accessibility>
                 <return typeId=""System.Void"" typeName=""void"" />
@@ -184,7 +184,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 some docs
             ]]></xmldoc>                
         </member>
-        <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"">
+        <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"" methodKind=""ExplicitInterfaceImplementation"">
             <signature>
                 <accessibility>Private</accessibility>
                 <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator"" />
@@ -197,7 +197,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <returns></returns>
             ]]></xmldoc>
         </member>
-        <member name = ""Clone"" type=""Method"">
+        <member name = ""Clone"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Object"" typeName=""object"" />
@@ -259,7 +259,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     </summary>
 
 ]]>
-        </xmldoc><member name = ""Foo"" type=""Method"">
+        </xmldoc><member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
 <accessibility>Public</accessibility>
 <return typeId=""System.Void"" typeName=""void"" />
@@ -416,6 +416,20 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </summary>]]></xmldoc>
 </member>"
                 }).SetName("Operator_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithConstructor.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithConstructor",
+                    expectedXml =
+                        @"<member name = "".ctor"" type=""Method"" methodKind=""Constructor"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <parameters></parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>A Constructor</summary>]]></xmldoc>
+</member>"
+                }).SetName("Constructor_Is_Reported");
         }
 
         [Test]

@@ -50,13 +50,13 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             {
                 switch (methodSymbol.MethodKind)
                 {
-                    case MethodKind.StaticConstructor:
                     case MethodKind.Ordinary:
                     case MethodKind.UserDefinedOperator:
                     case MethodKind.Destructor:
                     case MethodKind.Constructor:
                     case MethodKind.Conversion:
                         break;
+                    case MethodKind.StaticConstructor:
                     case MethodKind.EventAdd:
                     case MethodKind.EventRemove:
                     case MethodKind.EventRaise:
