@@ -492,6 +492,26 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </member>
   </member>"
                 }).SetName("GenericStructWithConstraints");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithExtensionMethods.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithExtensionMethods",
+                    expectedXml =
+                        @"<member name = ""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int"" />
+        <parameters>
+            <parameter name=""s"" typeId=""System.String"" typeName=""string"" isThis=""true""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>
+        Extension method
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Extension_Method_Is_Reported");
         }
 
         [Test]

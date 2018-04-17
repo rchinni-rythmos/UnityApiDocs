@@ -333,7 +333,8 @@ namespace Unity.DocTool.XMLDocHandler
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
-                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\" />");
+                string isThisAttribute = parameter.IsThis ? "" : @" isThis=""true""";
+                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{isThisAttribute}/>");
             }
             return sb.ToString();
         }

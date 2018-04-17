@@ -517,9 +517,40 @@ Updated Docs
 }",
                     sourcePath = "TestTypes/ClassWithConstructor.cs"
                 }).SetName("Update_Constructor");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithExtensionMethods"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[<summary>New class docs</summary>]]>
+        </xmldoc>
+        <member name = ""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Int32"" typeName=""int"" />
+                <parameters>
+                    <parameter name=""s"" typeId=""System.String"" typeName=""string"" isThis=""true""/>
+                </parameters>
+            </signature>
+            <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"
+    /// <summary>New class docs</summary>
+    static class ClassWithExtensionMethods
+    {
+        /// <summary>new docs</summary>
+        public static int ExtensionMethod(this string s)
+        {",
+                    sourcePath = "TestTypes/ClassWithExtensionMethods.cs"
+                }).SetName("Update_Extension_Method");
         }
 
-        //TODO: Add tests for: Generics, Extension methods
+        //TODO: Add tests for: Extension methods
         //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates
         [Test]
