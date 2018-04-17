@@ -128,16 +128,35 @@ Updated Docs
                 new UpdateTestData
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+<doc version=""3"">
+    <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+        <typeParameters>
+            <typeParameter name=""T""/>
+        </typeParameters>
         <xmldoc>
-            <![CDATA[<summary>
-Overidden Docs
-</summary>]]>
+            <![CDATA[<summary>New Class docs</summary>]]>
         </xmldoc>
-</member></doc>",
+        <member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters></parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[<summary>New Foo docs</summary>]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
 {
+    /// <summary>New Class docs</summary>
+    public class GenericClass<T>
+    {
+        /// <summary>New Foo docs</summary>
+        public void Foo()
+        {}
+    }
     /// <summary>
     /// Existing Docs for GenericClass
     /// </summary>
@@ -145,17 +164,6 @@ Overidden Docs
     {
         /// <summary>
         /// Existing Docs for GenericClass.Foo
-        /// </summary>
-        public void Foo()
-        {}
-    }
-    /// <summary>
-    /// Overidden Docs
-    /// </summary>
-    public class GenericClass<T>
-    {
-        /// <summary>
-        /// Existing GenericClass-T.Foo
         /// </summary>
         public void Foo()
         {}
@@ -511,7 +519,7 @@ Updated Docs
                 }).SetName("Update_Constructor");
         }
 
-        //TODO: Add tests for: Ctors, Static / Instance / Generics, Extension methods
+        //TODO: Add tests for: Generics, Extension methods
         //TODO: Add tests for: Formating
         //TODO: Add tests for: Delegates
         [Test]

@@ -92,13 +92,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <doc version=""1"">
     <types>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.ExtendsGenericInterface</id>
             <parentId></parentId>
-            <name>GenericClass</name>
+            <name>ExtendsGenericInterface</name>
             <kind>Class</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
-                <path>GenericClass.cs</path>
+                <path>ExtendsGenericInterface.cs</path>
 
             </relativeFilePaths>
         </type>
@@ -114,9 +114,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClassWithConstraints`1</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass</id>
             <parentId></parentId>
-            <name>GenericClassWithConstraints</name>
+            <name>GenericClass</name>
             <kind>Class</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
@@ -125,13 +125,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.ExtendsInterface</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1</id>
             <parentId></parentId>
-            <name>ExtendsInterface</name>
-            <kind>Class</kind>
+            <name>GenericStructWithConstraints</name>
+            <kind>Struct</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
-                <path>GenericClass.cs</path>
+                <path>GenericStructWithConstraints.cs</path>
 
             </relativeFilePaths>
         </type></types></doc>";
@@ -250,20 +250,23 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/Generics/GenericClass.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1",
                     expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+<doc version=""3"">
+    <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+        <typeParameters>
+            <typeParameter name=""T""/>
+        </typeParameters>
         <xmldoc>
             <![CDATA[
     <summary>
     Existing Docs for GenericClass-T
-    </summary>
-
-]]>
-        </xmldoc><member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
+    </summary>]]>
+        </xmldoc>
+        <member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
-<accessibility>Public</accessibility>
-<return typeId=""System.Void"" typeName=""void"" />
-<parameters></parameters></signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters></parameters>
+            </signature>
             <xmldoc>
                 <![CDATA[
     <summary>
@@ -273,7 +276,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 ]]>
             </xmldoc>
         </member>
-</member></doc>",
+    </member>
+</doc>",
                     exact = true
                 }).SetName("Generic_Types");
             yield return new TestCaseData(
@@ -430,6 +434,64 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     <xmldoc><![CDATA[<summary>A Constructor</summary>]]></xmldoc>
 </member>"
                 }).SetName("Constructor_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericStructWithConstraints.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1",
+                    expectedXml =
+                        @"<member name=""GenericStructWithConstraints`1"" type = ""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"">
+        <typeParameters>
+            <typeParameter name=""T"" hasConstructorConstraint=""true"" hasReferenceTypeConstraint=""true"">
+                <type typeId=""System.Collections.Generic.IList`1"" typeName=""System.Collections.Generic.IList&lt;Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass&gt;"">
+                    <typeArguments>
+                        <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass"" />
+                    </typeArguments>
+                </type>
+            </typeParameter>
+        </typeParameters>
+        <xmldoc>
+            <![CDATA[
+            <summary>
+                Existing Docs for GenericStructWithConstraints-T
+            </summary>
+            ]]>
+        </xmldoc>
+        <member name = ""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters></parameters>
+                <typeParameters>
+                    <typeParameter name=""T2"">
+                        <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T""/>
+                    </typeParameter>
+                </typeParameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[
+                <summary>
+                    Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
+                </summary>
+                ]]>
+            </xmldoc>
+        </member>
+        <member name = ""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters></parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[
+                <summary>
+                    Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint
+                </summary>
+                ]]>
+            </xmldoc>
+        </member>
+  </member>"
+                }).SetName("GenericStructWithConstraints");
         }
 
         [Test]
@@ -456,18 +518,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         [Test]
         public void Test_Attributes_Are_Reported()
-        {
-            Assert.Inconclusive("Not implementated yet");
-        }
-
-        [Test]
-        public void Test_Generic_Types_With_Constraints()
-        {
-            Assert.Inconclusive("Not implementated yet. Should expose enough information to produce consumer docs.");
-        }
-
-        [Test]
-        public void Test_Generic_Members()
         {
             Assert.Inconclusive("Not implementated yet");
         }

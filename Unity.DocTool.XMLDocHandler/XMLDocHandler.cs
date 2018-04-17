@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -90,11 +91,13 @@ namespace Unity.DocTool.XMLDocHandler
                         var containingType = typeSymbol.ContainingType != null ? 
                             $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
                             string.Empty;
-                        
+
+                        var inheritsXml = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""{typeSymbol.MetadataName}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}"" inherits=""{BaseType(typeSymbol)}"">
+        <member name=""{typeSymbol.MetadataName}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{inheritsXml}>
         {InterfaceList(typeSymbol)}
+        {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         <xmldoc>
             <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
         </xmldoc>");
@@ -107,10 +110,17 @@ namespace Unity.DocTool.XMLDocHandler
                         foreach (var member in members)
                         {
                             string methodKind = "";
+                            var memberName = member.Name;
+                            int typeParameterCount = 0;
                             if (member.Kind == SymbolKind.Method)
-                                methodKind = $@" methodKind=""{((IMethodSymbol)member).MethodKind}""";
+                            {
+                                var methodSymbol = ((IMethodSymbol)member);
+                                methodKind = $@" methodKind=""{methodSymbol.MethodKind}""";
+                                if (methodSymbol.TypeParameters.Length > 0)
+                                    memberName += "`" + methodSymbol.TypeParameters.Length;
+                            }
 
-                            xml.Append($@"<member name = ""{member.Name}"" type=""{member.Kind}""{methodKind}>
+                            xml.Append($@"<member name = ""{memberName}"" type=""{member.Kind}""{methodKind}>
             <signature>{SignatureFor(member)}</signature>
             <xmldoc>
                 <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
@@ -164,7 +174,7 @@ namespace Unity.DocTool.XMLDocHandler
                     {
 
                         var field = (IFieldSymbol) member;
-                        var typeXml = TypeXml(field.Type);
+                        var typeXml = TypeReferenceXml(field.Type);
                         var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
 {accessibilityXml}
@@ -178,13 +188,14 @@ namespace Unity.DocTool.XMLDocHandler
                         return $@"
 {accessibilityXml}
 {returnXml}
-<parameters>{ParametersSignature(method.Parameters)}</parameters>";
+<parameters>{ParametersSignature(method.Parameters)}</parameters>
+{TypeParametersXmlForDeclaration(method.TypeParameters)}";
                     }
 
                 case SymbolKind.Property:
                     {
                         var property = (IPropertySymbol)member;
-                        var typeXml = TypeXml(property.Type);
+                        var typeXml = TypeReferenceXml(property.Type);
                         var accessorsXml = string.Empty;
 
                         if (property.GetMethod != null && property.GetMethod.IsPublicApi())
@@ -209,11 +220,21 @@ namespace Unity.DocTool.XMLDocHandler
                     {
                         return $@"
 {AccessibilityXml(member.DeclaredAccessibility)}
-{TypeXml(((IEventSymbol)member).Type)}";
+{TypeReferenceXml(((IEventSymbol)member).Type)}";
                     }
                 default:
                     throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
             }
+        }
+
+        private static string TypeParametersXmlForDeclaration(ImmutableArray<ITypeParameterSymbol> typeParameters)
+        {
+            if (typeParameters.IsEmpty)
+                return "";
+
+            return $@"<typeParameters>
+{string.Join((string) "\n", typeParameters.Select(p => TypeParameterXml(p, true, false)))}
+</typeParameters>";
         }
 
         private static string AccessibilityXml(Accessibility accessibility)
@@ -221,27 +242,80 @@ namespace Unity.DocTool.XMLDocHandler
             return $@"<accessibility>{accessibility}</accessibility>";
         }
 
-        private static string TypeXml(ITypeSymbol typeSymbol)
+        private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeConstraints = false)
         {
             var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
-            Debug.Assert(namedTypeSymbol != null, "Unsupported type");
-            var typeTagAttributes = $"typeId=\"{typeSymbol.Id()}\" typeName=\"{EscapeXml(typeSymbol.ToDisplayString())}\"";
+            if (namedTypeSymbol != null)
+            {
+                return TypeReferenceXml(namedTypeSymbol);
+            }
+
+            var sourceTypeParameterSymbol = typeSymbol as ITypeParameterSymbol;
+            if (sourceTypeParameterSymbol != null)
+            {
+                return TypeParameterXml(sourceTypeParameterSymbol, includeConstraints, true);
+            }
+            throw new NotImplementedException("Unsupported typeSymbol");
+        }
+
+        private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
+        {
+            string constraintAttributes = "";
+            string suffix = "/>";
+            if (includeConstraints)
+            {
+                if (sourceTypeParameterSymbol.HasConstructorConstraint)
+                    constraintAttributes += @" hasConstructorConstraint=""true""";
+                if (sourceTypeParameterSymbol.HasReferenceTypeConstraint)
+                    constraintAttributes += @" hasReferenceTypeConstraint=""true""";
+                if (sourceTypeParameterSymbol.HasValueTypeConstraint)
+                    constraintAttributes += @" hasValueTypeConstraint=""true""";
+
+                if (!sourceTypeParameterSymbol.ConstraintTypes.IsEmpty)
+                {
+                    suffix = $@">
+{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}
+</typeParameter>";
+                }
+            }
+
+            string declaringTypeId = "";
+            if (includeDeclaringTypeId)
+                declaringTypeId = $@" declaringTypeId=""{sourceTypeParameterSymbol.DeclaringType.Id()}""";
+
+            return $@"<typeParameter{declaringTypeId} name=""{sourceTypeParameterSymbol.Name}""{constraintAttributes}{suffix}";
+        }
+
+        private static string TypeReferenceXml(INamedTypeSymbol namedTypeSymbol)
+        {
+            var typeTagAttributes =
+                $"typeId=\"{namedTypeSymbol.Id()}\" typeName=\"{EscapeXml(namedTypeSymbol.ToDisplayString())}\"";
 
             if (namedTypeSymbol.IsGenericType)
             {
-                string typeArguments = "";
-                foreach (var typeArgument in namedTypeSymbol.TypeArguments)
-                    typeArguments += TypeXml(typeArgument);
+                var typeArguments = TypeArguments(namedTypeSymbol.TypeArguments);
 
-                return 
-$@"<type {typeTagAttributes}>
-<typeArguments>
-{typeArguments}
-</typeArguments>
-</type>";
+                return
+                    $@"<type {typeTagAttributes}>
+    {typeArguments}
+    </type>";
             }
             else
                 return $"<type {typeTagAttributes} />";
+        }
+
+        private static string TypeArguments(ImmutableArray<ITypeSymbol> typeArguments)
+        {
+            if (typeArguments.IsEmpty)
+                return "";
+
+            string typeArgumentsXml = "";
+            foreach (var typeArgument in typeArguments)
+                typeArgumentsXml += TypeReferenceXml(typeArgument);
+
+            return  $@"<typeArguments>
+{typeArgumentsXml}
+</typeArguments>";
         }
 
         private static string EscapeXml(string xmlString)

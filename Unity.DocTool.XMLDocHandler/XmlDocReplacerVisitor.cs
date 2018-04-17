@@ -39,7 +39,7 @@ namespace Unity.DocTool.XMLDocHandler
             if (node is BaseFieldDeclarationSyntax baseFieldDeclarationSyntax)
                 return VisitBaseFieldDeclaration(baseFieldDeclarationSyntax);
 
-            if (node is MemberDeclarationSyntax memberDeclarationSyntax)
+            if (node is MemberDeclarationSyntax memberDeclarationSyntax && !(node is NamespaceDeclarationSyntax))
                 return AddOrUpdateXmlDoc(memberDeclarationSyntax, (MemberDeclarationSyntax)updatedNode);
 
             return updatedNode;
@@ -94,19 +94,38 @@ namespace Unity.DocTool.XMLDocHandler
         {
             var typeSymbol = _semanticModel.GetDeclaredSymbol(originalNode);
 
-            var selector = new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
+            var typeNode = SelectTypeNode(typeSymbol);
+            if (typeNode == null)
+                return nodeToUpdate;
+
+            var docNode = typeNode["xmldoc"];
+            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
+        }
+
+        private XmlNode SelectTypeNode(INamedTypeSymbol typeSymbol)
+        {
+            var selector =
+                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
             if (typeSymbol.ContainingType != null)
                 selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
-            
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]/xmldoc");
-            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
+
+            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]");
+            return docNode;
         }
 
         private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax originalNode, MemberDeclarationSyntax nodeToUpdate)
         {
-            var typeSymbol = _semanticModel.GetDeclaredSymbol(originalNode);
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
-            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
+            var symbol = _semanticModel.GetDeclaredSymbol(originalNode);
+            Debug.Assert(symbol.ContainingType != null);
+            if (symbol.ContainingType == null)
+                return nodeToUpdate;
+
+            var typeNode = SelectTypeNode(symbol.ContainingType);
+            if (typeNode == null)
+                return nodeToUpdate;
+
+            var docNode = typeNode.SelectSingleNode($"member[@name='{symbol.Name}']/xmldoc");
+            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, symbol);
         }
 
         private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNode docNode, ISymbol symbol)
