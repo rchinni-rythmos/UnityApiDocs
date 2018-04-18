@@ -56,6 +56,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.Delegate</id>
+            <parentId>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass</parentId>
+            <name>Delegate</name>
+            <kind>Delegate</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
+            <relativeFilePaths>
+                <path>AClass.cs</path>
+            </relativeFilePaths>
+        </type>
+        <type>
             <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AnEnum</id>
             <parentId></parentId>
             <name>AnEnum</name>
@@ -64,6 +74,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <relativeFilePaths>
                 <path>AnEnum.cs</path>
 
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.ADelegate</id>
+            <parentId></parentId>
+            <name>ADelegate</name>
+            <kind>Delegate</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
+            <relativeFilePaths>
+                <path>GlobalDelegate.cs</path>
             </relativeFilePaths>
         </type>
         <type>
@@ -578,6 +598,46 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     </xmldoc>
 </member>"
                 }).SetName("Optional_Parameter_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/GlobalDelegate.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.ADelegate",
+                    expectedXml =
+                        @"<member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int""/>
+        <parameters>
+            <parameter name=""o"" typeId=""System.Object"" typeName=""object""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        A Delegate
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Global_Delegate");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/AClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.Delegate",
+                    expectedXml =
+                        @"<member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters></parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        Delegate
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Inner_Delegate");
         }
 
         [Test]

@@ -53,5 +53,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
         /// </summary>
         private void DoNotReport()
         {}
+
+        /// <summary>
+        /// Delegate
+        /// </summary>
+        public delegate void Delegate();
     }
 }

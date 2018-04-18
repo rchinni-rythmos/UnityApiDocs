@@ -551,7 +551,7 @@ Updated Docs
         }
 
         //TODO: Add tests for: Formating
-        //TODO: Add tests for: Delegates, optional parameters
+        //TODO: Add tests for: Delegates
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)

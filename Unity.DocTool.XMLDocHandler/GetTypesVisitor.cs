@@ -33,11 +33,10 @@ namespace Unity.DocTool.XMLDocHandler
 
         //TODO: Support global delegates
 
-        //public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node)
-        //{
-        //if (AddTypeIfPublicAPI(node))
-        //base.VisitDelegateDeclaration(node);
-        //}
+        public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node)
+        {
+            AddTypeIfPublicApi(node);
+        }
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
@@ -45,9 +44,9 @@ namespace Unity.DocTool.XMLDocHandler
                 base.VisitStructDeclaration(node);
         }
 
-        private bool AddTypeIfPublicApi(BaseTypeDeclarationSyntax node)
+        private bool AddTypeIfPublicApi(MemberDeclarationSyntax node)
         {
-            var symbol = semanticModel.GetDeclaredSymbol(node);
+            var symbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(node);
             if (symbol.IsPublicApi())
             {
                 types.Add(symbol);

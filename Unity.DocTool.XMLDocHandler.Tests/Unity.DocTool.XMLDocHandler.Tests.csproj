@@ -50,6 +50,12 @@
     <Compile Include="TestTypes\ClassWithConstructor.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithDelegate.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestTypes\CommonTypes\GlobalDelegate.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithOptionalParameters.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

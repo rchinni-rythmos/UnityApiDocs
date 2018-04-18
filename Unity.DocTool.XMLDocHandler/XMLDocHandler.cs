@@ -82,15 +82,17 @@ namespace Unity.DocTool.XMLDocHandler
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
                 var descendants = syntaxTree.GetRoot().DescendantNodes();
-                var res = descendants.OfType<BaseTypeDeclarationSyntax>().ToArray();
+                var res = descendants.OfType<BaseTypeDeclarationSyntax>().Cast<MemberDeclarationSyntax>().Concat(descendants.OfType<DelegateDeclarationSyntax>()).ToArray();
                 foreach (var typeDeclaration in res)
                 {
-                    var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
+                    var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
                         var containingType = typeSymbol.ContainingType != null ? 
                             $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
                             string.Empty;
+
+
 
                         var attributes = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
                         if (typeSymbol.IsStatic)
@@ -98,19 +100,28 @@ namespace Unity.DocTool.XMLDocHandler
                         if (typeSymbol.IsSealed && !typeSymbol.IsValueType)
                             attributes += @" isSealed=""true""";
 
+                        var extraContent = "";
+                        if (typeDeclaration is DelegateDeclarationSyntax)
+                        {
+                            extraContent = $@"<signature>
+{SignatureFor(typeSymbol.DelegateInvokeMethod)}
+</signature>";
+                        }
+
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{attributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
+        {extraContent}
         <xmldoc>
             <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
         </xmldoc>");
 
                         var members = typeSymbol.GetMembers()
                             .Where(m => m.Kind != SymbolKind.NamedType &&
-                                        m.MayHaveXmlDoc() &&
-                                        !m.IsImplicitlyDeclared);
+                                        !m.IsImplicitlyDeclared &&
+                                        m.MayHaveXmlDoc());
 
                         foreach (var member in members)
                         {
@@ -194,9 +205,8 @@ namespace Unity.DocTool.XMLDocHandler
                     {
                         var method = (IMethodSymbol)member;
                         var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\"/>";
-                        var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
-{accessibilityXml}
+{AccessibilityXml(member.DeclaredAccessibility)}
 {returnXml}
 <parameters>{ParametersSignature(method.Parameters)}</parameters>
 {TypeParametersXmlForDeclaration(method.TypeParameters)}";
