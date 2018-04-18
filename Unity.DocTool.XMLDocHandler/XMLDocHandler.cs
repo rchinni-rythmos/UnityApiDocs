@@ -92,10 +92,15 @@ namespace Unity.DocTool.XMLDocHandler
                             $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
                             string.Empty;
 
-                        var inheritsXml = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
+                        var attributes = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
+                        if (typeSymbol.IsStatic)
+                            attributes += @" isStatic=""true""";
+                        if (typeSymbol.IsSealed && !typeSymbol.IsValueType)
+                            attributes += @" isSealed=""true""";
+
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""{typeSymbol.MetadataName}"" type = ""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{inheritsXml}>
+        <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{attributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         <xmldoc>
@@ -109,18 +114,23 @@ namespace Unity.DocTool.XMLDocHandler
 
                         foreach (var member in members)
                         {
-                            string methodKind = "";
+                            string methodAttributes = "";
                             var memberName = member.Name;
                             int typeParameterCount = 0;
                             if (member.Kind == SymbolKind.Method)
                             {
-                                var methodSymbol = ((IMethodSymbol)member);
-                                methodKind = $@" methodKind=""{methodSymbol.MethodKind}""";
+                                var methodSymbol = (IMethodSymbol)member;
                                 if (methodSymbol.TypeParameters.Length > 0)
                                     memberName += "`" + methodSymbol.TypeParameters.Length;
+
+                                methodAttributes = $@" methodKind=""{methodSymbol.MethodKind}""";
+                                if (methodSymbol.IsStatic)
+                                    methodAttributes += @" isStatic=""true""";
+                                if (methodSymbol.IsExtensionMethod)
+                                    methodAttributes += @" isExtensionMethod=""true""";
                             }
 
-                            xml.Append($@"<member name = ""{memberName}"" type=""{member.Kind}""{methodKind}>
+                            xml.Append($@"<member name = ""{memberName}"" type=""{member.Kind}""{methodAttributes}>
             <signature>{SignatureFor(member)}</signature>
             <xmldoc>
                 <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
@@ -162,7 +172,7 @@ namespace Unity.DocTool.XMLDocHandler
                 return String.Empty;
 
             return $@"<interfaces>
-{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{i.Name}"" />"))}
+{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{i.Name}""/>"))}
 </interfaces>";
         }
 
@@ -183,7 +193,7 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Method:
                     {
                         var method = (IMethodSymbol)member;
-                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\" />";
+                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\"/>";
                         var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
 {accessibilityXml}
@@ -301,7 +311,7 @@ namespace Unity.DocTool.XMLDocHandler
     </type>";
             }
             else
-                return $"<type {typeTagAttributes} />";
+                return $"<type {typeTagAttributes}/>";
         }
 
         private static string TypeArguments(ImmutableArray<ITypeSymbol> typeArguments)
@@ -333,8 +343,21 @@ namespace Unity.DocTool.XMLDocHandler
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
-                string isThisAttribute = parameter.IsThis ? "" : @" isThis=""true""";
-                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{isThisAttribute}/>");
+                string optionalAttribute = parameter.IsOptional ? @" isOptional=""true""" : "";
+                string defaultValueAttribute;
+                if (parameter.HasExplicitDefaultValue)
+                {
+                    string defaultValue;
+                    if (parameter.ExplicitDefaultValue == null)
+                        defaultValue = "default";
+                    else
+                        defaultValue = parameter.ExplicitDefaultValue.ToString();
+
+                    defaultValueAttribute = $@" defaultValue=""{defaultValue}""";
+                }
+                else
+                    defaultValueAttribute = "";
+                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{optionalAttribute}{defaultValueAttribute}/>");
             }
             return sb.ToString();
         }

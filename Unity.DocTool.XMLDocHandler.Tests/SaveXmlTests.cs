@@ -550,9 +550,8 @@ Updated Docs
                 }).SetName("Update_Extension_Method");
         }
 
-        //TODO: Add tests for: Extension methods
         //TODO: Add tests for: Formating
-        //TODO: Add tests for: Delegates
+        //TODO: Add tests for: Delegates, optional parameters
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
