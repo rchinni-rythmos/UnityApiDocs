@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Unity.DocTool.XMLDocHandler.Extensions;
+using ISymbolExtensions = Unity.DocTool.XMLDocHandler.Extensions.ISymbolExtensions;
 
 namespace Unity.DocTool.XMLDocHandler
 {
@@ -126,13 +127,12 @@ namespace Unity.DocTool.XMLDocHandler
                         foreach (var member in members)
                         {
                             string methodAttributes = "";
-                            var memberName = member.Name;
+                            var memberName = ISymbolExtensions.MemberName(member);
+
                             int typeParameterCount = 0;
                             if (member.Kind == SymbolKind.Method)
                             {
                                 var methodSymbol = (IMethodSymbol)member;
-                                if (methodSymbol.TypeParameters.Length > 0)
-                                    memberName += "`" + methodSymbol.TypeParameters.Length;
 
                                 methodAttributes = $@" methodKind=""{methodSymbol.MethodKind}""";
                                 if (methodSymbol.IsStatic)
@@ -141,7 +141,7 @@ namespace Unity.DocTool.XMLDocHandler
                                     methodAttributes += @" isExtensionMethod=""true""";
                             }
 
-                            xml.Append($@"<member name = ""{memberName}"" type=""{member.Kind}""{methodAttributes}>
+                            xml.Append($@"<member name=""{memberName}"" type=""{member.Kind}""{methodAttributes}>
             <signature>{SignatureFor(member)}</signature>
             <xmldoc>
                 <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
@@ -183,7 +183,7 @@ namespace Unity.DocTool.XMLDocHandler
                 return String.Empty;
 
             return $@"<interfaces>
-{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{i.Name}""/>"))}
+{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{XmlUtility.EscapeString(i.Name)}""/>"))}
 </interfaces>";
         }
 
@@ -204,7 +204,7 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Method:
                     {
                         var method = (IMethodSymbol)member;
-                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{method.ReturnType.ToDisplayString()}\"/>";
+                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{XmlUtility.EscapeString(method.ReturnType.ToDisplayString())}\"/>";
                         return $@"
 {AccessibilityXml(member.DeclaredAccessibility)}
 {returnXml}
@@ -309,7 +309,7 @@ namespace Unity.DocTool.XMLDocHandler
         private static string TypeReferenceXml(INamedTypeSymbol namedTypeSymbol)
         {
             var typeTagAttributes =
-                $"typeId=\"{namedTypeSymbol.Id()}\" typeName=\"{EscapeXml(namedTypeSymbol.ToDisplayString())}\"";
+                $"typeId=\"{namedTypeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(namedTypeSymbol.ToDisplayString())}\"";
 
             if (namedTypeSymbol.IsGenericType)
             {
@@ -336,16 +336,6 @@ namespace Unity.DocTool.XMLDocHandler
             return  $@"<typeArguments>
 {typeArgumentsXml}
 </typeArguments>";
-        }
-
-        private static string EscapeXml(string xmlString)
-        {
-            return xmlString
-                .Replace("&", "&amp;")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;")
-                .Replace("\"", "&quot;")
-                .Replace("'", "&apos;");
         }
 
         private string ParametersSignature(IEnumerable<IParameterSymbol> parameters)

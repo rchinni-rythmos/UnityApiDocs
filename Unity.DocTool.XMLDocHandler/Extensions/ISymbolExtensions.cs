@@ -11,7 +11,17 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             if (symbol == null)
                 return null;
 
-            var name = useMetadataName ? symbol.MetadataName : symbol.Name;
+            string name;
+            if (useMetadataName)
+            {
+                var methodSymbol = symbol as IMethodSymbol;
+                if (methodSymbol != null)
+                    name = methodSymbol.MemberName();
+                else
+                    name = symbol.MetadataName;
+            }
+            else
+                name = symbol.Name;
 
             string prefix = null;
             if (symbol.ContainingType != null)
@@ -33,7 +43,7 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
         }
 
         private static HashSet<MethodKind> implicitMethodKinds = new HashSet<MethodKind>
-            {
+        {
                 MethodKind.AnonymousFunction,
                 MethodKind.EventAdd,
                 MethodKind.EventRemove,
@@ -85,6 +95,24 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             return accessibility == Accessibility.Public ||
                    accessibility == Accessibility.Protected ||
                    accessibility == Accessibility.ProtectedAndInternal;
+        }
+
+        public static string MemberName(this ISymbol member)
+        {
+            return XmlUtility.EscapeString(member.MemberNameUnescaped());
+        }
+
+        public static string MemberNameUnescaped(this ISymbol member)
+        {
+            var memberName = member.Name;
+            if (member.Kind == SymbolKind.Method)
+            {
+                var methodSymbol = (IMethodSymbol)member;
+                if (methodSymbol.TypeParameters.Length > 0)
+                    memberName += "`" + methodSymbol.TypeParameters.Length;
+            }
+
+            return memberName;
         }
     }
 }

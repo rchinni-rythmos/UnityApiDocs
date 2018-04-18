@@ -66,7 +66,7 @@ namespace Unity.DocTool.XMLDocHandler
             try
             {
                 var symbol = _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]);
-                var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{symbol.Name}']/xmldoc");
+                var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
                 var updatedNode = base.Visit(node);
                 return AddOrUpdateXmlDoc(node, updatedNode, docNode, symbol);
             }
@@ -84,7 +84,7 @@ namespace Unity.DocTool.XMLDocHandler
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
             Debug.Assert(typeSymbol != null, "No symbol found for field");
 
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.Name}']/xmldoc");
+            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.MemberNameUnescaped()}']/xmldoc");
 
             var updatedNode = AddOrUpdateXmlDoc(node, node, docNode, typeSymbol);
             return updatedNode;
@@ -116,15 +116,17 @@ namespace Unity.DocTool.XMLDocHandler
         private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax originalNode, MemberDeclarationSyntax nodeToUpdate)
         {
             var symbol = _semanticModel.GetDeclaredSymbol(originalNode);
-            Debug.Assert(symbol.ContainingType != null);
-            if (symbol.ContainingType == null)
+
+            XmlNode parentNode;
+            if (symbol is INamedTypeSymbol)
+                parentNode = _xmlDoc.SelectSingleNode("doc");
+            else
+                parentNode = SelectTypeNode(symbol.ContainingType);
+
+            if (parentNode == null)
                 return nodeToUpdate;
 
-            var typeNode = SelectTypeNode(symbol.ContainingType);
-            if (typeNode == null)
-                return nodeToUpdate;
-
-            var docNode = typeNode.SelectSingleNode($"member[@name='{symbol.Name}']/xmldoc");
+            var docNode = parentNode.SelectSingleNode($"member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
             return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, symbol);
         }
 

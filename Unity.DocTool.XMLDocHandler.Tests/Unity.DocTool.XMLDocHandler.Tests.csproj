@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GetTypesTests.cs" />
+    <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveXmlTests.cs" />
     <Compile Include="TestTypes\ClassWithConstructor.cs">

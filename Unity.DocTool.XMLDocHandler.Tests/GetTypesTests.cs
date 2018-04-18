@@ -180,7 +180,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Here is some more docs
         ]]></xmldoc>
 
-        <member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Int32"" typeName=""int""/>
@@ -194,7 +194,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             ]]></xmldoc>                
         </member>
 
-        <member name = ""VoidProtectedMethod"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""VoidProtectedMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Protected</accessibility>
                 <return typeId=""System.Void"" typeName=""void""/>
@@ -205,7 +205,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 some docs
             ]]></xmldoc>                
         </member>
-        <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"" methodKind=""ExplicitInterfaceImplementation"">
+        <member name=""System.Collections.IEnumerable.GetEnumerator"" type=""Method"" methodKind=""ExplicitInterfaceImplementation"">
             <signature>
                 <accessibility>Private</accessibility>
                 <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator""/>
@@ -218,7 +218,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <returns></returns>
             ]]></xmldoc>
         </member>
-        <member name = ""Clone"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""Clone"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Object"" typeName=""object""/>
@@ -253,7 +253,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 {
                     sourceFile = "TestTypes/ClassWithField.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithField",
-                    expectedXml = @"<member name = ""value"" type=""Field"">
+                    expectedXml = @"<member name=""value"" type=""Field"">
 <signature>
     <accessibility>Public</accessibility>
     <type typeId=""System.Int32"" typeName=""int""/>
@@ -282,7 +282,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     Existing Docs for GenericClass-T
     </summary>]]>
         </xmldoc>
-        <member name = ""Foo"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Void"" typeName=""void""/>
@@ -306,7 +306,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 {
                     sourceFile = "TestTypes/ClassWithProperty.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty",
-                    expectedXml = @"<member name = ""Value"" type=""Property"">
+                    expectedXml = @"<member name=""Value"" type=""Property"">
 <signature>
     <accessibility>Public</accessibility>
     <type typeId=""System.Int32"" typeName=""int""/>
@@ -334,7 +334,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         
         <xmldoc><![CDATA[
         
-        ]]></xmldoc><member name = ""this[]"" type=""Property"">
+        ]]></xmldoc><member name=""this[]"" type=""Property"">
             <signature>
                 <accessibility>Public</accessibility>
                 <type typeId=""System.Int32"" typeName=""int""/>
@@ -379,7 +379,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/ClassWithEvent.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEvent",
                     expectedXml =
-@"<member name = ""anEvent"" type=""Event"">
+@"<member name=""anEvent"" type=""Event"">
     <signature>
         <accessibility>Public</accessibility>
         <type typeId=""System.Action`1"" typeName=""System.Action&lt;bool&gt;"">
@@ -401,7 +401,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/ClassWithEventAddRemove.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEventAddRemove",
                     expectedXml =
-                        @"<member name = ""anEvent"" type=""Event"">
+                        @"<member name=""anEvent"" type=""Event"">
     <signature>
         <accessibility>Public</accessibility>
         <type typeId=""System.Action`1"" typeName=""System.Action&lt;System.Func&lt;bool&gt;&gt;"">
@@ -427,7 +427,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/ClassWithOperator.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator",
                     expectedXml =
-                        @"<member name = ""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"" isStatic=""true"">
+                        @"<member name=""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"" isStatic=""true"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Int32"" typeName=""int""/>
@@ -448,7 +448,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/ClassWithConstructor.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithConstructor",
                     expectedXml =
-                        @"<member name = "".ctor"" type=""Method"" methodKind=""Constructor"">
+                        @"<member name="".ctor"" type=""Method"" methodKind=""Constructor"">
     <signature>
         <accessibility>Public</accessibility>
         <parameters></parameters>
@@ -479,7 +479,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </summary>
             ]]>
         </xmldoc>
-        <member name = ""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Void"" typeName=""void""/>
@@ -498,7 +498,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 ]]>
             </xmldoc>
         </member>
-        <member name = ""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
+        <member name=""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
                 <return typeId=""System.Void"" typeName=""void""/>
@@ -524,7 +524,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <xmldoc>
     <![CDATA[]]>
 </xmldoc>
-<member name = ""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"" isStatic=""true"" isExtensionMethod=""true"">
+<member name=""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"" isStatic=""true"" isExtensionMethod=""true"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Int32"" typeName=""int""/>
@@ -545,7 +545,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     sourceFile = "TestTypes/ClassWithOptionalParameters.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters",
                     expectedXml =
-                        @"<member name = ""OptionalInt"" type=""Method"" methodKind=""Ordinary"">
+                        @"<member name=""OptionalInt"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Void"" typeName=""void""/>
@@ -558,7 +558,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </summary>]]>
     </xmldoc>
 </member>
-<member name = ""OptionalNoDefaultValue"" type=""Method"" methodKind=""Ordinary"">
+<member name=""OptionalNoDefaultValue"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Void"" typeName=""void""/>
@@ -571,7 +571,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </summary>]]>
     </xmldoc>
 </member>
-<member name = ""OptionalConstValue"" type=""Method"" methodKind=""Ordinary"">
+<member name=""OptionalConstValue"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Void"" typeName=""void""/>
@@ -584,7 +584,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </summary>]]>
     </xmldoc>
 </member>
-<member name = ""OptionalDefaultStruct"" type=""Method"" methodKind=""Ordinary"">
+<member name=""OptionalDefaultStruct"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
         <return typeId=""System.Void"" typeName=""void""/>
@@ -655,20 +655,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 AssertXmlContains(data.expectedXml, actualXml);
         }
 
-        private void AssertXmlContains(string expectedXml, string actualXml)
-        {
-            var normalizedExpectedXml = Normalize(expectedXml);
-            var firstExpectedEnd = normalizedExpectedXml.IndexOf(">");
-            var firstTag = normalizedExpectedXml.Substring(0, firstExpectedEnd);
-
-            var normalizedActualXml = Normalize(actualXml);
-            var indexOfStart = normalizedActualXml.IndexOf(firstTag);
-            Assert.AreNotEqual(-1, indexOfStart, "Could not find \"" + firstTag + "\" in \"" + actualXml + "\"");
-            var actualXmlExpectedToMatch = normalizedActualXml.Substring(indexOfStart,
-                Math.Min(normalizedActualXml.Length - indexOfStart, normalizedExpectedXml.Length));
-            AssertXml(normalizedExpectedXml, actualXmlExpectedToMatch);
-        }
-
         private void AssertValidXml(string actualXml)
         {
             var doc = new XmlDocument();
@@ -680,14 +666,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         public void Test_Attributes_Are_Reported()
         {
             Assert.Inconclusive("Not implementated yet");
-        }
-
-        private void AssertXml(string expectedXml, string actualXml)
-        {
-            var normalizedExpectedXml = Normalize(expectedXml);
-            var normalizedActualXml = Normalize(actualXml);
-
-            Assert.AreEqual(normalizedExpectedXml, normalizedActualXml, actualXml);
         }
     }
 }
