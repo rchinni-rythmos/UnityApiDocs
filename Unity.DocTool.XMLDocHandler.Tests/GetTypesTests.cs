@@ -788,6 +788,29 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     </member>
 </doc>"
                 }).SetName("Delegate_With_Attributes");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithParams.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithParams",
+                    expectedXml =
+                        @"
+<member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters>
+            <parameter name=""ints"" typeId=""System.Int32[]"" typeName=""int[]"" isParams=""true""/>
+        </parameters>
+    </signature>
+    <xmldoc>
+        <![CDATA[
+    <summary>
+    Params field
+    </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Params_Parameter");
         }
 
         [Test]

@@ -12,6 +12,13 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             if (symbol == null)
                 return null;
 
+            if (symbol is IArrayTypeSymbol)
+            {
+                var arraySymbol = (IArrayTypeSymbol) symbol;
+                var elementName = QualifiedName(arraySymbol.ElementType, includeNamespace, useMetadataName);
+                return $"{elementName}[{string.Join(" ", Enumerable.Repeat(',', arraySymbol.Rank - 1))}]";
+            }
+
             string name;
             if (useMetadataName)
             {

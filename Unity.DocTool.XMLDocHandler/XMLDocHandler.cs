@@ -445,6 +445,7 @@ namespace Unity.DocTool.XMLDocHandler
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
+                string paramsAttribute = parameter.IsParams ? @" isParams=""true""" : "";
                 string optionalAttribute = parameter.IsOptional ? @" isOptional=""true""" : "";
                 string defaultValueAttribute;
                 if (parameter.HasExplicitDefaultValue)
@@ -461,7 +462,7 @@ namespace Unity.DocTool.XMLDocHandler
                     defaultValueAttribute = "";
 
                 string parameterTag =
-                    $"parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{optionalAttribute}{defaultValueAttribute}";
+                    $"parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{paramsAttribute}{optionalAttribute}{defaultValueAttribute}";
 
                 var attributesXml = AttributesXml(parameter);
                 if (string.IsNullOrEmpty(attributesXml))
