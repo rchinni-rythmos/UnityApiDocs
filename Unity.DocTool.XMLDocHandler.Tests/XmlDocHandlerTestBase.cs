@@ -25,7 +25,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         protected static CompilationParameters MakeCompilationParameters(string testFileDirectory)
         {
-            return new CompilationParameters(testFileDirectory, new string[0], new []
+            return new CompilationParameters(testFileDirectory, new string[0], new string[0], new []
             {
                 typeof(object).Assembly.Location,
             });

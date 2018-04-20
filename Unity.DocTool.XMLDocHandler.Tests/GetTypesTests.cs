@@ -233,6 +233,14 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         }
 
         [Test]
+        public void GetTypes_ExcludeDirectories()
+        {
+            var handler = new XMLDocHandler(new CompilationParameters("TestTypes/", new []{ "TestTypes/CommonTypes" }, new string[0], new[] {typeof(object).Assembly.Location}));
+            string actualXml = handler.GetTypesXml();
+            Assert.That(actualXml, !Contains.Substring("AClass"));
+        }
+
+        [Test]
         public void Test_Documentation_Under_Conditional_Compilation_Symbols_Works()
         {
             Assert.Inconclusive("Not implementated yet");

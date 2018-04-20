@@ -18,11 +18,13 @@ namespace Unity.DocTool.XMLDocHandler
     public class CompilationParameters
     {
         public IEnumerable<string> DefinedSymbols { get; }
-        public string RootPath { get;  }
+        public string RootPath { get; }
+        public IEnumerable<string> ExcludedPaths { get; }
         public IEnumerable<string> ReferencedAssemblyPaths { get; }
 
-        public CompilationParameters(string rootPath, IEnumerable<string> definedSymbols, IEnumerable<string> referencedAssemblyPaths)
+        public CompilationParameters(string rootPath, IEnumerable<string> excludedPaths, IEnumerable<string> definedSymbols, IEnumerable<string> referencedAssemblyPaths)
         {
+            ExcludedPaths = (excludedPaths ?? new string[0]).Select(Path.GetFullPath).ToArray();
             DefinedSymbols = definedSymbols ?? throw new ArgumentNullException(nameof(definedSymbols));
             RootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
             ReferencedAssemblyPaths = referencedAssemblyPaths ?? throw new ArgumentNullException(nameof(referencedAssemblyPaths));
@@ -40,12 +42,17 @@ namespace Unity.DocTool.XMLDocHandler
 
         public string GetTypesXml()
         {
-            if (!Directory.Exists(compilationParameters.RootPath))
-                throw new ArgumentException($"Directory \"{compilationParameters.RootPath}\" does not exist.");
+            var compilationParametersRootPath = Path.GetFullPath(compilationParameters.RootPath);
+            if (!Directory.Exists(compilationParametersRootPath))
+                throw new ArgumentException($"Directory \"{compilationParametersRootPath}\" does not exist.");
 
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            var filePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories);
-            var startIndex = compilationParameters.RootPath.Length + (compilationParameters.RootPath.EndsWith("\\") || compilationParameters.RootPath.EndsWith("/") ? 0 : 1);
+            
+            var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath)
+                .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
+
+            var startIndex = compilationParametersRootPath.Length + (compilationParametersRootPath.EndsWith("\\") || compilationParametersRootPath.EndsWith("/") ? 0 : 1);
             var syntaxTrees = filePaths.Select(
                 p =>
                 {
