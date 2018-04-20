@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Unity.DocTool.XMLDocHandler.Extensions
@@ -29,30 +30,33 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
             else if (includeNamespace && !symbol.ContainingNamespace.IsGlobalNamespace)
                 prefix = QualifiedName(symbol.ContainingNamespace, includeNamespace, useMetadataName);
 
-            return prefix != null ? prefix + "." + name : name;
+            string separator = symbol is IMethodSymbol ? "::" : ".";
+
+            return prefix != null ? prefix + separator + name : name;
         }
+
 
         internal static string Id(this ISymbol symbol)
         {
+            if (symbol is IMethodSymbol)
+                return Id((IMethodSymbol)symbol);
+
             return FullyQualifiedName(symbol, true, true);
+        }
+
+        internal static string Id(this IMethodSymbol symbol)
+        {
+            string id = $@"{symbol.ReturnType.Id()} {FullyQualifiedName(symbol, true, true)}({string.Join(", ", symbol.Parameters.Select(p => p.Type.Id()))})";
+            if (symbol.IsStatic)
+                id = "static " + id;
+
+            return id;
         }
 
         internal static string FullyQualifiedName(this ISymbol t, bool includeNamespace, bool useMetadataName)
         {
             return t.QualifiedName(includeNamespace, useMetadataName);
         }
-
-        private static HashSet<MethodKind> implicitMethodKinds = new HashSet<MethodKind>
-        {
-                MethodKind.AnonymousFunction,
-                MethodKind.EventAdd,
-                MethodKind.EventRemove,
-                MethodKind.EventRaise,
-                MethodKind.PropertyGet,
-                MethodKind.PropertySet,
-                MethodKind.LocalFunction,
-                MethodKind.DelegateInvoke
-            };
 
         internal static bool MayHaveXmlDoc(this ISymbol symbol)
         {

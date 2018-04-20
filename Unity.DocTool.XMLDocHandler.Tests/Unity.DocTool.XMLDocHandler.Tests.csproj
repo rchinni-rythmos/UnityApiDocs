@@ -66,6 +66,9 @@
     <Compile Include="TestTypes\Attributes\TestPublicAttribute.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithOverloads.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithConstructor.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

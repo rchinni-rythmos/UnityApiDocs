@@ -606,8 +606,6 @@ Updated Docs
                         sourcePath = "TestTypes/CommonTypes/AClass.cs"
                     }).SetName("Update_Inner_Delegate");
 
-
-
             yield return new TestCaseData(
                 new UpdateTestData
                 {
@@ -646,6 +644,53 @@ Updated Docs
         { }",
                     sourcePath = "TestTypes/Generics/GenericStructWithConstraints.cs"
                 }).SetName("Update_Non_Generic_Overload");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithOverloads"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" id="""">
+        <xmldoc>
+            <![CDATA[New class docs]]>
+        </xmldoc>
+        <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters>
+                </parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new docs for Method()]]>
+            </xmldoc>
+        </member>
+        <member name=""Method"" type=""Method"" methodKind=""Ordinary"" id="""">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void"" />
+                <parameters>
+                    <parameter typeId=""System.Int32"" typeName=""int"" name=""i""/>
+                </parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new docs for Method(int)]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// New class docs
+    class ClassWithOverloads
+    {
+        /// new docs for Method()
+        public void Method() { }
+        /// new docs for Method(int)
+        public void Method(int i) { }
+    }",
+                    sourcePath = "TestTypes/ClassWithOverloads.cs"
+                }).SetName("Update_Overload");
         }
 
         //TODO: Add tests for: Formating

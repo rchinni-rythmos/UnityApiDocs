@@ -811,11 +811,5 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Assert.DoesNotThrow(() => doc.LoadXml(actualXml), $@"Xml parse error. Xml:
 {actualXml}");
         }
-
-        [Test]
-        public void Test_Attributes_Are_Reported()
-        {
-            Assert.Inconclusive("Not implementated yet");
-        }
     }
 }
