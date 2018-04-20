@@ -8,6 +8,9 @@
     //Here is a partial for implementation details...
     public partial class AClass
     {
-        public enum AnEnum { }
+        public enum AnEnum
+        {
+            Value
+        }
     }
 }

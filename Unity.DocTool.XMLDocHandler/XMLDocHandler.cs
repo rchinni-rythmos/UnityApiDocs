@@ -70,7 +70,15 @@ namespace Unity.DocTool.XMLDocHandler
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
-            var syntaxTrees = paths.Select(p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(Path.Combine(compilationParameters.RootPath, p)), parserOptions, p));
+            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
+            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories).Select(Path.GetFullPath);
+            var syntaxTrees = csFilePaths.Select(
+                p =>
+                {
+                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
+                    treesForPaths[p] = syntaxTree;
+                    return syntaxTree;
+                }).ToArray();
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
@@ -78,8 +86,13 @@ namespace Unity.DocTool.XMLDocHandler
 
             var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
 
-            foreach (var syntaxTree in compilation.SyntaxTrees)
+            var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
+            foreach (var path in fullPaths)
             {
+                SyntaxTree syntaxTree;
+                if (!treesForPaths.TryGetValue(path, out syntaxTree))
+                    throw new ArgumentException("File \"" + path + "\" does not exist or was not found under root \"" + compilationParameters.RootPath + "\"");
+
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
                 var descendants = syntaxTree.GetRoot().DescendantNodes();
@@ -95,23 +108,28 @@ namespace Unity.DocTool.XMLDocHandler
 
 
 
-                        var attributes = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
+                        string xmlAttributes = "";
+                        var baseType = BaseType(typeSymbol);
+                        if (!string.IsNullOrEmpty(baseType))
+                            xmlAttributes = $@" inherits=""{baseType}""";
                         if (typeSymbol.IsStatic)
-                            attributes += @" isStatic=""true""";
+                            xmlAttributes += @" isStatic=""true""";
                         if (typeSymbol.IsSealed && !typeSymbol.IsValueType)
-                            attributes += @" isSealed=""true""";
+                            xmlAttributes += @" isSealed=""true""";
 
                         var extraContent = "";
                         if (typeDeclaration is DelegateDeclarationSyntax)
                         {
-                            extraContent = $@"<signature>
+                            extraContent += $@"<signature>
 {SignatureFor(typeSymbol.DelegateInvokeMethod)}
 </signature>";
                         }
 
+                        extraContent += AttributesXml(typeSymbol);
+
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{attributes}>
+<doc version=""3"">
+    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{xmlAttributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         {extraContent}
@@ -143,6 +161,7 @@ namespace Unity.DocTool.XMLDocHandler
 
                             xml.Append($@"<member name=""{memberName}"" type=""{member.Kind}""{methodAttributes}>
             <signature>{SignatureFor(member)}</signature>
+            {AttributesXml(member)}
             <xmldoc>
                 <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
             </xmldoc>
@@ -160,6 +179,58 @@ namespace Unity.DocTool.XMLDocHandler
             throw new Exception($"Type not found Id={id}");
         }
 
+        private static string AttributesXml(ISymbol typeSymbol)
+        {
+            var attributeData = typeSymbol.GetAttributes();
+            return AttributesXml(attributeData);
+        }
+
+        private static string AttributesXml(ImmutableArray<AttributeData> attributeData)
+        {
+            var attributes = attributeData.Where(a => a.AttributeClass.IsPublicApi()).ToArray();
+            var attributeXml = string.Empty;
+            if (attributes.Length > 0)
+            {
+                attributeXml = $@"<attributes>
+{string.Join("\n", attributes.Select(AttributeXml))}
+</attributes>";
+            }
+
+            return attributeXml;
+        }
+
+        private static string AttributeXml(AttributeData attribute)
+        {
+            var tag = $@"attribute typeId=""{attribute.AttributeClass.Id()}""";
+            var namedArguments = attribute.NamedArguments;
+            var constructorArguments = attribute.ConstructorArguments;
+            if (constructorArguments.IsEmpty && namedArguments.IsEmpty)
+                return $@"<{tag}/>";
+            else
+            {
+                StringBuilder sb = new StringBuilder($@"<{tag}>");
+                if (!constructorArguments.IsEmpty)
+                {
+                    sb.AppendLine("<constructorArguments>");
+                    foreach (var argument in constructorArguments)
+                        sb.AppendLine($@"<argument value=""{argument.ToCSharpString()}""/>");
+
+                    sb.AppendLine("</constructorArguments>");
+                }
+                if (!namedArguments.IsEmpty)
+                {
+                    sb.AppendLine("<namedArguments>");
+                    foreach (var argument in namedArguments)
+                        sb.AppendLine($@"<argument name=""{argument.Key}"" value=""{argument.Value.ToCSharpString()}""/>");
+
+                    sb.AppendLine("</namedArguments>");
+                }
+
+                sb.AppendLine("</attribute>");
+                return sb.ToString();
+            }
+        }
+
         private IEnumerable<PortableExecutableReference> GetMetadataReferences()
         {
             return compilationParameters.ReferencedAssemblyPaths.Select(p => MetadataReference.CreateFromFile(p));
@@ -167,10 +238,13 @@ namespace Unity.DocTool.XMLDocHandler
 
         private static string BaseType(INamedTypeSymbol typeSymbol)
         {
-            if (typeSymbol.TypeKind == TypeKind.Interface)
+            if (typeSymbol.TypeKind == TypeKind.Interface || typeSymbol.TypeKind == TypeKind.Struct)
                 return null;
 
-            return typeSymbol.BaseType.TypeKind == TypeKind.Interface ? "Object" : typeSymbol.BaseType.Name;
+            if (typeSymbol.BaseType.FullyQualifiedName(true, true) == "System.Object")
+                return null;
+
+            return typeSymbol.BaseType.Id();
         }
 
         private string InterfaceList(INamedTypeSymbol typeSymbol)
@@ -204,7 +278,22 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Method:
                     {
                         var method = (IMethodSymbol)member;
-                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{XmlUtility.EscapeString(method.ReturnType.ToDisplayString())}\"/>";
+                        string returnXml = "";
+                        if (method.Name != ".ctor")
+                        {
+                            var returnXmlTag = $"return typeId=\"{method.ReturnType.Id()}\" typeName=\"{XmlUtility.EscapeString(method.ReturnType.ToDisplayString())}\"";
+
+                            var returnTypeAttributes = method.GetReturnTypeAttributes();
+                            if (returnTypeAttributes.IsEmpty)
+                                returnXml = $@"<{returnXmlTag}/>";
+                            else
+                            {
+                                returnXml = $@"<{returnXmlTag}>
+    {AttributesXml(returnTypeAttributes)}
+</return>";
+                            }
+                        }
+
                         return $@"
 {AccessibilityXml(member.DeclaredAccessibility)}
 {returnXml}
@@ -281,6 +370,7 @@ namespace Unity.DocTool.XMLDocHandler
         private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
         {
             string constraintAttributes = "";
+            string body = string.Empty;
             string suffix = "/>";
             if (includeConstraints)
             {
@@ -293,17 +383,29 @@ namespace Unity.DocTool.XMLDocHandler
 
                 if (!sourceTypeParameterSymbol.ConstraintTypes.IsEmpty)
                 {
-                    suffix = $@">
-{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}
-</typeParameter>";
+                    body += $@"{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}";
                 }
+            }
+
+            var attributesXml = AttributesXml(sourceTypeParameterSymbol.GetAttributes());
+            if (!string.IsNullOrEmpty(attributesXml))
+            {
+                body += attributesXml;
             }
 
             string declaringTypeId = "";
             if (includeDeclaringTypeId)
                 declaringTypeId = $@" declaringTypeId=""{sourceTypeParameterSymbol.DeclaringType.Id()}""";
 
-            return $@"<typeParameter{declaringTypeId} name=""{sourceTypeParameterSymbol.Name}""{constraintAttributes}{suffix}";
+            string typeParameterTag = $@"typeParameter{declaringTypeId} name=""{sourceTypeParameterSymbol.Name}""{constraintAttributes}";
+            if (!string.IsNullOrEmpty(body))
+            {
+                return $@"<{typeParameterTag}>
+{body}
+</typeParameter>";
+            }
+            else
+                return $"<{typeParameterTag}/>";
         }
 
         private static string TypeReferenceXml(INamedTypeSymbol namedTypeSymbol)
@@ -357,7 +459,19 @@ namespace Unity.DocTool.XMLDocHandler
                 }
                 else
                     defaultValueAttribute = "";
-                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{optionalAttribute}{defaultValueAttribute}/>");
+
+                string parameterTag =
+                    $"parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{optionalAttribute}{defaultValueAttribute}";
+
+                var attributesXml = AttributesXml(parameter);
+                if (string.IsNullOrEmpty(attributesXml))
+                    sb.AppendLine($"<{parameterTag}/>");
+                else
+                {
+                    sb.AppendLine($"<{parameterTag}>");
+                    sb.AppendLine(attributesXml);
+                    sb.AppendLine("</parameter>");
+                }
             }
             return sb.ToString();
         }

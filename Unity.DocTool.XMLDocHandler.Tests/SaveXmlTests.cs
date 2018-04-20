@@ -42,9 +42,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {    
     class ClassWithProperty
     {
-    /// <summary>
-    ///New Value Propery
-    ///</summary>
+        /// <summary>
+        ///New Value Propery
+        ///</summary>
+        [TestInternal][TestPublic]
         public int Value
 ",
                     sourcePath = "TestTypes/ClassWithProperty.cs"
@@ -103,7 +104,7 @@ Some Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -176,7 +177,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -259,6 +260,7 @@ Updated Docs
     class ClassWithField
     {
         /// <summary>New Docs</summary>
+        [TestInternal][TestPublic]
         public int value;
     }
 }",
@@ -325,6 +327,7 @@ Updated Docs
     class ClassWithField
     {
         /// <summary>New value Docs</summary>
+        [TestInternal][TestPublic]
         public int value;
     }
 }",
@@ -403,6 +406,7 @@ Updated Docs
     class ClassWithEvent
     {
         /// <summary>new docs</summary>
+        [TestInternal] [TestPublic]
         public event System.Action<bool> anEvent;
     }
 }
@@ -544,6 +548,7 @@ Updated Docs
     static class ClassWithExtensionMethods
     {
         /// <summary>new docs</summary>
+        [TestInternal][TestPublic]
         public static int ExtensionMethod(this string s)
         {",
                     sourcePath = "TestTypes/ClassWithExtensionMethods.cs"
@@ -554,7 +559,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
@@ -581,7 +586,7 @@ Updated Docs
                     {
                         newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
@@ -634,7 +639,7 @@ Updated Docs
         /// <summary>
         /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
         /// </summary>
-        public void GenericMethodWithGenericConstraint<T2>() where T2 : T
+        public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>() where T2 : T
         { }
         /// new docs
         public void GenericMethodWithGenericConstraint()
@@ -644,7 +649,6 @@ Updated Docs
         }
 
         //TODO: Add tests for: Formating
-        //TODO: Add tests for: Delegates
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
