@@ -1,6 +1,6 @@
 ﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithEventAddRemove
+    public class ClassWithEventAddRemove
     {
         /// <summary>
         /// anEvent

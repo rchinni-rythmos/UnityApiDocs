@@ -94,7 +94,9 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
 
         public static bool IsPublicApi(this ISymbol symbol)
         {
-            //TODO: Take nested types into account.           
+            if (symbol.ContainingType != null && !IsPublicApi(symbol.ContainingType))
+                return false;
+
             var accessibility = symbol.DeclaredAccessibility;
             return accessibility == Accessibility.Public ||
                    accessibility == Accessibility.Protected ||

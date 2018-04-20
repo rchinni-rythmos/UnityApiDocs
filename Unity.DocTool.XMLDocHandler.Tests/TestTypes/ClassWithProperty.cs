@@ -2,7 +2,7 @@
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithProperty
+    public class ClassWithProperty
     {
         /// <summary>
         /// Value property

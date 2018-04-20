@@ -1,6 +1,6 @@
 ﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithOperator
+    public class ClassWithOperator
     {
         /// <summary>
         /// Plus Operator

@@ -2,7 +2,7 @@
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithEvent
+    public class ClassWithEvent
     {
         /// <summary>
         /// anEvent

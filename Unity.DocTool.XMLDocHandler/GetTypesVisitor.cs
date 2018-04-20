@@ -31,8 +31,6 @@ namespace Unity.DocTool.XMLDocHandler
                 base.VisitInterfaceDeclaration(node);
         }
 
-        //TODO: Support global delegates
-
         public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node)
         {
             AddTypeIfPublicApi(node);

@@ -2,7 +2,7 @@
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    static class ClassWithExtensionMethods
+    public static class ClassWithExtensionMethods
     {
         /// <summary>
         /// Extension method

@@ -2,7 +2,7 @@
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithField
+    public class ClassWithField
     {
         /// <summary>
         /// Value field

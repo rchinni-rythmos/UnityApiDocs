@@ -1,6 +1,6 @@
 ﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithOverloads
+    public class ClassWithOverloads
     {
         /// <summary>
         /// Method()

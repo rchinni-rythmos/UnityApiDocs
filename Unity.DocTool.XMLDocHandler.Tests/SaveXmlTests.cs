@@ -40,7 +40,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     expectedSource = @"
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {    
-    class ClassWithProperty
+    public class ClassWithProperty
     {
         /// <summary>
         ///New Value Propery
@@ -257,7 +257,7 @@ Updated Docs
 </doc>",
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithField
+    public class ClassWithField
     {
         /// <summary>New Docs</summary>
         [TestInternal][TestPublic]
@@ -286,7 +286,7 @@ Updated Docs
 </doc>",
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithMultipleFieldsOnDeclaration
+    public class ClassWithMultipleFieldsOnDeclaration
     {
         /// <summary>
         /// Value field 1
@@ -324,7 +324,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New ClassWithField Docs</summary>
-    class ClassWithField
+    public class ClassWithField
     {
         /// <summary>New value Docs</summary>
         [TestInternal][TestPublic]
@@ -403,7 +403,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithEvent
+    public class ClassWithEvent
     {
         /// <summary>new docs</summary>
         [TestInternal] [TestPublic]
@@ -443,7 +443,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithEventAddRemove
+    public class ClassWithEventAddRemove
     {
         /// <summary>new docs</summary>
         public event System.Action<System.Func<bool>> anEvent
@@ -481,7 +481,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithOperator
+    public class ClassWithOperator
     {
         /// <summary>new docs</summary>
         public static int operator +(ClassWithOperator classWithOperator, int other)
@@ -513,7 +513,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithConstructor
+    public class ClassWithConstructor
     {
         /// <summary>new docs</summary>
         public ClassWithConstructor() { }
@@ -545,7 +545,7 @@ Updated Docs
 </doc>",
                     expectedSource = @"
     /// <summary>New class docs</summary>
-    static class ClassWithExtensionMethods
+    public static class ClassWithExtensionMethods
     {
         /// <summary>new docs</summary>
         [TestInternal][TestPublic]
@@ -682,7 +682,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// New class docs
-    class ClassWithOverloads
+    public class ClassWithOverloads
     {
         /// new docs for Method()
         public void Method() { }

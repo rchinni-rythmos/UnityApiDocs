@@ -40,12 +40,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
         /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public object Clone()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         /// <summary>

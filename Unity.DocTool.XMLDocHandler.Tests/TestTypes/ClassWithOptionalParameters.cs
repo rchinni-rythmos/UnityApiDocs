@@ -2,7 +2,7 @@
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithOptionalParameters
+    public class ClassWithOptionalParameters
     {
         /// <summary>
         /// OptionalInt

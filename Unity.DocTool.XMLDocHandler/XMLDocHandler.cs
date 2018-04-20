@@ -332,7 +332,7 @@ namespace Unity.DocTool.XMLDocHandler
 {TypeReferenceXml(((IEventSymbol)member).Type)}";
                     }
                 default:
-                    throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
+                    throw new NotSupportedException($"Unsupported type {member.Kind} : {member.Name}");
             }
         }
 
@@ -364,7 +364,7 @@ namespace Unity.DocTool.XMLDocHandler
             {
                 return TypeParameterXml(sourceTypeParameterSymbol, includeConstraints, true);
             }
-            throw new NotImplementedException("Unsupported typeSymbol");
+            throw new NotSupportedException("Unsupported typeSymbol");
         }
 
         private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
@@ -478,8 +478,6 @@ namespace Unity.DocTool.XMLDocHandler
 
         public void SetType(string docXml, params string[] sourcePaths)
         {
-            //TODO: Check if we need to visit newly instantiated AST nodes
-            //TODO: Extract common roslyn initializion code.
             IEnumerable<string> defines = new string[0];
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
 
@@ -636,7 +634,7 @@ namespace Unity.DocTool.XMLDocHandler
 
             SyntaxNode targetTypeNode;
             if (!_documentationTargetTypeNodes.TryGetValue(symbol.Id(), out targetTypeNode))
-                throw new NotImplementedException("This type of node has not been prioritized yet.");
+                throw new NotSupportedException("This type of node has not been prioritized yet.");
 
             return targetTypeNode == node;
         }
@@ -665,33 +663,9 @@ namespace Unity.DocTool.XMLDocHandler
             base.VisitClassDeclaration(node);
         }
 
-        public override void VisitStructDeclaration(StructDeclarationSyntax node)
-        {
-            base.VisitStructDeclaration(node);
-        }
-
-        public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
-        {
-            base.VisitEnumDeclaration(node);
-        }
-
         internal void Visit(SyntaxNode syntaxNode, SemanticModel semanticModel)
         {
             _semanticModel = semanticModel;
         }
-
-        //public override void VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node)
-        //{
-        //    base.VisitDocumentationCommentTrivia(node);
-        //    var documentationTarget = node.ParentTrivia.Token.Parent;
-
-        //    Console.WriteLine($"|{node.Content}|");
-        //}
-
-        //public override void VisitXmlElement(XmlElementSyntax node)
-        //{
-        //    base.VisitXmlElement(node);
-        //    Console.WriteLine($"----\r\n{node}");
-        //}
     }
 }

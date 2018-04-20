@@ -14,7 +14,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
         /// </summary>
         IEnumerator<int> IEnumerable<int>.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
         /// </summary>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }
