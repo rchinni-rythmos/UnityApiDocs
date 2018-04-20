@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Xml;
 using NUnit.Framework;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
     [TestFixture]
-    public class XmlDocHandlerTest : XmlDocHandlerTestBase
+    class XmlDocHandlerTest : XmlDocHandlerTestBase
     {
         [Test]
         public void GetTypes_Returns_Relative_Path_When_Given_Path_Without_Trailing_Slash()
         {
-            var testFileDirectory = TestPathFor("TestTypes/CommonTypes");
+            var testFileDirectory = "TestTypes/CommonTypes";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -22,7 +25,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Full_ReturnsCorrectXml()
         {
-            var testFileDirectory = TestPathFor("TestTypes/CommonTypes/");
+            var testFileDirectory = "TestTypes/CommonTypes/";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -53,6 +56,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.Delegate</id>
+            <parentId>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass</parentId>
+            <name>Delegate</name>
+            <kind>Delegate</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
+            <relativeFilePaths>
+                <path>AClass.cs</path>
+            </relativeFilePaths>
+        </type>
+        <type>
             <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AnEnum</id>
             <parentId></parentId>
             <name>AnEnum</name>
@@ -61,6 +74,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <relativeFilePaths>
                 <path>AnEnum.cs</path>
 
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.ADelegate</id>
+            <parentId></parentId>
+            <name>ADelegate</name>
+            <kind>Delegate</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes</namespace>
+            <relativeFilePaths>
+                <path>GlobalDelegate.cs</path>
             </relativeFilePaths>
         </type>
         <type>
@@ -82,7 +105,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         [Test]
         public void GetTypes_Generics_ReturnsCorrectXml()
         {
-            var testFileDirectory = TestPathFor("TestTypes/Generics/");
+            var testFileDirectory = "TestTypes/Generics/";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
             string xmlActual = handler.GetTypesXml();
 
@@ -90,13 +113,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <doc version=""1"">
     <types>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.ExtendsGenericInterface</id>
             <parentId></parentId>
-            <name>GenericClass</name>
+            <name>ExtendsGenericInterface</name>
             <kind>Class</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
-                <path>GenericClass.cs</path>
+                <path>ExtendsGenericInterface.cs</path>
 
             </relativeFilePaths>
         </type>
@@ -112,9 +135,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClassWithConstraints`1</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass</id>
             <parentId></parentId>
-            <name>GenericClassWithConstraints</name>
+            <name>GenericClass</name>
             <kind>Class</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
@@ -123,13 +146,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             </relativeFilePaths>
         </type>
         <type>
-            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.ExtendsInterface</id>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1</id>
             <parentId></parentId>
-            <name>ExtendsInterface</name>
-            <kind>Class</kind>
+            <name>GenericStructWithConstraints</name>
+            <kind>Struct</kind>
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
-                <path>GenericClass.cs</path>
+                <path>GenericStructWithConstraints.cs</path>
 
             </relativeFilePaths>
         </type></types></doc>";
@@ -146,10 +169,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""AClass"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+    <member name=""AClass"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <interfaces>
-            <interface typeId=""System.Collections.IEnumerable"" typeName=""IEnumerable"" />
-            <interface typeId=""System.ICloneable"" typeName=""ICloneable"" />
+            <interface typeId=""System.Collections.IEnumerable"" typeName=""IEnumerable""/>
+            <interface typeId=""System.ICloneable"" typeName=""ICloneable""/>
         </interfaces>
         <xmldoc><![CDATA[
             <summary>I have a summary</summary>
@@ -157,12 +180,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Here is some more docs
         ]]></xmldoc>
 
-        <member name = ""Foo"" type=""Method"">
+        <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return typeId=""System.Int32"" typeName=""int""/>
                 <parameters>
-                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
+                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int""/>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[
@@ -171,10 +194,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             ]]></xmldoc>                
         </member>
 
-        <member name = ""VoidProtectedMethod"" type=""Method"">
+        <member name=""VoidProtectedMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Protected</accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return typeId=""System.Void"" typeName=""void""/>
                 <parameters>
                 </parameters>
             </signature>
@@ -182,10 +205,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 some docs
             ]]></xmldoc>                
         </member>
-        <member name = ""System.Collections.IEnumerable.GetEnumerator"" type=""Method"">
+        <member name=""System.Collections.IEnumerable.GetEnumerator"" type=""Method"" methodKind=""ExplicitInterfaceImplementation"">
             <signature>
                 <accessibility>Private</accessibility>
-                <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator"" />
+                <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator""/>
                 <parameters></parameters>
             </signature>
             <xmldoc><![CDATA[
@@ -195,10 +218,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <returns></returns>
             ]]></xmldoc>
         </member>
-        <member name = ""Clone"" type=""Method"">
+        <member name=""Clone"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Object"" typeName=""object"" />
+                <return typeId=""System.Object"" typeName=""object""/>
                 <parameters></parameters>
             </signature>
             <xmldoc><![CDATA[    
@@ -214,38 +237,79 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         {
             Assert.Inconclusive("Not implementated yet");
         }
-
-        [Test]
-        public void Test_Inner_Types()
+        
+        public struct TestIsReportedData
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface", "AClass.cs");
-            Console.WriteLine(actualXml);
-
-            var expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-<doc version=""3"">
-    <member name=""INestedInterface"" type = ""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
-        <xmldoc><![CDATA[
-            <summary>
-            I am a nested interface
-            </summary>
-        ]]></xmldoc>
-    </member>
-</doc>";
-            AssertXml(expectedXml, actualXml);
+            public string typeId;
+            public string sourceFile;
+            public string expectedXml;
+            public bool exact;
         }
 
-        [Test]
-        public void Test_Property_Is_Reported()
+        static IEnumerable<TestCaseData> TestIsReportedTestCases()
         {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty", "ClassWithProperty.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"<member name = ""Value"" type=""Property"">
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithField.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithField",
+                    expectedXml = @"<member name=""value"" type=""Field"">
 <signature>
     <accessibility>Public</accessibility>
-    <type typeId=""System.Int32"" typeName=""int"" />
+    <type typeId=""System.Int32"" typeName=""int""/>
+</signature>
+<xmldoc><![CDATA[
+    <summary>
+    Value field
+    </summary>
+]]></xmldoc>
+</member>"
+                }).SetName("Field_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""GenericClass`1"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+        <typeParameters>
+            <typeParameter name=""T""/>
+        </typeParameters>
+        <xmldoc>
+            <![CDATA[
+    <summary>
+    Existing Docs for GenericClass-T
+    </summary>]]>
+        </xmldoc>
+        <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void""/>
+                <parameters></parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[
+    <summary>
+    Existing GenericClass-T.Foo
+    </summary>
+
+]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    exact = true
+                }).SetName("Generic_Types");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithProperty.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithProperty",
+                    expectedXml = @"<member name=""Value"" type=""Property"">
+<signature>
+    <accessibility>Public</accessibility>
+    <type typeId=""System.Int32"" typeName=""int""/>
     <get><accessibility>Public</accessibility></get>
     <parameters></parameters>
 </signature>
@@ -257,33 +321,29 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
 
 ]]></xmldoc>
-</member>";
-
-            Assert.That(Normalize(actualXml), Contains.Substring(Normalize(expectedXml)), actualXml);
-        }
-
-        [Test]
-        public void Test_PropertyWithIndexer_IsReported()
-        {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithIndexer", "ClassWithIndexer.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"  <?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+</member>"
+                }).SetName("Property");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithIndexer.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithIndexer",
+                    expectedXml = @"  <?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""ClassWithIndexer"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name=""ClassWithIndexer"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         
         <xmldoc><![CDATA[
         
-        ]]></xmldoc><member name = ""this[]"" type=""Property"">
+        ]]></xmldoc><member name=""this[]"" type=""Property"">
             <signature>
-<accessibility>Public</accessibility>
-<type typeId=""System.Int32"" typeName=""int"" />
+                <accessibility>Public</accessibility>
+                <type typeId=""System.Int32"" typeName=""int""/>
 
-<get><accessibility>Public</accessibility></get>
-<set><accessibility>Protected</accessibility></set>
-<parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int"" />
-</parameters></signature>
+                <get><accessibility>Public</accessibility></get>
+                <set><accessibility>Protected</accessibility></set>
+                <parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int""/>
+                </parameters>
+            </signature>
             <xmldoc><![CDATA[
                 
     <summary>
@@ -293,76 +353,319 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
             ]]></xmldoc>
         </member>
-</member></doc>";
-            
-            AssertXml(expectedXml, actualXml);
+</member></doc>",
+                    exact = true
+                }).SetName("Property_With_Indexer");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/AClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.INestedInterface",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+        <xmldoc><![CDATA[
+            <summary>
+            I am a nested interface
+            </summary>
+        ]]></xmldoc>
+    </member>
+</doc>",
+                    exact = true
+                }).SetName("Inner_Types");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithEvent.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEvent",
+                    expectedXml =
+@"<member name=""anEvent"" type=""Event"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Action`1"" typeName=""System.Action&lt;bool&gt;"">
+            <typeArguments>
+                <type typeId=""System.Boolean"" typeName=""bool""/>
+            </typeArguments>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[
+    <summary>
+    anEvent
+    </summary>
+    ]]></xmldoc>
+</member>"
+                }).SetName("Event_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithEventAddRemove.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEventAddRemove",
+                    expectedXml =
+                        @"<member name=""anEvent"" type=""Event"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Action`1"" typeName=""System.Action&lt;System.Func&lt;bool&gt;&gt;"">
+            <typeArguments>
+                <type typeId=""System.Func`1"" typeName=""System.Func&lt;bool&gt;"">
+                    <typeArguments>
+                        <type typeId=""System.Boolean"" typeName=""bool""/>
+                    </typeArguments>
+                </type>
+            </typeArguments>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[
+    <summary>
+    anEvent
+    </summary>
+    ]]></xmldoc>
+</member>"
+                }).SetName("Event_With_Add_Remove_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithOperator.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator",
+                    expectedXml =
+                        @"<member name=""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"" isStatic=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int""/>
+        <parameters>
+            <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator""/>
+            <parameter name=""other"" typeId=""System.Int32"" typeName=""int""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        Plus Operator
+        </summary>]]></xmldoc>
+</member>"
+                }).SetName("Operator_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithConstructor.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithConstructor",
+                    expectedXml =
+                        @"<member name="".ctor"" type=""Method"" methodKind=""Constructor"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <parameters></parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>A Constructor</summary>]]></xmldoc>
+</member>"
+                }).SetName("Constructor_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericStructWithConstraints.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1",
+                    expectedXml =
+                        @"<member name=""GenericStructWithConstraints`1"" type=""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"">
+        <typeParameters>
+            <typeParameter name=""T"" hasConstructorConstraint=""true"" hasReferenceTypeConstraint=""true"">
+                <type typeId=""System.Collections.Generic.IList`1"" typeName=""System.Collections.Generic.IList&lt;Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass&gt;"">
+                    <typeArguments>
+                        <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass""/>
+                    </typeArguments>
+                </type>
+            </typeParameter>
+        </typeParameters>
+        <xmldoc>
+            <![CDATA[
+            <summary>
+                Existing Docs for GenericStructWithConstraints-T
+            </summary>
+            ]]>
+        </xmldoc>
+        <member name=""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void""/>
+                <parameters></parameters>
+                <typeParameters>
+                    <typeParameter name=""T2"">
+                        <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T""/>
+                    </typeParameter>
+                </typeParameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[
+                <summary>
+                    Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
+                </summary>
+                ]]>
+            </xmldoc>
+        </member>
+        <member name=""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return typeId=""System.Void"" typeName=""void""/>
+                <parameters></parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[
+                <summary>
+                    Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint
+                </summary>
+                ]]>
+            </xmldoc>
+        </member>
+  </member>"
+                }).SetName("GenericStructWithConstraints");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithExtensionMethods.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithExtensionMethods",
+                    expectedXml =
+                        @"<member name=""ClassWithExtensionMethods"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"" isStatic=""true"">
+<xmldoc>
+    <![CDATA[]]>
+</xmldoc>
+<member name=""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"" isStatic=""true"" isExtensionMethod=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int""/>
+        <parameters>
+            <parameter name=""s"" typeId=""System.String"" typeName=""string""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        Extension method
+        </summary>]]></xmldoc>
+</member>
+</member>"
+                }).SetName("Extension_Method_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithOptionalParameters.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters",
+                    expectedXml =
+                        @"<member name=""OptionalInt"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters>
+            <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" isOptional=""true"" defaultValue=""3""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>
+        OptionalInt
+        </summary>]]>
+    </xmldoc>
+</member>
+<member name=""OptionalNoDefaultValue"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters>
+            <parameter name=""s"" typeId=""System.String"" typeName=""string"" isOptional=""true""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>
+        OptionalNoDefaultValue
+        </summary>]]>
+    </xmldoc>
+</member>
+<member name=""OptionalConstValue"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters>
+            <parameter name=""f"" typeId=""System.Single"" typeName=""float"" isOptional=""true"" defaultValue=""4""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>
+        OptionalConstValue
+        </summary>]]>
+    </xmldoc>
+</member>
+<member name=""OptionalDefaultStruct"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters>
+            <parameter name=""s"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct"" isOptional=""true"" defaultValue=""default""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[<summary>
+        OptionalDefaultStruct
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Optional_Parameter_Is_Reported");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/GlobalDelegate.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.ADelegate",
+                    expectedXml =
+                        @"<member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Int32"" typeName=""int""/>
+        <parameters>
+            <parameter name=""o"" typeId=""System.Object"" typeName=""object""/>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        A Delegate
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Global_Delegate");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/CommonTypes/AClass.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.Delegate",
+                    expectedXml =
+                        @"<member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return typeId=""System.Void"" typeName=""void""/>
+        <parameters></parameters>
+    </signature>
+    <xmldoc><![CDATA[
+        <summary>
+        Delegate
+        </summary>]]>
+    </xmldoc>
+</member>"
+                }).SetName("Inner_Delegate");
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestIsReportedTestCases))]
+        public void Test_Is_Reported(TestIsReportedData data)
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(data.sourceFile)));
+            string actualXml = handler.GetTypeDocumentation(data.typeId, Path.GetFileName(data.sourceFile));
+            Console.WriteLine(actualXml);
+
+            AssertValidXml(actualXml);
+            if (data.exact)
+                AssertXml(data.expectedXml, actualXml);
+            else
+                AssertXmlContains(data.expectedXml, actualXml);
+        }
+
+        private void AssertValidXml(string actualXml)
+        {
+            var doc = new XmlDocument();
+            Assert.DoesNotThrow(() => doc.LoadXml(actualXml), $@"Xml parse error. Xml:
+{actualXml}");
         }
 
         [Test]
         public void Test_Attributes_Are_Reported()
         {
             Assert.Inconclusive("Not implementated yet");
-        }
-
-        [Test]
-        public void Test_Generic_Types()
-        {
-            var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/Generics"));
-            string actualXml = handler.GetTypeDocumentation("Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericClass`1", "GenericClass.cs");
-            Console.WriteLine(actualXml);
-
-            string expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""GenericClass`1"" type = ""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
-        <xmldoc>
-            <![CDATA[
-    <summary>
-    Existing Docs for GenericClass-T
-    </summary>
-
-]]>
-        </xmldoc><member name = ""Foo"" type=""Method"">
-            <signature>
-<accessibility>Public</accessibility>
-<return typeId=""System.Void"" typeName=""void"" />
-<parameters></parameters></signature>
-            <xmldoc>
-                <![CDATA[
-    <summary>
-    Existing GenericClass-T.Foo
-    </summary>
-
-]]>
-            </xmldoc>
-        </member>
-</member></doc>";
-            AssertXml(expectedXml, actualXml);
-        }
-
-        [Test]
-        public void Test_Generic_Types_With_Constraints()
-        {
-            Assert.Inconclusive("Not implementated yet. Should expose enough information to produce consumer docs.");
-        }
-
-        [Test]
-        public void Test_Generic_Members()
-        {
-            Assert.Inconclusive("Not implementated yet");
-        }
-
-        private void AssertXml(string expectedXml, string actualXml)
-        {
-            var normalizedExpectedXml = Normalize(expectedXml);
-            var normalizedActualXml = Normalize(actualXml);
-
-            Assert.AreEqual(normalizedExpectedXml, normalizedActualXml, actualXml);
-        }
-
-        private static string TestPathFor(string path)
-        {
-            //TODO: Inline
-            return path;
         }
     }
 }

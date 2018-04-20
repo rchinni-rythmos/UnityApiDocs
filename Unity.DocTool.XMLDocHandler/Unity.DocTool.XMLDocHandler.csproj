@@ -111,11 +111,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CecilUtility.cs" />
     <Compile Include="Extensions\ISymbolExtensions.cs" />
     <Compile Include="GetTypesVisitor.cs" />
     <Compile Include="XMLDocHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDocReplacerVisitor.cs" />
+    <Compile Include="XmlUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
