@@ -66,7 +66,7 @@ namespace Unity.DocTool.XMLDocHandler.Driver
                 var tempPaths = paths.Select(p =>
                 {
                     var tempPath = Path.GetTempFileName();
-                    File.Copy(p, tempPath, true);
+                    File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
                     return tempPath;
                 }).ToArray();
 
