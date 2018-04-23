@@ -81,6 +81,9 @@
     <Compile Include="TestTypes\ClassWithDelegate.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\Attributes\ClassWithAttributeWithStringArgument.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\DerivedClass.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

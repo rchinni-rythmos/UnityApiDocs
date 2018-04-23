@@ -9,7 +9,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
         public AClass.AnEnum AnEnum { get; set; }
         public TestPublicAttribute()
         { }
-        public TestPublicAttribute(int anInt)
+        public TestPublicAttribute(Object value)
         {}
     }
 }

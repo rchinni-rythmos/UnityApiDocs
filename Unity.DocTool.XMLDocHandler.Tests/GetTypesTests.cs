@@ -709,10 +709,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <attributes>
             <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"">
                 <constructorArguments>
-                    <argument value=""50""/>
+                    <argument value='50'/>
                 </constructorArguments>
                 <namedArguments>
-                    <argument name=""AnEnum"" value=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.AnEnum.Value""/>
+                    <argument name=""AnEnum"" value='Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass.AnEnum.Value'/>
                 </namedArguments>
             </attribute>
         </attributes>
@@ -752,6 +752,26 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     </member>
 </doc>"
                 }).SetName("Class_With_Attributes");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Attributes/ClassWithAttributeWithStringArgument.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.ClassWithAttributeWithStringArgument",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithAttributeWithStringArgument"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes"">
+        <attributes>
+            <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"">
+                <constructorArguments>
+                    <argument value='""string""'/>
+                </constructorArguments>
+            </attribute>
+        </attributes>
+        <xmldoc><![CDATA[]]></xmldoc>
+    </member>
+</doc>",
+                    exact = true
+                }).SetName("Class_With_Attribute_With_String_Argument");
             yield return new TestCaseData(
                 new TestIsReportedData
                 {
