@@ -105,7 +105,7 @@ namespace Unity.DocTool.XMLDocHandler
         private XmlNode SelectTypeNode(INamedTypeSymbol typeSymbol)
         {
             var selector =
-                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
+                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}'");
             if (typeSymbol.ContainingType != null)
                 selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
 

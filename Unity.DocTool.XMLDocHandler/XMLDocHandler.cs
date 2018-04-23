@@ -136,7 +136,7 @@ namespace Unity.DocTool.XMLDocHandler
 
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{xmlAttributes}>
+    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}""{xmlAttributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         {extraContent}

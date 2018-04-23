@@ -691,6 +691,22 @@ Updated Docs
     }",
                     sourcePath = "TestTypes/ClassWithOverloads.cs"
                 }).SetName("Update_Overload");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassInGlobalNamespace"" type=""Class"" namespace="""">
+        <xmldoc><![CDATA[New Docs]]></xmldoc>
+    </member>
+</doc>",
+                    expectedSource = @"/// New Docs
+public class ClassInGlobalNamespace
+{}
+",
+                    sourcePath = "TestTypes/ClassInGlobalNamespace.cs"
+                }).SetName("Update_Class_In_Global_Namespace");
         }
 
         //TODO: Add tests for: Formating

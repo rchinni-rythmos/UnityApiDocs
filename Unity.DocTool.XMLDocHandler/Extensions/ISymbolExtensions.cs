@@ -19,6 +19,9 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
                 return $"{elementName}[{string.Join(" ", Enumerable.Repeat(',', arraySymbol.Rank - 1))}]";
             }
 
+            if (symbol is INamespaceSymbol && ((INamespaceSymbol) symbol).IsGlobalNamespace)
+                return string.Empty;
+
             string name;
             if (useMetadataName)
             {

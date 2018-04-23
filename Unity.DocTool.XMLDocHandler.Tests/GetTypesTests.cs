@@ -390,6 +390,23 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             yield return new TestCaseData(
                 new TestIsReportedData
                 {
+                    sourceFile = "TestTypes/ClassInGlobalNamespace.cs",
+                    typeId = "ClassInGlobalNamespace",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassInGlobalNamespace"" type=""Class"" namespace="""">
+        <xmldoc><![CDATA[
+            <summary>
+            ClassInGlobalNamespace
+            </summary>
+        ]]></xmldoc>
+    </member>
+</doc>",
+                    exact = true
+                }).SetName("Global_Namespace");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
                     sourceFile = "TestTypes/ClassWithEvent.cs",
                     typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithEvent",
                     expectedXml =
