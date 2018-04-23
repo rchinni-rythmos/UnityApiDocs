@@ -53,6 +53,10 @@
       <Project>{a5967f93-9f26-45bf-9e6f-77a90d45b8b6}</Project>
       <Name>Unity.DocTool.XMLDocHandler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Unity.Options\Unity.Options.csproj">
+      <Project>{783f0782-fa64-49fb-9b89-8b4a56003a70}</Project>
+      <Name>Unity.Options</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
