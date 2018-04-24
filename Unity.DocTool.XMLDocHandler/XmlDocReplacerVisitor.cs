@@ -126,17 +126,17 @@ namespace Unity.DocTool.XMLDocHandler
             if (parentNode == null)
                 return nodeToUpdate;
 
-            var parameterConstraints = "";
+            var constraints = "";
             var methodSymbol = symbol as IMethodSymbol;
             if (methodSymbol != null)
             {
                 foreach (var parameter in methodSymbol.Parameters)
                 {
-                    parameterConstraints += $@" and signature/parameters/parameter/@typeId='{parameter.Type.Id()}'";
+                    constraints += $@" and signature/parameters/parameter/type/@typeId='{parameter.Type.Id()}'";
                 }
             }
 
-            var docNode = parentNode.SelectSingleNode($"member[@name='{symbol.MemberNameUnescaped()}'{parameterConstraints}]/xmldoc");
+            var docNode = parentNode.SelectSingleNode($"member[@name='{symbol.MemberNameUnescaped()}'{constraints}]/xmldoc");
             return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, symbol);
         }
 

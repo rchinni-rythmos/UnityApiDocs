@@ -19,6 +19,12 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
                 return $"{elementName}[{string.Join(" ", Enumerable.Repeat(',', arraySymbol.Rank - 1))}]";
             }
 
+            if (symbol is IPointerTypeSymbol)
+            {
+                var pointerSymbol = (IPointerTypeSymbol)symbol;
+                return $"{pointerSymbol.PointedAtType.QualifiedName(includeNamespace, useMetadataName)}*";
+            }
+
             if (symbol is INamespaceSymbol && ((INamespaceSymbol) symbol).IsGlobalNamespace)
                 return string.Empty;
 

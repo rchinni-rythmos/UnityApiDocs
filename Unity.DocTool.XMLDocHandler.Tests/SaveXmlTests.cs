@@ -140,7 +140,9 @@ Updated Docs
         <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc>
@@ -347,9 +349,13 @@ Updated Docs
         <member name=""Foo"" type=""Method"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </return>
                 <parameters>
-                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
+                    <parameter name=""i"" >
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>New method docs</summary>]]></xmldoc>                
@@ -468,10 +474,16 @@ Updated Docs
         <member name=""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </return>
                 <parameters>
-                    <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
-                    <parameter name=""other"" typeId=""System.Int32"" typeName=""int"" />
+                    <parameter name=""classWithOperator"" >
+                        <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator""/>
+                    </parameter>
+                    <parameter name=""other"" >
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
@@ -534,9 +546,13 @@ Updated Docs
         <member name=""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </return>
                 <parameters>
-                    <parameter name=""s"" typeId=""System.String"" typeName=""string"" isThis=""true""/>
+                    <parameter name=""s"" isThis=""true"">
+                        <type typeId=""System.String"" typeName=""string""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
@@ -563,9 +579,13 @@ Updated Docs
         <signature>
             <accessibility>Public
             </accessibility>
-            <return typeId=""System.Int32"" typeName=""int"" />
+            <return>
+                <type typeId=""System.Int32"" typeName=""int""/>
+            </return>
             <parameters>
-                <parameter name=""o"" typeId=""System.Object"" typeName=""object"" />
+                <parameter name=""o"" >
+                    <type typeId=""System.Object"" typeName=""object""/>
+                </parameter>
             </parameters>
         </signature>
         <xmldoc>
@@ -590,7 +610,9 @@ Updated Docs
         <signature>
             <accessibility>Public
             </accessibility>
-            <return typeId=""System.Void"" typeName=""void"" />
+            <return>
+                <type typeId=""System.Void"" typeName=""void""/>
+            </return>
             <parameters>
             </parameters>
         </signature>
@@ -620,7 +642,9 @@ Updated Docs
             <signature>
                 <accessibility>Public
                 </accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters>
                 </parameters>
             </signature>
@@ -657,7 +681,9 @@ Updated Docs
         <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters>
                 </parameters>
             </signature>
@@ -668,9 +694,13 @@ Updated Docs
         <member name=""Method"" type=""Method"" methodKind=""Ordinary"" id="""">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters>
-                    <parameter typeId=""System.Int32"" typeName=""int"" name=""i""/>
+                    <parameter name=""i"">
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc>

@@ -41,6 +41,7 @@ namespace Unity.DocTool.XMLDocHandler.Driver
             foreach (XmlNode typeNode in getTypesXml.SelectNodes("//type"))
             {
                 var id = typeNode.SelectSingleNode("id").InnerText;
+                Console.WriteLine("Processing type " + id);
                 var pathNodes = typeNode.SelectNodes("relativeFilePaths/path");
                 var paths = new List<string>();
                 foreach (XmlNode pathNode in pathNodes)

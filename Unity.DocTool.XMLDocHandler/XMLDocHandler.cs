@@ -288,17 +288,11 @@ namespace Unity.DocTool.XMLDocHandler
                         string returnXml = "";
                         if (method.Name != ".ctor")
                         {
-                            var returnXmlTag = $"return typeId=\"{method.ReturnType.Id()}\" typeName=\"{XmlUtility.EscapeString(method.ReturnType.ToDisplayString())}\"";
-
                             var returnTypeAttributes = method.GetReturnTypeAttributes();
-                            if (returnTypeAttributes.IsEmpty)
-                                returnXml = $@"<{returnXmlTag}/>";
-                            else
-                            {
-                                returnXml = $@"<{returnXmlTag}>
+                            returnXml = $@"<return>
+    {TypeReferenceXml(method.ReturnType)}
     {AttributesXml(returnTypeAttributes)}
 </return>";
-                            }
                         }
 
                         return $@"
@@ -360,18 +354,42 @@ namespace Unity.DocTool.XMLDocHandler
 
         private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeConstraints = false)
         {
-            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
-            if (namedTypeSymbol != null)
-            {
-                return TypeReferenceXml(namedTypeSymbol);
-            }
 
             var sourceTypeParameterSymbol = typeSymbol as ITypeParameterSymbol;
             if (sourceTypeParameterSymbol != null)
             {
                 return TypeParameterXml(sourceTypeParameterSymbol, includeConstraints, true);
             }
-            throw new NotSupportedException("Unsupported typeSymbol");
+            var typeTagAttributes =
+                $"typeId=\"{typeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(typeSymbol.ToDisplayString())}\"";
+
+            if (typeSymbol is IArrayTypeSymbol)
+            {
+                return
+                    $@"<type {typeTagAttributes}>
+    {TypeReferenceXml(((IArrayTypeSymbol)typeSymbol).ElementType)}
+    </type>";
+            }
+            if (typeSymbol is IPointerTypeSymbol)
+            {
+                return
+                    $@"<type {typeTagAttributes}>
+    {TypeReferenceXml(((IPointerTypeSymbol)typeSymbol).PointedAtType)}
+    </type>";
+            }
+
+            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+            if (namedTypeSymbol != null && namedTypeSymbol.IsGenericType)
+            {
+                var typeArguments = TypeArguments(namedTypeSymbol.TypeArguments);
+
+                return
+                    $@"<type {typeTagAttributes}>
+    {typeArguments}
+    </type>";
+            }
+            else
+                return $"<type {typeTagAttributes}/>";
         }
 
         private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
@@ -415,24 +433,6 @@ namespace Unity.DocTool.XMLDocHandler
                 return $"<{typeParameterTag}/>";
         }
 
-        private static string TypeReferenceXml(INamedTypeSymbol namedTypeSymbol)
-        {
-            var typeTagAttributes =
-                $"typeId=\"{namedTypeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(namedTypeSymbol.ToDisplayString())}\"";
-
-            if (namedTypeSymbol.IsGenericType)
-            {
-                var typeArguments = TypeArguments(namedTypeSymbol.TypeArguments);
-
-                return
-                    $@"<type {typeTagAttributes}>
-    {typeArguments}
-    </type>";
-            }
-            else
-                return $"<type {typeTagAttributes}/>";
-        }
-
         private static string TypeArguments(ImmutableArray<ITypeSymbol> typeArguments)
         {
             if (typeArguments.IsEmpty)
@@ -469,17 +469,15 @@ namespace Unity.DocTool.XMLDocHandler
                     defaultValueAttribute = "";
 
                 string parameterTag =
-                    $"parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{paramsAttribute}{optionalAttribute}{defaultValueAttribute}";
+                    $"parameter name=\"{parameter.Name}\"{paramsAttribute}{optionalAttribute}{defaultValueAttribute}";
+
 
                 var attributesXml = AttributesXml(parameter);
-                if (string.IsNullOrEmpty(attributesXml))
-                    sb.AppendLine($"<{parameterTag}/>");
-                else
-                {
-                    sb.AppendLine($"<{parameterTag}>");
-                    sb.AppendLine(attributesXml);
-                    sb.AppendLine("</parameter>");
-                }
+
+                sb.AppendLine($@"<{parameterTag}>
+    {TypeReferenceXml(parameter.Type)}
+    {attributesXml}
+</parameter>");
             }
             return sb.ToString();
         }

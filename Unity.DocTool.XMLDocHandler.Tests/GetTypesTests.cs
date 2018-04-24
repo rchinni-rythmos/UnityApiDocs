@@ -120,7 +120,26 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
                 <path>ExtendsGenericInterface.cs</path>
-
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericArrayField</id>
+            <parentId></parentId>
+            <name>GenericArrayField</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericArrayField.cs</path>
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericArrayMethodParameter</id>
+            <parentId></parentId>
+            <name>GenericArrayMethodParameter</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericArrayMethodParameter.cs</path>
             </relativeFilePaths>
         </type>
         <type>
@@ -131,7 +150,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
                 <path>GenericClass.cs</path>
-
             </relativeFilePaths>
         </type>
         <type>
@@ -142,7 +160,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
                 <path>GenericClass.cs</path>
-
+            </relativeFilePaths>
+        </type>
+        <type>
+            <id>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericMethodParameter</id>
+            <parentId></parentId>
+            <name>GenericMethodParameter</name>
+            <kind>Class</kind>
+            <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
+            <relativeFilePaths>
+                <path>GenericMethodParameter.cs</path>
             </relativeFilePaths>
         </type>
         <type>
@@ -153,7 +180,6 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             <namespace>Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics</namespace>
             <relativeFilePaths>
                 <path>GenericStructWithConstraints.cs</path>
-
             </relativeFilePaths>
         </type></types></doc>";
 
@@ -183,9 +209,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int""/>
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </return>
                 <parameters>
-                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int""/>
+                    <parameter name=""i"">
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[
@@ -197,7 +227,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""VoidProtectedMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Protected</accessibility>
-                <return typeId=""System.Void"" typeName=""void""/>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters>
                 </parameters>
             </signature>
@@ -208,7 +240,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""System.Collections.IEnumerable.GetEnumerator"" type=""Method"" methodKind=""ExplicitInterfaceImplementation"">
             <signature>
                 <accessibility>Private</accessibility>
-                <return typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator""/>
+                <return>
+                    <type typeId=""System.Collections.IEnumerator"" typeName=""System.Collections.IEnumerator""/>
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc><![CDATA[
@@ -221,7 +255,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""Clone"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Object"" typeName=""object""/>
+                <return>
+                    <type typeId=""System.Object"" typeName=""object""/>
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc><![CDATA[    
@@ -296,7 +332,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void""/>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc>
@@ -355,7 +393,10 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
                 <get><accessibility>Public</accessibility></get>
                 <set><accessibility>Protected</accessibility></set>
-                <parameters><parameter name=""a"" typeId=""System.Int32"" typeName=""int""/>
+                <parameters>
+                    <parameter name=""a"">
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[
@@ -464,10 +505,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                         @"<member name=""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"" isStatic=""true"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Int32"" typeName=""int""/>
+        <return>
+    <type typeId=""System.Int32"" typeName=""int""/>
+</return>
         <parameters>
-            <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator""/>
-            <parameter name=""other"" typeId=""System.Int32"" typeName=""int""/>
+            <parameter name=""classWithOperator"">
+                <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator""/>
+            </parameter>
+            <parameter name=""other"">
+                <type typeId=""System.Int32"" typeName=""int""/>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc><![CDATA[
@@ -516,7 +563,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void""/>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters></parameters>
                 <typeParameters>
                     <typeParameter name=""T2"">
@@ -538,7 +587,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void""/>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc>
@@ -564,9 +615,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <member name=""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"" isStatic=""true"" isExtensionMethod=""true"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Int32"" typeName=""int""/>
+        <return>
+            <type typeId=""System.Int32"" typeName=""int""/>
+        </return>
         <parameters>
-            <parameter name=""s"" typeId=""System.String"" typeName=""string""/>
+            <parameter name=""s"">
+                <type typeId=""System.String"" typeName=""string""/>
+            </parameter>
         </parameters>
     </signature>
     <attributes>
@@ -588,9 +643,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                         @"<member name=""OptionalInt"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters>
-            <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" isOptional=""true"" defaultValue=""3""/>
+            <parameter name=""i"" isOptional=""true"" defaultValue=""3"">
+                <type typeId=""System.Int32"" typeName=""int""/>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc><![CDATA[<summary>
@@ -601,9 +660,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <member name=""OptionalNoDefaultValue"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters>
-            <parameter name=""s"" typeId=""System.String"" typeName=""string"" isOptional=""true"">
+            <parameter name=""s"" isOptional=""true"">
+                <type typeId=""System.String"" typeName=""string""/>
                 <attributes>
                     <attribute typeId=""System.Runtime.InteropServices.OptionalAttribute""/>
                 </attributes>
@@ -618,9 +680,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <member name=""OptionalConstValue"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters>
-            <parameter name=""f"" typeId=""System.Single"" typeName=""float"" isOptional=""true"" defaultValue=""4""/>
+            <parameter name=""f"" isOptional=""true"" defaultValue=""4"">
+                <type typeId=""System.Single"" typeName=""float""/>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc><![CDATA[<summary>
@@ -631,9 +697,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <member name=""OptionalDefaultStruct"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters>
-            <parameter name=""s"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct"" isOptional=""true"" defaultValue=""default""/>
+            <parameter name=""s"" isOptional=""true"" defaultValue=""default"">
+                <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOptionalParameters.AStruct""/>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc><![CDATA[<summary>
@@ -651,9 +721,13 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                         @"<member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Int32"" typeName=""int""/>
+        <return>
+    <type typeId=""System.Int32"" typeName=""int""/>
+</return>
         <parameters>
-            <parameter name=""o"" typeId=""System.Object"" typeName=""object""/>
+            <parameter name=""o"">
+                <type typeId=""System.Object"" typeName=""object""/>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc><![CDATA[
@@ -672,7 +746,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                         @"<member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters></parameters>
     </signature>
     <xmldoc><![CDATA[
@@ -722,9 +798,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""MethodWithParameter"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void""/>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
                 <parameters>
-                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"">
+                    <parameter name=""i"">
+                        <type typeId=""System.Int32"" typeName=""int""/>
                         <attributes>
                             <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute""/>
                         </attributes>
@@ -738,7 +817,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <member name=""MethodWithReturn"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"">
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int""/>
                     <attributes>
                         <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute""/>
                     </attributes>
@@ -820,7 +900,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         <signature>
             <accessibility>Public
             </accessibility>
-            <return typeId=""System.Void"" typeName=""void""/>
+            <return>
+                <type typeId=""System.Void"" typeName=""void""/>
+            </return>
             <parameters>
             </parameters>
         </signature>
@@ -843,9 +925,15 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
     <signature>
         <accessibility>Public</accessibility>
-        <return typeId=""System.Void"" typeName=""void""/>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
         <parameters>
-            <parameter name=""ints"" typeId=""System.Int32[]"" typeName=""int[]"" isParams=""true""/>
+            <parameter name=""ints"" isParams=""true"">
+                <type typeId=""System.Int32[]"" typeName=""int[]"">
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </type>
+            </parameter>
         </parameters>
     </signature>
     <xmldoc>
@@ -856,6 +944,112 @@ namespace Unity.DocTool.XMLDocHandler.Tests
     </xmldoc>
 </member>"
                 }).SetName("Params_Parameter");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/ClassWithPointerParam.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithPointerParam",
+                    expectedXml =
+                        @"<member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
+        <parameters>
+            <parameter name=""p"">
+                <type typeId=""System.Int32*"" typeName=""int*"">
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </type>
+            </parameter>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[]]></xmldoc>
+</member>"
+                }).SetName("Class_With_Pointer_Param");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericMethodParameter.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericMethodParameter",
+                    expectedXml =
+                        @"<member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
+        <parameters>
+            <parameter name=""ints"">
+                <type typeId=""System.Collections.Generic.List`1"" typeName=""System.Collections.Generic.List&lt;int&gt;"">
+                    <typeArguments>
+                        <type typeId=""System.Int32"" typeName=""int""/>
+                    </typeArguments>
+                </type>
+            </parameter>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[]]></xmldoc>
+</member>"
+                }).SetName("Generic_Method_Parameter");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericArrayMethodParameter.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericArrayMethodParameter",
+                    expectedXml =
+                        @"<member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <return>
+            <type typeId=""System.Void"" typeName=""void""/>
+        </return>
+        <parameters>
+            <parameter name=""ints"">
+                <type typeId=""System.Collections.Generic.List`1[]"" typeName=""System.Collections.Generic.List&lt;int&gt;[]"">
+                    <type typeId=""System.Collections.Generic.List`1"" typeName=""System.Collections.Generic.List&lt;int&gt;"">
+                        <typeArguments>
+                            <type typeId=""System.Int32"" typeName=""int""/>
+                        </typeArguments>
+                    </type>
+                </type>
+            </parameter>
+        </parameters>
+    </signature>
+    <xmldoc><![CDATA[]]></xmldoc>
+</member>"
+                }).SetName("Generic_Array_Method_Parameter");
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/Generics/GenericArrayField.cs",
+                    typeId = "Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericArrayField",
+                    expectedXml =
+                        @"<member name=""intListArray"" type=""Field"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Collections.Generic.List`1[]"" typeName=""System.Collections.Generic.List&lt;int&gt;[]"">
+            <type typeId=""System.Collections.Generic.List`1"" typeName=""System.Collections.Generic.List&lt;int&gt;"">
+                <typeArguments>
+                    <type typeId=""System.Int32"" typeName=""int""/>
+                </typeArguments>
+            </type>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[List Array]]></xmldoc>
+</member>
+<member name=""intList"" type=""Field"">
+    <signature>
+        <accessibility>Public</accessibility>
+        <type typeId=""System.Collections.Generic.List`1"" typeName=""System.Collections.Generic.List&lt;int&gt;"">
+            <typeArguments>
+                <type typeId=""System.Int32"" typeName=""int""/>
+            </typeArguments>
+        </type>
+    </signature>
+    <xmldoc><![CDATA[List]]></xmldoc>
+</member>"
+                }).SetName("Generic_Array_Field");
         }
 
         [Test]
