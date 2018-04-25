@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 
@@ -638,6 +639,36 @@ Updated Docs
         <xmldoc>
             <![CDATA[New class docs]]>
         </xmldoc>
+
+        <member name=""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public
+                </accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
+                <parameters>
+                    <parameter name=""t2"">
+                        <typeParameter declaringTypeId="""" name=""T2"">
+                            <attributes>
+                                <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                            </attributes>
+                        </typeParameter>
+                    </parameter>
+                </parameters>
+                <typeParameters>
+                    <typeParameter name=""T2"">
+                        <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T"" />
+                        <attributes>
+                            <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                        </attributes>
+                    </typeParameter>
+                </typeParameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new GenericMethodWithGenericConstraint`1 docs]]>
+            </xmldoc>
+        </member>     
         <member name=""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public
@@ -649,7 +680,7 @@ Updated Docs
                 </parameters>
             </signature>
             <xmldoc>
-                <![CDATA[new docs]]>
+                <![CDATA[new GenericMethodWithGenericConstraint docs]]>
             </xmldoc>
         </member>
     </member>
@@ -658,12 +689,10 @@ Updated Docs
     /// New class docs
     public struct GenericStructWithConstraints<T> where T : class, IList<Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass>, new()
     {
-        /// <summary>
-        /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
-        /// </summary>
-        public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>() where T2 : T
+        /// new GenericMethodWithGenericConstraint`1 docs
+        public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>(T2 t2) where T2 : T
         { }
-        /// new docs
+        /// new GenericMethodWithGenericConstraint docs
         public void GenericMethodWithGenericConstraint()
         { }",
                     sourcePath = "TestTypes/Generics/GenericStructWithConstraints.cs"
@@ -737,6 +766,38 @@ public class ClassInGlobalNamespace
 ",
                     sourcePath = "TestTypes/ClassInGlobalNamespace.cs"
                 }).SetName("Update_Class_In_Global_Namespace");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithProtectedMethod"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+        <xmldoc><![CDATA[New class docs]]></xmldoc>
+        <member name=""ProtectedMethod"" type=""Method"">
+            <signature>
+                <accessibility>Protected</accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void""/>
+                </return>
+                <parameters>
+                </parameters>
+            </signature>
+            <xmldoc><![CDATA[New method docs]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"
+    /// New class docs
+    public class ClassWithProtectedMethod
+    {
+        /// New method docs
+        protected void ProtectedMethod()
+        {
+        }
+    }",
+                    sourcePath = "TestTypes/ClassWithProtectedMethod.cs"
+                }).SetName("Update_Protected_Method");
         }
 
         //TODO: Add tests for: Formating
@@ -747,12 +808,19 @@ public class ClassInGlobalNamespace
             var testFilePath = Path.GetTempFileName();
 
             File.Copy(data.sourcePath, testFilePath, true);
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath)));
+            try
+            {
+                var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(data.sourcePath)));
 
-            handler.SetType(data.newDocXml, Path.GetFileName(testFilePath));
+                handler.SetType(data.newDocXml, Path.GetFileName(data.sourcePath));
 
-            var actualSource = File.ReadAllText(testFilePath);
-            AssertSourceContains(data.expectedSource, actualSource);
+                var actualSource = File.ReadAllText(data.sourcePath);
+                AssertSourceContains(data.expectedSource, actualSource);
+            }
+            finally
+            {
+                File.Copy(testFilePath, data.sourcePath, true);
+            }
         }
 
         // Partials: 
@@ -867,16 +935,48 @@ public class ClassInGlobalNamespace
 
             File.Copy(testData.filename1, testFilePath1, true);
             File.Copy(testData.filename2, testFilePath2, true);
+            try
+            {
 
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath1)));
+                var handler = new XMLDocHandler(MakeCompilationParameters("."));
 
-            handler.SetType(testData.newContent, Path.GetFileName(testFilePath1), Path.GetFileName(testFilePath2));
+                handler.SetType(testData.newContent, testData.filename1, testData.filename2);
 
-            var actualSource1 = File.ReadAllText(testFilePath1);
-            AssertSourceContains(testData.expectedFile1Source, actualSource1);
+                var actualSource1 = File.ReadAllText(testData.filename1);
+                AssertSourceContains(testData.expectedFile1Source, actualSource1);
 
-            var actualSource2 = File.ReadAllText(testFilePath2);
-            AssertSourceContains(testData.expectedFile2Source, actualSource2);
+                var actualSource2 = File.ReadAllText(testData.filename2);
+                AssertSourceContains(testData.expectedFile2Source, actualSource2);
+            }
+            finally
+            {
+                File.Copy(testFilePath1, testData.filename1, true);
+                File.Copy(testFilePath2, testData.filename2, true);
+            }
+        }
+
+        [Test]
+        public void Throws_When_Given_Cs_Outside_Root()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("."));
+            var tempPath = Path.GetTempFileName();
+            var tempScriptPath = tempPath + ".cs";
+            File.Move(tempPath, tempScriptPath);
+            Assert.Throws(typeof(ArgumentException), ()=> handler.SetType(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?><doc/>", tempScriptPath));
+        }
+
+        [Test]
+        public void Throws_When_Given_Non_Existant_Script()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("."));
+            Assert.Throws(typeof(FileNotFoundException), () => handler.SetType(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?><doc/>", "asdf.cs"));
+        }
+
+        [Test]
+        public void Throws_When_Given_Non_Cs_file()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetTempPath()));
+            Assert.Throws(typeof(ArgumentException), () => handler.SetType("", Path.GetTempFileName()));
         }
 
         private void AssertSourceContains(string expectedSource, string actualSource, bool normalize = true)

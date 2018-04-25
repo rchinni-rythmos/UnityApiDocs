@@ -70,6 +70,9 @@
     <Compile Include="TestTypes\ClassInGlobalNamespace.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestTypes\ClassWithProtectedMethod.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestTypes\ClassWithPointerParam.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

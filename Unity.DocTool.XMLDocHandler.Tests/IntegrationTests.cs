@@ -59,19 +59,21 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 xmlDocNode.ReplaceChild(getTypeXml.CreateCDataSection(randomComment), xmlDocNode.FirstChild);
             }
 
-            var tempPaths = paths.Select(p =>
+            var tempPaths = paths.ToDictionary(p => p, p =>
             {
                 var tempPath = Path.GetTempFileName();
                 File.Copy(Path.Combine(TestFileDirectory, p), tempPath, true);
                 return tempPath;
-            }).ToArray();
+            });
 
             var getTypeXmlString = getTypeXml.OuterXml;
-            handler.SetType(getTypeXmlString, tempPaths);
-            foreach (var path in tempPaths)
+            handler.SetType(getTypeXmlString, paths);
+            foreach (var path in paths)
             {
-                var content = File.ReadAllText(Path.Combine(TestFileDirectory, path));
+                var fullPath = Path.Combine(TestFileDirectory, path);
+                var content = File.ReadAllText(fullPath);
                 randomComments.RemoveWhere(comment => content.Contains("/// " + comment));
+                File.Copy(tempPaths[path], fullPath, true);
             }
 
             Assert.IsEmpty(randomComments, "Did not write all comments back properly. Xml used to set:\n" + getTypeXmlString);

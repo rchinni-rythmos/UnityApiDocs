@@ -132,7 +132,11 @@ namespace Unity.DocTool.XMLDocHandler
             {
                 foreach (var parameter in methodSymbol.Parameters)
                 {
-                    constraints += $@" and signature/parameters/parameter/type/@typeId='{parameter.Type.Id()}'";
+                    var parameterType = parameter.Type;
+                    if (parameterType is ITypeParameterSymbol)
+                        constraints += $@" and signature/parameters/parameter/typeParameter/@name='{parameterType.Name}'";
+                    else
+                        constraints += $@" and signature/parameters/parameter/type/@typeId='{parameterType.Id()}'";
                 }
             }
 

@@ -23,6 +23,9 @@ namespace Unity.DocTool.XMLDocHandler.Driver
         static void Main(string[] args)
         {
             OptionsParser.Prepare(args, typeof(Program).Assembly);
+
+            var testDir = Path.Combine(Path.GetTempPath(), TestFileDirectory);
+
             var handler = new XMLDocHandler(new CompilationParameters(
                 DriverOptions.RootPath ?? ".",
                 DriverOptions.ExcludedPaths ?? new string[0], 
@@ -64,19 +67,22 @@ namespace Unity.DocTool.XMLDocHandler.Driver
                     xmlDocNode.ReplaceChild(getTypeXml.CreateCDataSection(randomComment), xmlDocNode.FirstChild);
                 }
 
-                var tempPaths = paths.Select(p =>
+
+                var tempPaths = paths.ToDictionary(p=>p, p =>
                 {
                     var tempPath = Path.GetTempFileName();
                     File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
                     return tempPath;
-                }).ToArray();
+                });
 
                 var getTypeXmlString = getTypeXml.OuterXml;
-                handler.SetType(getTypeXmlString, tempPaths);
-                foreach (var path in tempPaths)
+                handler.SetType(getTypeXmlString, paths.ToArray());
+                foreach (var path in paths)
                 {
-                    var content = File.ReadAllText(path);
+                    var fullPath = Path.Combine(DriverOptions.RootPath, path);
+                    var content = File.ReadAllText(fullPath);
                     randomComments.RemoveWhere(comment => content.Contains("/// " + comment));
+                    File.Copy(tempPaths[path], fullPath, true);
                 }
 
                 if (randomComments.Count > 0)

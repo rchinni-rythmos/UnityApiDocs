@@ -566,7 +566,11 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <return>
                     <type typeId=""System.Void"" typeName=""void""/>
                 </return>
-                <parameters></parameters>
+                <parameters>
+                    <parameter name=""t2"">
+                        <typeParameter declaringTypeId="""" name=""T2""/>
+                    </parameter>
+                </parameters>
                 <typeParameters>
                     <typeParameter name=""T2"">
                         <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T""/>
@@ -590,7 +594,8 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 <return>
                     <type typeId=""System.Void"" typeName=""void""/>
                 </return>
-                <parameters></parameters>
+                <parameters>
+                </parameters>
             </signature>
             <xmldoc>
                 <![CDATA[

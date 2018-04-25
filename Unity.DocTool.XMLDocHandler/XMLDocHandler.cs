@@ -75,25 +75,12 @@ namespace Unity.DocTool.XMLDocHandler
         
         public string GetTypeDocumentation(string id, params string[] paths)
         {
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories).Select(Path.GetFullPath);
-            var syntaxTrees = csFilePaths.Select(
-                p =>
-                {
-                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
-                    treesForPaths[p] = syntaxTree;
-                    return syntaxTree;
-                }).ToArray();
-
-            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
-
-            var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
+            var compilation = ParseAndCompile(treesForPaths);
 
             var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
+
+            var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
             foreach (var path in fullPaths)
             {
                 SyntaxTree syntaxTree;
@@ -184,6 +171,27 @@ namespace Unity.DocTool.XMLDocHandler
             }
 
             throw new Exception($"Type not found Id={id}");
+        }
+
+        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
+        {
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
+                SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+
+            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath);
+            var syntaxTrees = csFilePaths.Select(
+                p =>
+                {
+                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
+                    treesForPaths[p] = syntaxTree;
+                    return syntaxTree;
+                }).ToArray();
+
+            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            compilerOptions = compilerOptions.WithAllowUnsafe(true);
+            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
+            return compilation;
         }
 
         private static string AttributesXml(ISymbol typeSymbol)
@@ -352,13 +360,13 @@ namespace Unity.DocTool.XMLDocHandler
             return $@"<accessibility>{accessibility}</accessibility>";
         }
 
-        private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeConstraints = false)
+        private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeMetaInfo = false)
         {
 
             var sourceTypeParameterSymbol = typeSymbol as ITypeParameterSymbol;
             if (sourceTypeParameterSymbol != null)
             {
-                return TypeParameterXml(sourceTypeParameterSymbol, includeConstraints, true);
+                return TypeParameterXml(sourceTypeParameterSymbol, includeMetaInfo, true);
             }
             var typeTagAttributes =
                 $"typeId=\"{typeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(typeSymbol.ToDisplayString())}\"";
@@ -392,12 +400,12 @@ namespace Unity.DocTool.XMLDocHandler
                 return $"<type {typeTagAttributes}/>";
         }
 
-        private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
+        private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeMetaInfo, bool includeDeclaringTypeId)
         {
             string constraintAttributes = "";
             string body = string.Empty;
             string suffix = "/>";
-            if (includeConstraints)
+            if (includeMetaInfo)
             {
                 if (sourceTypeParameterSymbol.HasConstructorConstraint)
                     constraintAttributes += @" hasConstructorConstraint=""true""";
@@ -410,12 +418,12 @@ namespace Unity.DocTool.XMLDocHandler
                 {
                     body += $@"{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}";
                 }
-            }
 
-            var attributesXml = AttributesXml(sourceTypeParameterSymbol.GetAttributes());
-            if (!string.IsNullOrEmpty(attributesXml))
-            {
-                body += attributesXml;
+                var attributesXml = AttributesXml(sourceTypeParameterSymbol.GetAttributes());
+                if (!string.IsNullOrEmpty(attributesXml))
+                {
+                    body += attributesXml;
+                }
             }
 
             string declaringTypeId = "";
@@ -484,32 +492,33 @@ namespace Unity.DocTool.XMLDocHandler
 
         public void SetType(string docXml, params string[] sourcePaths)
         {
-            IEnumerable<string> defines = new string[0];
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
+            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
+            var compilation = ParseAndCompile(treesForPaths);
 
-            var syntaxTrees = sourcePaths.Select(path =>
-            {
-                var filePath = Path.Combine(compilationParameters.RootPath, path);
-                return SyntaxFactory.ParseSyntaxTree(
-                        File.ReadAllText(filePath), parserOptions,
-                        filePath);
-            }).ToArray();
+            var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
-            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
-
+            var nonExistantFile = fullPaths.FirstOrDefault(p => !File.Exists(p));
+            if (nonExistantFile != null)
+                throw new FileNotFoundException(nonExistantFile + " does not exist");
+            var nonScriptFile = sourcePaths.FirstOrDefault(p => !string.Equals(".cs", Path.GetExtension(p), StringComparison.OrdinalIgnoreCase));
+            if (nonScriptFile != null)
+                throw new ArgumentException(nonScriptFile + " is not a .cs file. Only .cs files are supported.");
 
             var partialInfoCollector = new PartialTypeInfoCollectorVisitor(docXml);
-            foreach (var syntaxTree in syntaxTrees)
+            foreach (var fullPath in fullPaths)
             {
+                SyntaxTree syntaxTree;
+                if (!treesForPaths.TryGetValue(fullPath, out syntaxTree))
+                    throw new ArgumentException(fullPath + " is not contained in root path " + compilationParameters.RootPath);
+
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 partialInfoCollector.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
             var docUpdater = new XmlDocReplacerVisitor(docXml, partialInfoCollector);
-            foreach (var syntaxTree in syntaxTrees)
+            foreach (var fullPath in fullPaths)
             {
+                var syntaxTree = treesForPaths[fullPath];
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var result = docUpdater.Visit(syntaxTree.GetRoot(), semanticModel);
 
