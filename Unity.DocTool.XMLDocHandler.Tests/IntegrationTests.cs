@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using NUnit.Framework;
 
@@ -14,7 +15,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         static IEnumerable<TestCaseData> CanReadTypesAndWriteToAllMembersTestCases()
         {
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             var handler = new XMLDocHandler(MakeCompilationParameters(TestFileDirectory));
             string typesXml = handler.GetTypesXml();
             XmlDocument getTypesXml = new XmlDocument();

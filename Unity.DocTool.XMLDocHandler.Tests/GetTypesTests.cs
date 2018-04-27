@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Framework;
 using Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes;
+using Unity.DocTool.XMLDocHandler.TestUtilities;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {
@@ -910,7 +911,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 <doc version=""3"">
     <member name=""ClassWithExternalAttribute"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes"">
         <attributes>
-            <attribute typeId=""Unity.DocTool.XMLDocHandler.TestUtilities"">
+            <attribute typeId=""Unity.DocTool.XMLDocHandler.TestUtilities.PublicExternalAttribute"">
                 <constructorArguments>
                     <argument value=""true"" />
                 </constructorArguments>
@@ -921,7 +922,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </xmldoc>
     </member>
 </doc>",
-                    referencedAssemblyPaths = new[] {typeof(ClassWithExternalAttribute).Assembly.Location}
+                    referencedAssemblyPaths = new[] {typeof(PublicExternalAttribute).Assembly.Location}
                 }).SetName("Class_With_External_Attribute_With_Reference");
             yield return new TestCaseData(
                 new TestIsReportedData

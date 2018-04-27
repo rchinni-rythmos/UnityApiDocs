@@ -77,6 +77,7 @@ namespace Unity.DocTool.XMLDocHandler
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
             var compilation = ParseAndCompile(treesForPaths);
+            var diagnostics = compilation.GetDiagnostics();
 
             var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
@@ -276,7 +277,10 @@ namespace Unity.DocTool.XMLDocHandler
 
         private IEnumerable<PortableExecutableReference> GetMetadataReferences()
         {
-            return compilationParameters.ReferencedAssemblyPaths.Select(p => MetadataReference.CreateFromFile(p));
+            var platformAssembliesString = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString();
+            var assemblies = platformAssembliesString.Split(Path.PathSeparator).Where(p => !p.Contains("XMLDocHandler"));
+
+            return compilationParameters.ReferencedAssemblyPaths.Concat(assemblies).Select(p => MetadataReference.CreateFromFile(p));
         }
 
         private static string BaseType(INamedTypeSymbol typeSymbol)

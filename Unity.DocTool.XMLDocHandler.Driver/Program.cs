@@ -30,8 +30,6 @@ namespace Unity.DocTool.XMLDocHandler.Driver
             if (DriverOptions.ReferencedAssemblies != null)
                 referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);
 
-            referencedAssemblies.Add(typeof(object).Assembly.Location);
-
             var handler = new XMLDocHandler(new CompilationParameters(
                 DriverOptions.RootPath ?? ".",
                 DriverOptions.ExcludedPaths ?? new string[0], 

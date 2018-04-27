@@ -15,7 +15,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         public void Init()
         {
             originalCurrentDirectory = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
         [TearDown]
@@ -26,14 +26,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
 
         protected static CompilationParameters MakeCompilationParameters(string testFileDirectory, string[] referencedAssemblyPaths = null)
         {
-            var referencedAssemblies = new[]
-            {
-                typeof(object).Assembly.Location,
-            };
-            if (referencedAssemblyPaths != null)
-                referencedAssemblies = referencedAssemblyPaths.Concat(referencedAssemblies).ToArray();
-
-            return new CompilationParameters(testFileDirectory, new string[0], new string[0], referencedAssemblies);
+            return new CompilationParameters(testFileDirectory, new string[0], new string[0], referencedAssemblyPaths ?? new string[0]);
         }
 
         protected static string Normalize(string source)
