@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
@@ -14,7 +15,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         public void Init()
         {
             originalCurrentDirectory = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
         [TearDown]
@@ -23,12 +24,9 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Directory.SetCurrentDirectory(originalCurrentDirectory);
         }
 
-        protected static CompilationParameters MakeCompilationParameters(string testFileDirectory)
+        protected static CompilationParameters MakeCompilationParameters(string testFileDirectory, string[] referencedAssemblyPaths = null)
         {
-            return new CompilationParameters(testFileDirectory, new string[0], new []
-            {
-                typeof(object).Assembly.Location,
-            });
+            return new CompilationParameters(testFileDirectory, new string[0], new string[0], referencedAssemblyPaths ?? new string[0]);
         }
 
         protected static string Normalize(string source)

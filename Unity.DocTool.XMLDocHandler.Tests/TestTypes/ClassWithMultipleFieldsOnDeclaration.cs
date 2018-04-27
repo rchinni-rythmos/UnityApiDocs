@@ -1,6 +1,6 @@
 ﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithMultipleFieldsOnDeclaration
+    public class ClassWithMultipleFieldsOnDeclaration
     {
         /// <summary>
         /// Value field 1

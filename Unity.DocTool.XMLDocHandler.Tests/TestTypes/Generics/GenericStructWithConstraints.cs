@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes;
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
 {
@@ -10,7 +11,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
         /// <summary>
         /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
         /// </summary>
-        public void GenericMethodWithGenericConstraint<T2>() where T2 : T
+        public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>(T2 t2) where T2 : T
         { }
         /// <summary>
         /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint

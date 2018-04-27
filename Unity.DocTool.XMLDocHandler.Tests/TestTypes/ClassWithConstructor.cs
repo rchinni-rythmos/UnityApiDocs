@@ -1,6 +1,6 @@
 ﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithConstructor
+    public class ClassWithConstructor
     {
         /// <summary>
         /// A Constructor

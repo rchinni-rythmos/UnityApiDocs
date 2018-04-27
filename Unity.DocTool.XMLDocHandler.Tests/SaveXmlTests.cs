@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 
@@ -19,7 +20,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""ClassWithProperty"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
             <member name=""Value"" type=""Property"">
@@ -40,11 +41,12 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                     expectedSource = @"
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {    
-    class ClassWithProperty
+    public class ClassWithProperty
     {
-    /// <summary>
-    ///New Value Propery
-    ///</summary>
+        /// <summary>
+        ///New Value Propery
+        ///</summary>
+        [TestInternal][TestPublic]
         public int Value
 ",
                     sourcePath = "TestTypes/ClassWithProperty.cs"
@@ -101,9 +103,9 @@ Some Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -127,11 +129,11 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""GenericClass`1"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
         <typeParameters>
-            <typeParameter name=""T""/>
+            <typeParameter name=""T"" />
         </typeParameters>
         <xmldoc>
             <![CDATA[<summary>New Class docs</summary>]]>
@@ -139,7 +141,9 @@ Updated Docs
         <member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
                 <parameters></parameters>
             </signature>
             <xmldoc>
@@ -174,9 +178,9 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits="""">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -200,7 +204,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""ClassWithXmlDocsAndNormalComments"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -220,7 +224,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
         <member name=""ClassWithMultipleXmlDocs"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -240,7 +244,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithField"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <member name=""value"" type=""Field"">
@@ -256,9 +260,10 @@ Updated Docs
 </doc>",
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithField
+    public class ClassWithField
     {
         /// <summary>New Docs</summary>
+        [TestInternal][TestPublic]
         public int value;
     }
 }",
@@ -268,7 +273,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithMultipleFieldsOnDeclaration"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <member name=""value2"" type=""Field"">
@@ -284,7 +289,7 @@ Updated Docs
 </doc>",
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
-    class ClassWithMultipleFieldsOnDeclaration
+    public class ClassWithMultipleFieldsOnDeclaration
     {
         /// <summary>
         /// Value field 1
@@ -302,7 +307,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithField"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -322,9 +327,10 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New ClassWithField Docs</summary>
-    class ClassWithField
+    public class ClassWithField
     {
         /// <summary>New value Docs</summary>
+        [TestInternal][TestPublic]
         public int value;
     }
 }",
@@ -334,7 +340,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""AClass"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <xmldoc>
@@ -344,9 +350,13 @@ Updated Docs
         <member name=""Foo"" type=""Method"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int"" />
+                </return>
                 <parameters>
-                    <parameter name=""i"" typeId=""System.Int32"" typeName=""int"" />
+                    <parameter name=""i"" >
+                        <type typeId=""System.Int32"" typeName=""int"" />
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>New method docs</summary>]]></xmldoc>                
@@ -378,7 +388,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithEvent"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -400,9 +410,10 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithEvent
+    public class ClassWithEvent
     {
         /// <summary>new docs</summary>
+        [TestInternal] [TestPublic]
         public event System.Action<bool> anEvent;
     }
 }
@@ -413,7 +424,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithEventAddRemove"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -439,7 +450,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithEventAddRemove
+    public class ClassWithEventAddRemove
     {
         /// <summary>new docs</summary>
         public event System.Action<System.Func<bool>> anEvent
@@ -455,7 +466,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithOperator"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -464,10 +475,16 @@ Updated Docs
         <member name=""op_Addition"" type=""Method"" methodKind=""UserDefinedOperator"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int"" />
+                </return>
                 <parameters>
-                    <parameter name=""classWithOperator"" typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
-                    <parameter name=""other"" typeId=""System.Int32"" typeName=""int"" />
+                    <parameter name=""classWithOperator"" >
+                        <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
+                    </parameter>
+                    <parameter name=""other"" >
+                        <type typeId=""System.Int32"" typeName=""int"" />
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
@@ -477,7 +494,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithOperator
+    public class ClassWithOperator
     {
         /// <summary>new docs</summary>
         public static int operator +(ClassWithOperator classWithOperator, int other)
@@ -492,7 +509,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithConstructor"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -509,7 +526,7 @@ Updated Docs
                     expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
-    class ClassWithConstructor
+    public class ClassWithConstructor
     {
         /// <summary>new docs</summary>
         public ClassWithConstructor() { }
@@ -521,7 +538,7 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithExtensionMethods"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
@@ -530,9 +547,13 @@ Updated Docs
         <member name=""ExtensionMethod"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public</accessibility>
-                <return typeId=""System.Int32"" typeName=""int"" />
+                <return>
+                    <type typeId=""System.Int32"" typeName=""int"" />
+                </return>
                 <parameters>
-                    <parameter name=""s"" typeId=""System.String"" typeName=""string"" isThis=""true""/>
+                    <parameter name=""s"" isThis=""true"">
+                        <type typeId=""System.String"" typeName=""string"" />
+                    </parameter>
                 </parameters>
             </signature>
             <xmldoc><![CDATA[<summary>new docs</summary>]]></xmldoc>
@@ -541,9 +562,10 @@ Updated Docs
 </doc>",
                     expectedSource = @"
     /// <summary>New class docs</summary>
-    static class ClassWithExtensionMethods
+    public static class ClassWithExtensionMethods
     {
         /// <summary>new docs</summary>
+        [TestInternal][TestPublic]
         public static int ExtensionMethod(this string s)
         {",
                     sourcePath = "TestTypes/ClassWithExtensionMethods.cs"
@@ -552,15 +574,19 @@ Updated Docs
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
-            <return typeId=""System.Int32"" typeName=""int"" />
+            <return>
+                <type typeId=""System.Int32"" typeName=""int"" />
+            </return>
             <parameters>
-                <parameter name=""o"" typeId=""System.Object"" typeName=""object"" />
+                <parameter name=""o"" >
+                    <type typeId=""System.Object"" typeName=""object"" />
+                </parameter>
             </parameters>
         </signature>
         <xmldoc>
@@ -579,13 +605,15 @@ Updated Docs
             yield return new TestCaseData(
                     new UpdateTestData
                     {
-                        newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                        newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""MulticastDelegate"" isSealed=""true"">
+    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
-            <return typeId=""System.Void"" typeName=""void"" />
+            <return>
+                <type typeId=""System.Void"" typeName=""void"" />
+            </return>
             <parameters>
             </parameters>
         </signature>
@@ -601,28 +629,58 @@ Updated Docs
                         sourcePath = "TestTypes/CommonTypes/AClass.cs"
                     }).SetName("Update_Inner_Delegate");
 
-
-
             yield return new TestCaseData(
                 new UpdateTestData
                 {
-                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""GenericStructWithConstraints`1"" type=""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"">
         
         <xmldoc>
             <![CDATA[New class docs]]>
         </xmldoc>
+
+        <member name=""GenericMethodWithGenericConstraint`1"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public
+                </accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
+                <parameters>
+                    <parameter name=""t2"">
+                        <typeParameter declaringTypeId="""" name=""T2"">
+                            <attributes>
+                                <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                            </attributes>
+                        </typeParameter>
+                    </parameter>
+                </parameters>
+                <typeParameters>
+                    <typeParameter name=""T2"">
+                        <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T"" />
+                        <attributes>
+                            <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                        </attributes>
+                    </typeParameter>
+                </typeParameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new GenericMethodWithGenericConstraint`1 docs]]>
+            </xmldoc>
+        </member>     
         <member name=""GenericMethodWithGenericConstraint"" type=""Method"" methodKind=""Ordinary"">
             <signature>
                 <accessibility>Public
                 </accessibility>
-                <return typeId=""System.Void"" typeName=""void"" />
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
                 <parameters>
                 </parameters>
             </signature>
             <xmldoc>
-                <![CDATA[new docs]]>
+                <![CDATA[new GenericMethodWithGenericConstraint docs]]>
             </xmldoc>
         </member>
     </member>
@@ -631,20 +689,118 @@ Updated Docs
     /// New class docs
     public struct GenericStructWithConstraints<T> where T : class, IList<Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass>, new()
     {
-        /// <summary>
-        /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2
-        /// </summary>
-        public void GenericMethodWithGenericConstraint<T2>() where T2 : T
+        /// new GenericMethodWithGenericConstraint`1 docs
+        public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>(T2 t2) where T2 : T
         { }
-        /// new docs
+        /// new GenericMethodWithGenericConstraint docs
         public void GenericMethodWithGenericConstraint()
         { }",
                     sourcePath = "TestTypes/Generics/GenericStructWithConstraints.cs"
                 }).SetName("Update_Non_Generic_Overload");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithOverloads"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" id="""">
+        <xmldoc>
+            <![CDATA[New class docs]]>
+        </xmldoc>
+        <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
+                <parameters>
+                </parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new docs for Method()]]>
+            </xmldoc>
+        </member>
+        <member name=""Method"" type=""Method"" methodKind=""Ordinary"" id="""">
+            <signature>
+                <accessibility>Public</accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
+                <parameters>
+                    <parameter name=""i"">
+                        <type typeId=""System.Int32"" typeName=""int"" />
+                    </parameter>
+                </parameters>
+            </signature>
+            <xmldoc>
+                <![CDATA[new docs for Method(int)]]>
+            </xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    /// New class docs
+    public class ClassWithOverloads
+    {
+        /// new docs for Method()
+        public void Method() { }
+        /// new docs for Method(int)
+        public void Method(int i) { }
+    }",
+                    sourcePath = "TestTypes/ClassWithOverloads.cs"
+                }).SetName("Update_Overload");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassInGlobalNamespace"" type=""Class"" namespace="""">
+        <xmldoc><![CDATA[New Docs]]></xmldoc>
+    </member>
+</doc>",
+                    expectedSource = @"/// New Docs
+public class ClassInGlobalNamespace
+{}
+",
+                    sourcePath = "TestTypes/ClassInGlobalNamespace.cs"
+                }).SetName("Update_Class_In_Global_Namespace");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""ClassWithProtectedMethod"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+        <xmldoc><![CDATA[New class docs]]></xmldoc>
+        <member name=""ProtectedMethod"" type=""Method"">
+            <signature>
+                <accessibility>Protected</accessibility>
+                <return>
+                    <type typeId=""System.Void"" typeName=""void"" />
+                </return>
+                <parameters>
+                </parameters>
+            </signature>
+            <xmldoc><![CDATA[New method docs]]></xmldoc>
+        </member>
+    </member>
+</doc>",
+                    expectedSource = @"
+    /// New class docs
+    public class ClassWithProtectedMethod
+    {
+        /// New method docs
+        protected void ProtectedMethod()
+        {
+        }
+    }",
+                    sourcePath = "TestTypes/ClassWithProtectedMethod.cs"
+                }).SetName("Update_Protected_Method");
         }
 
         //TODO: Add tests for: Formating
-        //TODO: Add tests for: Delegates
         [Test]
         [TestCaseSource(nameof(UpdateTestCases))]
         public void Update(UpdateTestData data)
@@ -652,12 +808,52 @@ Updated Docs
             var testFilePath = Path.GetTempFileName();
 
             File.Copy(data.sourcePath, testFilePath, true);
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath)));
+            try
+            {
+                var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(data.sourcePath)));
 
-            handler.SetType(data.newDocXml, Path.GetFileName(testFilePath));
+                handler.SetType(data.newDocXml, Path.GetFileName(data.sourcePath));
 
-            var actualSource = File.ReadAllText(testFilePath);
-            AssertSourceContains(data.expectedSource, actualSource);
+                var actualSource = File.ReadAllText(data.sourcePath);
+                AssertSourceContains(data.expectedSource, actualSource);
+            }
+            finally
+            {
+                File.Copy(testFilePath, data.sourcePath, true);
+            }
+        }
+
+        [Test]
+        public void Update_Duplicate_Member_Throws()
+        {
+            var updateTestData = new UpdateTestData
+            {
+                newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
+<doc version=""3"">
+    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[Doc 1]]>
+        </xmldoc>
+    </member>
+    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <xmldoc>
+            <![CDATA[Doc 2]]>
+        </xmldoc>
+    </member>
+</doc>
+",
+                expectedSource = @"
+/// <summary>Updated Doc</summary>
+public class SimpleClassWithXmlDoc
+{
+    /// <summary>
+    /// Foo XmlDoc
+    /// </summary>
+    public void Foo() {}
+}",
+                sourcePath = "TestTypes/SimpleClassWithXmlDoc.cs"
+            };
+            Assert.Throws(typeof(DuplicateMemberException), () => Update(updateTestData));
         }
 
         // Partials: 
@@ -680,7 +876,7 @@ Updated Docs
                 {
                     filename1 = "TestTypes/CommonTypes/AClass.cs",
                     filename2 = "TestTypes/CommonTypes/AFolder/AClass.part2.cs",
-                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""AClass"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
@@ -707,7 +903,7 @@ Updated Docs
                 {
                     filename1 = "TestTypes/PartialInterfaceNoDocs.cs",
                     filename2 = "TestTypes/PartialInterfaceNoDocs.part2.cs",
-                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""PartialInterfaceNoDocs"" type=""Interface"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
@@ -735,7 +931,7 @@ Updated Docs
                 {
                     filename1 = "TestTypes/PartialStructWithDocs.cs",
                     filename2 = "TestTypes/PartialStructWithDocs.part2.cs",
-                    newContent = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                    newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""PartialStructWithDocs"" type=""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
@@ -772,16 +968,48 @@ Updated Docs
 
             File.Copy(testData.filename1, testFilePath1, true);
             File.Copy(testData.filename2, testFilePath2, true);
+            try
+            {
 
-            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(testFilePath1)));
+                var handler = new XMLDocHandler(MakeCompilationParameters("."));
 
-            handler.SetType(testData.newContent, Path.GetFileName(testFilePath1), Path.GetFileName(testFilePath2));
+                handler.SetType(testData.newContent, testData.filename1, testData.filename2);
 
-            var actualSource1 = File.ReadAllText(testFilePath1);
-            AssertSourceContains(testData.expectedFile1Source, actualSource1);
+                var actualSource1 = File.ReadAllText(testData.filename1);
+                AssertSourceContains(testData.expectedFile1Source, actualSource1);
 
-            var actualSource2 = File.ReadAllText(testFilePath2);
-            AssertSourceContains(testData.expectedFile2Source, actualSource2);
+                var actualSource2 = File.ReadAllText(testData.filename2);
+                AssertSourceContains(testData.expectedFile2Source, actualSource2);
+            }
+            finally
+            {
+                File.Copy(testFilePath1, testData.filename1, true);
+                File.Copy(testFilePath2, testData.filename2, true);
+            }
+        }
+
+        [Test]
+        public void Throws_When_Given_Cs_Outside_Root()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("."));
+            var tempPath = Path.GetTempFileName();
+            var tempScriptPath = tempPath + ".cs";
+            File.Move(tempPath, tempScriptPath);
+            Assert.Throws(typeof(ArgumentException), ()=> handler.SetType(@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?><doc />", tempScriptPath));
+        }
+
+        [Test]
+        public void Throws_When_Given_Non_Existant_Script()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters("."));
+            Assert.Throws(typeof(FileNotFoundException), () => handler.SetType(@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?><doc />", "asdf.cs"));
+        }
+
+        [Test]
+        public void Throws_When_Given_Non_Cs_file()
+        {
+            var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetTempPath()));
+            Assert.Throws(typeof(ArgumentException), () => handler.SetType("", Path.GetTempFileName()));
         }
 
         private void AssertSourceContains(string expectedSource, string actualSource, bool normalize = true)

@@ -18,11 +18,13 @@ namespace Unity.DocTool.XMLDocHandler
     public class CompilationParameters
     {
         public IEnumerable<string> DefinedSymbols { get; }
-        public string RootPath { get;  }
+        public string RootPath { get; }
+        public IEnumerable<string> ExcludedPaths { get; }
         public IEnumerable<string> ReferencedAssemblyPaths { get; }
 
-        public CompilationParameters(string rootPath, IEnumerable<string> definedSymbols, IEnumerable<string> referencedAssemblyPaths)
+        public CompilationParameters(string rootPath, IEnumerable<string> excludedPaths, IEnumerable<string> definedSymbols, IEnumerable<string> referencedAssemblyPaths)
         {
+            ExcludedPaths = (excludedPaths ?? new string[0]).Select(Path.GetFullPath).ToArray();
             DefinedSymbols = definedSymbols ?? throw new ArgumentNullException(nameof(definedSymbols));
             RootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
             ReferencedAssemblyPaths = referencedAssemblyPaths ?? throw new ArgumentNullException(nameof(referencedAssemblyPaths));
@@ -40,12 +42,17 @@ namespace Unity.DocTool.XMLDocHandler
 
         public string GetTypesXml()
         {
-            if (!Directory.Exists(compilationParameters.RootPath))
-                throw new ArgumentException($"Directory \"{compilationParameters.RootPath}\" does not exist.");
+            var compilationParametersRootPath = Path.GetFullPath(compilationParameters.RootPath);
+            if (!Directory.Exists(compilationParametersRootPath))
+                throw new ArgumentException($"Directory \"{compilationParametersRootPath}\" does not exist.");
 
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            var filePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories);
-            var startIndex = compilationParameters.RootPath.Length + (compilationParameters.RootPath.EndsWith("\\") || compilationParameters.RootPath.EndsWith("/") ? 0 : 1);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+            
+            var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath)
+                .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
+
+            var startIndex = compilationParametersRootPath.Length + (compilationParametersRootPath.EndsWith("\\") || compilationParametersRootPath.EndsWith("/") ? 0 : 1);
             var syntaxTrees = filePaths.Select(
                 p =>
                 {
@@ -63,23 +70,24 @@ namespace Unity.DocTool.XMLDocHandler
                 getTypesVisitor.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
-            return getTypesVisitor.GetXml();
+            return FormatXml(getTypesVisitor.GetXml());
         }
         
         public string GetTypeDocumentation(string id, params string[] paths)
         {
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
+            var compilation = ParseAndCompile(treesForPaths);
+            var diagnostics = compilation.GetDiagnostics();
 
-            var syntaxTrees = paths.Select(p => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(Path.Combine(compilationParameters.RootPath, p)), parserOptions, p));
-
-            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
+            var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
             var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
-
-            foreach (var syntaxTree in compilation.SyntaxTrees)
+            foreach (var path in fullPaths)
             {
+                SyntaxTree syntaxTree;
+                if (!treesForPaths.TryGetValue(path, out syntaxTree))
+                    throw new ArgumentException("File \"" + path + "\" does not exist or was not found under root \"" + compilationParameters.RootPath + "\"");
+
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
                 var descendants = syntaxTree.GetRoot().DescendantNodes();
@@ -95,28 +103,33 @@ namespace Unity.DocTool.XMLDocHandler
 
 
 
-                        var attributes = typeSymbol.IsValueType ? "" : $@" inherits=""{BaseType(typeSymbol)}""";
+                        string xmlAttributes = "";
+                        var baseType = BaseType(typeSymbol);
+                        if (!string.IsNullOrEmpty(baseType))
+                            xmlAttributes = $@" inherits=""{baseType}""";
                         if (typeSymbol.IsStatic)
-                            attributes += @" isStatic=""true""";
+                            xmlAttributes += @" isStatic=""true""";
                         if (typeSymbol.IsSealed && !typeSymbol.IsValueType)
-                            attributes += @" isSealed=""true""";
+                            xmlAttributes += @" isSealed=""true""";
 
                         var extraContent = "";
                         if (typeDeclaration is DelegateDeclarationSyntax)
                         {
-                            extraContent = $@"<signature>
+                            extraContent += $@"<signature>
 {SignatureFor(typeSymbol.DelegateInvokeMethod)}
 </signature>";
                         }
 
-                        var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-    <doc version=""3"">
-        <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace}""{attributes}>
+                        extraContent += AttributesXml(typeSymbol);
+
+                        var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}""{xmlAttributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         {extraContent}
         <xmldoc>
-            <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
+            { GetCDataDocXml(extraMemberRegEx, typeSymbol)}
         </xmldoc>");
 
                         var members = typeSymbol.GetMembers()
@@ -143,16 +156,17 @@ namespace Unity.DocTool.XMLDocHandler
 
                             xml.Append($@"<member name=""{memberName}"" type=""{member.Kind}""{methodAttributes}>
             <signature>{SignatureFor(member)}</signature>
+            {AttributesXml(member)}
             <xmldoc>
-                <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
+                { GetCDataDocXml(extraMemberRegEx, member) }
             </xmldoc>
         </member>
 ");
                         }
 
                         xml.Append(@"</member></doc>");
-
-                        return xml.ToString();
+                        var formatedXml = FormatXml(xml.ToString());
+                        return formatedXml;
                     }
                 }
             }
@@ -160,17 +174,131 @@ namespace Unity.DocTool.XMLDocHandler
             throw new Exception($"Type not found Id={id}");
         }
 
+        private static string GetCDataDocXml(Regex extraMemberRegEx, ISymbol typeSymbol)
+        {
+            var xml = typeSymbol.GetDocumentationCommentXml();
+            xml = extraMemberRegEx.Replace(xml, "");
+            //escape end of CDATA tags
+            xml = xml.Replace("]]>", "]]]]><![CDATA[>");
+            return $@"<![CDATA[{xml}]]>";
+        }
+
+        private string FormatXml(string xml)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xml);
+            StringBuilder sb = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = "  ",
+                NewLineChars = "\r\n",
+                NewLineHandling = NewLineHandling.Replace
+            };
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
+            {
+                doc.Save(writer);
+            }
+            return sb.ToString();
+        }
+
+        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
+        {
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
+                SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+
+            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath);
+            var syntaxTrees = csFilePaths.Select(
+                p =>
+                {
+                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
+                    treesForPaths[p] = syntaxTree;
+                    return syntaxTree;
+                }).ToArray();
+
+            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            compilerOptions = compilerOptions.WithAllowUnsafe(true);
+            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
+            return compilation;
+        }
+
+        private static string AttributesXml(ISymbol typeSymbol)
+        {
+            var attributeData = typeSymbol.GetAttributes();
+            return AttributesXml(attributeData);
+        }
+
+        private static string AttributesXml(ImmutableArray<AttributeData> attributeData)
+        {
+            var attributes = attributeData.Where(a => a.AttributeClass.IsPublicApi()).ToArray();
+            var attributeXml = string.Empty;
+            if (attributes.Length > 0)
+            {
+                attributeXml = $@"<attributes>
+{string.Join("\n", attributes.Select(AttributeXml))}
+</attributes>";
+            }
+
+            return attributeXml;
+        }
+
+        private static string AttributeXml(AttributeData attribute)
+        {
+            var tag = $@"attribute typeId=""{attribute.AttributeClass.Id()}""";
+            var namedArguments = attribute.NamedArguments;
+            var constructorArguments = attribute.ConstructorArguments;
+            if (constructorArguments.IsEmpty && namedArguments.IsEmpty)
+                return $@"<{tag}/>";
+            else
+            {
+                StringBuilder sb = new StringBuilder($@"<{tag}>");
+                if (!constructorArguments.IsEmpty)
+                {
+                    sb.AppendLine("<constructorArguments>");
+                    foreach (var argument in constructorArguments)
+                        sb.AppendLine($@"<argument value='{argument.ToCSharpString()}'/>");
+
+                    sb.AppendLine("</constructorArguments>");
+                }
+                if (!namedArguments.IsEmpty)
+                {
+                    sb.AppendLine("<namedArguments>");
+                    foreach (var argument in namedArguments)
+                        sb.AppendLine($@"<argument name=""{argument.Key}"" value='{argument.Value.ToCSharpString()}'/>");
+
+                    sb.AppendLine("</namedArguments>");
+                }
+
+                sb.AppendLine("</attribute>");
+                return sb.ToString();
+            }
+        }
+
         private IEnumerable<PortableExecutableReference> GetMetadataReferences()
         {
-            return compilationParameters.ReferencedAssemblyPaths.Select(p => MetadataReference.CreateFromFile(p));
+            var platformAssembliesString = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")?.ToString();
+            IEnumerable<string> assemblies;
+            if (platformAssembliesString != null)
+            {
+                assemblies = platformAssembliesString.Split(Path.PathSeparator)
+                    .Where(p => !p.Contains("XMLDocHandler"));
+            }
+            else
+                assemblies = new[] {typeof(object).Assembly.Location};
+
+            return compilationParameters.ReferencedAssemblyPaths.Concat(assemblies).Select(p => MetadataReference.CreateFromFile(p));
         }
 
         private static string BaseType(INamedTypeSymbol typeSymbol)
         {
-            if (typeSymbol.TypeKind == TypeKind.Interface)
+            if (typeSymbol.TypeKind == TypeKind.Interface || typeSymbol.TypeKind == TypeKind.Struct)
                 return null;
 
-            return typeSymbol.BaseType.TypeKind == TypeKind.Interface ? "Object" : typeSymbol.BaseType.Name;
+            if (typeSymbol.BaseType.FullyQualifiedName(true, true) == "System.Object")
+                return null;
+
+            return typeSymbol.BaseType.Id();
         }
 
         private string InterfaceList(INamedTypeSymbol typeSymbol)
@@ -183,7 +311,7 @@ namespace Unity.DocTool.XMLDocHandler
                 return String.Empty;
 
             return $@"<interfaces>
-{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{XmlUtility.EscapeString(i.Name)}""/>"))}
+{String.Join(Environment.NewLine, interfaces.Select(i => TypeReferenceXml(i)))}
 </interfaces>";
         }
 
@@ -204,7 +332,16 @@ namespace Unity.DocTool.XMLDocHandler
                 case SymbolKind.Method:
                     {
                         var method = (IMethodSymbol)member;
-                        var returnXml = method.Name == ".ctor" ? "" : $"<return typeId=\"{method.ReturnType.Id()}\" typeName=\"{XmlUtility.EscapeString(method.ReturnType.ToDisplayString())}\"/>";
+                        string returnXml = "";
+                        if (method.Name != ".ctor")
+                        {
+                            var returnTypeAttributes = method.GetReturnTypeAttributes();
+                            returnXml = $@"<return>
+    {TypeReferenceXml(method.ReturnType)}
+    {AttributesXml(returnTypeAttributes)}
+</return>";
+                        }
+
                         return $@"
 {AccessibilityXml(member.DeclaredAccessibility)}
 {returnXml}
@@ -243,7 +380,7 @@ namespace Unity.DocTool.XMLDocHandler
 {TypeReferenceXml(((IEventSymbol)member).Type)}";
                     }
                 default:
-                    throw new NotImplementedException($"Unsupported type {member.Kind} : {member.Name}");
+                    throw new NotSupportedException($"Unsupported type {member.Kind} : {member.Name}");
             }
         }
 
@@ -262,56 +399,34 @@ namespace Unity.DocTool.XMLDocHandler
             return $@"<accessibility>{accessibility}</accessibility>";
         }
 
-        private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeConstraints = false)
+        private static string TypeReferenceXml(ITypeSymbol typeSymbol, bool includeMetaInfo = false)
         {
-            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
-            if (namedTypeSymbol != null)
-            {
-                return TypeReferenceXml(namedTypeSymbol);
-            }
 
             var sourceTypeParameterSymbol = typeSymbol as ITypeParameterSymbol;
             if (sourceTypeParameterSymbol != null)
             {
-                return TypeParameterXml(sourceTypeParameterSymbol, includeConstraints, true);
+                return TypeParameterXml(sourceTypeParameterSymbol, includeMetaInfo, true);
             }
-            throw new NotImplementedException("Unsupported typeSymbol");
-        }
-
-        private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeConstraints, bool includeDeclaringTypeId)
-        {
-            string constraintAttributes = "";
-            string suffix = "/>";
-            if (includeConstraints)
-            {
-                if (sourceTypeParameterSymbol.HasConstructorConstraint)
-                    constraintAttributes += @" hasConstructorConstraint=""true""";
-                if (sourceTypeParameterSymbol.HasReferenceTypeConstraint)
-                    constraintAttributes += @" hasReferenceTypeConstraint=""true""";
-                if (sourceTypeParameterSymbol.HasValueTypeConstraint)
-                    constraintAttributes += @" hasValueTypeConstraint=""true""";
-
-                if (!sourceTypeParameterSymbol.ConstraintTypes.IsEmpty)
-                {
-                    suffix = $@">
-{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}
-</typeParameter>";
-                }
-            }
-
-            string declaringTypeId = "";
-            if (includeDeclaringTypeId)
-                declaringTypeId = $@" declaringTypeId=""{sourceTypeParameterSymbol.DeclaringType.Id()}""";
-
-            return $@"<typeParameter{declaringTypeId} name=""{sourceTypeParameterSymbol.Name}""{constraintAttributes}{suffix}";
-        }
-
-        private static string TypeReferenceXml(INamedTypeSymbol namedTypeSymbol)
-        {
             var typeTagAttributes =
-                $"typeId=\"{namedTypeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(namedTypeSymbol.ToDisplayString())}\"";
+                $"typeId=\"{typeSymbol.Id()}\" typeName=\"{XmlUtility.EscapeString(typeSymbol.ToDisplayString())}\"";
 
-            if (namedTypeSymbol.IsGenericType)
+            if (typeSymbol is IArrayTypeSymbol)
+            {
+                return
+                    $@"<type {typeTagAttributes}>
+    {TypeReferenceXml(((IArrayTypeSymbol)typeSymbol).ElementType)}
+    </type>";
+            }
+            if (typeSymbol is IPointerTypeSymbol)
+            {
+                return
+                    $@"<type {typeTagAttributes}>
+    {TypeReferenceXml(((IPointerTypeSymbol)typeSymbol).PointedAtType)}
+    </type>";
+            }
+
+            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+            if (namedTypeSymbol != null && namedTypeSymbol.IsGenericType)
             {
                 var typeArguments = TypeArguments(namedTypeSymbol.TypeArguments);
 
@@ -322,6 +437,47 @@ namespace Unity.DocTool.XMLDocHandler
             }
             else
                 return $"<type {typeTagAttributes}/>";
+        }
+
+        private static string TypeParameterXml(ITypeParameterSymbol sourceTypeParameterSymbol, bool includeMetaInfo, bool includeDeclaringTypeId)
+        {
+            string constraintAttributes = "";
+            string body = string.Empty;
+            string suffix = "/>";
+            if (includeMetaInfo)
+            {
+                if (sourceTypeParameterSymbol.HasConstructorConstraint)
+                    constraintAttributes += @" hasConstructorConstraint=""true""";
+                if (sourceTypeParameterSymbol.HasReferenceTypeConstraint)
+                    constraintAttributes += @" hasReferenceTypeConstraint=""true""";
+                if (sourceTypeParameterSymbol.HasValueTypeConstraint)
+                    constraintAttributes += @" hasValueTypeConstraint=""true""";
+
+                if (!sourceTypeParameterSymbol.ConstraintTypes.IsEmpty)
+                {
+                    body += $@"{string.Join("\n", sourceTypeParameterSymbol.ConstraintTypes.Select(c => TypeReferenceXml(c)))}";
+                }
+
+                var attributesXml = AttributesXml(sourceTypeParameterSymbol.GetAttributes());
+                if (!string.IsNullOrEmpty(attributesXml))
+                {
+                    body += attributesXml;
+                }
+            }
+
+            string declaringTypeId = "";
+            if (includeDeclaringTypeId)
+                declaringTypeId = $@" declaringTypeId=""{sourceTypeParameterSymbol.DeclaringType.Id()}""";
+
+            string typeParameterTag = $@"typeParameter{declaringTypeId} name=""{sourceTypeParameterSymbol.Name}""{constraintAttributes}";
+            if (!string.IsNullOrEmpty(body))
+            {
+                return $@"<{typeParameterTag}>
+{body}
+</typeParameter>";
+            }
+            else
+                return $"<{typeParameterTag}/>";
         }
 
         private static string TypeArguments(ImmutableArray<ITypeSymbol> typeArguments)
@@ -343,13 +499,20 @@ namespace Unity.DocTool.XMLDocHandler
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
+                string paramsAttribute = parameter.IsParams ? @" isParams=""true""" : "";
                 string optionalAttribute = parameter.IsOptional ? @" isOptional=""true""" : "";
                 string defaultValueAttribute;
                 if (parameter.HasExplicitDefaultValue)
                 {
                     string defaultValue;
                     if (parameter.ExplicitDefaultValue == null)
-                        defaultValue = "default";
+                    {
+                        var parameterWithDefault = parameter.DeclaringSyntaxReferences.Select(reference => (ParameterSyntax)reference.GetSyntax()).FirstOrDefault(p => p.Default != null);
+                        if (parameterWithDefault != null)
+                            defaultValue = parameterWithDefault.Default.Value.ToFullString();
+                        else
+                            throw new NotSupportedException("Unsupported default value declaration: " + parameter.ToDisplayString());
+                    }
                     else
                         defaultValue = parameter.ExplicitDefaultValue.ToString();
 
@@ -357,41 +520,50 @@ namespace Unity.DocTool.XMLDocHandler
                 }
                 else
                     defaultValueAttribute = "";
-                sb.AppendLine($"<parameter name=\"{parameter.Name}\" typeId=\"{parameter.Type.Id()}\" typeName=\"{parameter.Type.ToDisplayString()}\"{optionalAttribute}{defaultValueAttribute}/>");
+
+                string parameterTag =
+                    $"parameter name=\"{parameter.Name}\"{paramsAttribute}{optionalAttribute}{defaultValueAttribute}";
+
+
+                var attributesXml = AttributesXml(parameter);
+
+                sb.AppendLine($@"<{parameterTag}>
+    {TypeReferenceXml(parameter.Type)}
+    {attributesXml}
+</parameter>");
             }
             return sb.ToString();
         }
 
         public void SetType(string docXml, params string[] sourcePaths)
         {
-            //TODO: Check if we need to visit newly instantiated AST nodes
-            //TODO: Extract common roslyn initializion code.
-            IEnumerable<string> defines = new string[0];
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
+            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
+            var compilation = ParseAndCompile(treesForPaths);
 
-            var syntaxTrees = sourcePaths.Select(path =>
-            {
-                var filePath = Path.Combine(compilationParameters.RootPath, path);
-                return SyntaxFactory.ParseSyntaxTree(
-                        File.ReadAllText(filePath), parserOptions,
-                        filePath);
-            }).ToArray();
+            var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
-            var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
-
+            var nonExistantFile = fullPaths.FirstOrDefault(p => !File.Exists(p));
+            if (nonExistantFile != null)
+                throw new FileNotFoundException(nonExistantFile + " does not exist");
+            var nonScriptFile = sourcePaths.FirstOrDefault(p => !string.Equals(".cs", Path.GetExtension(p), StringComparison.OrdinalIgnoreCase));
+            if (nonScriptFile != null)
+                throw new ArgumentException(nonScriptFile + " is not a .cs file. Only .cs files are supported.");
 
             var partialInfoCollector = new PartialTypeInfoCollectorVisitor(docXml);
-            foreach (var syntaxTree in syntaxTrees)
+            foreach (var fullPath in fullPaths)
             {
+                SyntaxTree syntaxTree;
+                if (!treesForPaths.TryGetValue(fullPath, out syntaxTree))
+                    throw new ArgumentException(fullPath + " is not contained in root path " + compilationParameters.RootPath);
+
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 partialInfoCollector.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
             var docUpdater = new XmlDocReplacerVisitor(docXml, partialInfoCollector);
-            foreach (var syntaxTree in syntaxTrees)
+            foreach (var fullPath in fullPaths)
             {
+                var syntaxTree = treesForPaths[fullPath];
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var result = docUpdater.Visit(syntaxTree.GetRoot(), semanticModel);
 
@@ -522,7 +694,7 @@ namespace Unity.DocTool.XMLDocHandler
 
             SyntaxNode targetTypeNode;
             if (!_documentationTargetTypeNodes.TryGetValue(symbol.Id(), out targetTypeNode))
-                throw new NotImplementedException("This type of node has not been prioritized yet.");
+                throw new NotSupportedException("This type of node has not been prioritized yet.");
 
             return targetTypeNode == node;
         }
@@ -551,33 +723,9 @@ namespace Unity.DocTool.XMLDocHandler
             base.VisitClassDeclaration(node);
         }
 
-        public override void VisitStructDeclaration(StructDeclarationSyntax node)
-        {
-            base.VisitStructDeclaration(node);
-        }
-
-        public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
-        {
-            base.VisitEnumDeclaration(node);
-        }
-
         internal void Visit(SyntaxNode syntaxNode, SemanticModel semanticModel)
         {
             _semanticModel = semanticModel;
         }
-
-        //public override void VisitDocumentationCommentTrivia(DocumentationCommentTriviaSyntax node)
-        //{
-        //    base.VisitDocumentationCommentTrivia(node);
-        //    var documentationTarget = node.ParentTrivia.Token.Parent;
-
-        //    Console.WriteLine($"|{node.Content}|");
-        //}
-
-        //public override void VisitXmlElement(XmlElementSyntax node)
-        //{
-        //    base.VisitXmlElement(node);
-        //    Console.WriteLine($"----\r\n{node}");
-        //}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -66,9 +67,9 @@ namespace Unity.DocTool.XMLDocHandler
             try
             {
                 var symbol = _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]);
-                var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
+                var docNodes = _xmlDoc.SelectNodes($"descendant::member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
                 var updatedNode = base.Visit(node);
-                return AddOrUpdateXmlDoc(node, updatedNode, docNode, symbol);
+                return AddOrUpdateXmlDoc(node, updatedNode, docNodes, symbol);
             }
             finally
             {
@@ -84,9 +85,9 @@ namespace Unity.DocTool.XMLDocHandler
             var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
             Debug.Assert(typeSymbol != null, "No symbol found for field");
 
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[@name='{typeSymbol.MemberNameUnescaped()}']/xmldoc");
+            var docNodes = _xmlDoc.SelectNodes($"descendant::member[@name='{typeSymbol.MemberNameUnescaped()}']/xmldoc");
 
-            var updatedNode = AddOrUpdateXmlDoc(node, node, docNode, typeSymbol);
+            var updatedNode = AddOrUpdateXmlDoc(node, node, docNodes, typeSymbol);
             return updatedNode;
         }
 
@@ -99,18 +100,29 @@ namespace Unity.DocTool.XMLDocHandler
                 return nodeToUpdate;
 
             var docNode = typeNode["xmldoc"];
+            if (docNode == null)
+                return nodeToUpdate;
+
             return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, typeSymbol);
         }
 
         private XmlNode SelectTypeNode(INamedTypeSymbol typeSymbol)
         {
             var selector =
-                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace}'");
+                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}'");
             if (typeSymbol.ContainingType != null)
                 selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
 
-            var docNode = _xmlDoc.SelectSingleNode($"descendant::member[{selector}]");
-            return docNode;
+            var docNodes = _xmlDoc.SelectNodes($"descendant::member[{selector}]");
+            if (docNodes.Count > 1)
+            {
+                throw new DuplicateMemberException($@"Multiple matches for ""{typeSymbol}"" found in xml.\nMatches:\n{string.Join("\n", docNodes.Cast<XmlNode>().Select(n => n.OuterXml))}");
+            }
+
+            if (docNodes.Count == 0)
+                return null;
+
+            return docNodes[0];
         }
 
         private SyntaxNode AddOrUpdateXmlDoc(MemberDeclarationSyntax originalNode, MemberDeclarationSyntax nodeToUpdate)
@@ -126,14 +138,47 @@ namespace Unity.DocTool.XMLDocHandler
             if (parentNode == null)
                 return nodeToUpdate;
 
-            var docNode = parentNode.SelectSingleNode($"member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
-            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNode, symbol);
+            var constraints = "";
+            var methodSymbol = symbol as IMethodSymbol;
+            if (methodSymbol != null)
+            {
+                int xpathIdx = 1;
+                foreach (var parameter in methodSymbol.Parameters)
+                {
+                    var parameterType = parameter.Type;
+                    if (parameterType is ITypeParameterSymbol)
+                        constraints += $@" and signature/parameters/parameter[{xpathIdx}]/typeParameter/@name='{parameterType.Name}'";
+                    else
+                        constraints += $@" and signature/parameters/parameter[{xpathIdx}]/type/@typeId='{parameterType.Id()}'";
+
+                    xpathIdx++;
+                }
+                constraints += $@" and not(signature/parameters/parameter[{xpathIdx}])";
+            }
+
+            var docNodes = parentNode.SelectNodes($"member[@name='{symbol.MemberNameUnescaped()}'{constraints}]/xmldoc");
+
+            return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNodes, symbol);
         }
 
-        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNode docNode, ISymbol symbol)
+        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNodeList matchingDocNodes, ISymbol symbol)
         {
-            if (docNode == null) return nodeToBeUpdated;
+            if (matchingDocNodes.Count > 1)
+            {
+                throw new DuplicateMemberException($@"Multiple matches for ""{symbol}"" found in xml.\nMatches:\n{string.Join("\n", matchingDocNodes.Cast<XmlNode>().Select(n => n.OuterXml))}");
+            }
 
+            if (matchingDocNodes.Count == 0)
+                return nodeToBeUpdated;
+
+            var docNode = matchingDocNodes[0];
+
+            return AddOrUpdateXmlDoc(originalNode, nodeToBeUpdated, docNode, symbol);
+        }
+
+        private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNode docNode,
+            ISymbol symbol)
+        {
             var docTrivia = nodeToBeUpdated.GetLeadingTrivia();
 
             var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
