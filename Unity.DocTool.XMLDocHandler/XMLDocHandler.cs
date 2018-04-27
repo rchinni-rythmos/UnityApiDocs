@@ -277,8 +277,15 @@ namespace Unity.DocTool.XMLDocHandler
 
         private IEnumerable<PortableExecutableReference> GetMetadataReferences()
         {
-            var platformAssembliesString = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString();
-            var assemblies = platformAssembliesString.Split(Path.PathSeparator).Where(p => !p.Contains("XMLDocHandler"));
+            var platformAssembliesString = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")?.ToString();
+            IEnumerable<string> assemblies;
+            if (platformAssembliesString != null)
+            {
+                assemblies = platformAssembliesString.Split(Path.PathSeparator)
+                    .Where(p => !p.Contains("XMLDocHandler"));
+            }
+            else
+                assemblies = new[] {typeof(object).Assembly.Location};
 
             return compilationParameters.ReferencedAssemblyPaths.Concat(assemblies).Select(p => MetadataReference.CreateFromFile(p));
         }
