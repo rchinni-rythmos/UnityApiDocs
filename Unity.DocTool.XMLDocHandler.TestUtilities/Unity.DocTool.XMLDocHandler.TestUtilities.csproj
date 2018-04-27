@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C34495C3-D3B5-4191-86E6-A9843EF52106}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Unity.DocTool.XMLDocHandler.Driver</RootNamespace>
-    <AssemblyName>Unity.DocTool.XMLDocHandler.Driver</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <ProjectGuid>{0FB4619E-D868-4297-A545-C5A6E02E10B7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Unity.DocTool.XMLDocHandler.TestUtilities</RootNamespace>
+    <AssemblyName>Unity.DocTool.XMLDocHandler.TestUtilities</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,9 +21,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Unity.DocTool.XMLDocHandler.TestUtilities.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,21 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublicExternalAttribute.cs" />
+    <Compile Include="ExternalEnum.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Unity.DocTool.XMLDocHandler\Unity.DocTool.XMLDocHandler.csproj">
-      <Project>{a5967f93-9f26-45bf-9e6f-77a90d45b8b6}</Project>
-      <Name>Unity.DocTool.XMLDocHandler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Unity.Options\Unity.Options.csproj">
-      <Project>{783f0782-fa64-49fb-9b89-8b4a56003a70}</Project>
-      <Name>Unity.Options</Name>
-    </ProjectReference>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

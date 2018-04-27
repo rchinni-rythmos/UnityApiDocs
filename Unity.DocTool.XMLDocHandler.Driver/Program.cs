@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using Unity.Options;
 
@@ -14,6 +15,7 @@ namespace Unity.DocTool.XMLDocHandler.Driver
         {
             public static string RootPath;
             public static string[] ExcludedPaths;
+            public static string[] ReferencedAssemblies;
             public static string[] Defines;
             public static string OutputDirectory;
         }
@@ -24,18 +26,25 @@ namespace Unity.DocTool.XMLDocHandler.Driver
         {
             OptionsParser.Prepare(args, typeof(Program).Assembly);
 
-            var testDir = Path.Combine(Path.GetTempPath(), TestFileDirectory);
+            var referencedAssemblies = new List<string>();
+            if (DriverOptions.ReferencedAssemblies != null)
+                referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);
+
+            referencedAssemblies.Add(typeof(object).Assembly.Location);
 
             var handler = new XMLDocHandler(new CompilationParameters(
                 DriverOptions.RootPath ?? ".",
                 DriverOptions.ExcludedPaths ?? new string[0], 
                 DriverOptions.Defines ?? new string[0], 
-                new [] {typeof(object).Assembly.Location}));
+                referencedAssemblies));
 
             string typesXml = handler.GetTypesXml();
             var isOutputDirectorySpecified = !string.IsNullOrEmpty(DriverOptions.OutputDirectory);
             if (isOutputDirectorySpecified)
-                File.WriteAllText(args[1], Path.Combine(DriverOptions.OutputDirectory, "GetTypes.xml"));
+            {
+                Directory.CreateDirectory(DriverOptions.OutputDirectory);
+                File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, "GetTypes.xml"), typesXml);
+            }
 
             XmlDocument getTypesXml = new XmlDocument();
 
@@ -56,7 +65,7 @@ namespace Unity.DocTool.XMLDocHandler.Driver
                 getTypeXml.LoadXml(typeXml);
 
                 if (isOutputDirectorySpecified)
-                    File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, FixupFilename(id)), typeXml);
+                    File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, FixupFilename(id) + ".xml"), typeXml);
 
                 var xmlDocNodes = getTypeXml.SelectNodes("//xmldoc");
                 HashSet<string> randomComments = new HashSet<string>();

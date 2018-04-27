@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
@@ -23,12 +24,16 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             Directory.SetCurrentDirectory(originalCurrentDirectory);
         }
 
-        protected static CompilationParameters MakeCompilationParameters(string testFileDirectory)
+        protected static CompilationParameters MakeCompilationParameters(string testFileDirectory, string[] referencedAssemblyPaths = null)
         {
-            return new CompilationParameters(testFileDirectory, new string[0], new string[0], new []
+            var referencedAssemblies = new[]
             {
                 typeof(object).Assembly.Location,
-            });
+            };
+            if (referencedAssemblyPaths != null)
+                referencedAssemblies = referencedAssemblyPaths.Concat(referencedAssemblies).ToArray();
+
+            return new CompilationParameters(testFileDirectory, new string[0], new string[0], referencedAssemblies);
         }
 
         protected static string Normalize(string source)

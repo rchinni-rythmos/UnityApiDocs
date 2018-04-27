@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Options", "Unity.Options\Unity.Options.csproj", "{783F0782-FA64-49FB-9B89-8B4A56003A70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler.TestUtilities", "Unity.DocTool.XMLDocHandler.TestUtilities\Unity.DocTool.XMLDocHandler.TestUtilities.csproj", "{0FB4619E-D868-4297-A545-C5A6E02E10B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{783F0782-FA64-49FB-9B89-8B4A56003A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{783F0782-FA64-49FB-9B89-8B4A56003A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{783F0782-FA64-49FB-9B89-8B4A56003A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FB4619E-D868-4297-A545-C5A6E02E10B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FB4619E-D868-4297-A545-C5A6E02E10B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FB4619E-D868-4297-A545-C5A6E02E10B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FB4619E-D868-4297-A545-C5A6E02E10B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

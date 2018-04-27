@@ -46,7 +46,7 @@ namespace Unity.DocTool.XMLDocHandler
             if (!Directory.Exists(compilationParametersRootPath))
                 throw new ArgumentException($"Directory \"{compilationParametersRootPath}\" does not exist.");
 
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
             
             var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
                 .Select(Path.GetFullPath)
@@ -70,7 +70,7 @@ namespace Unity.DocTool.XMLDocHandler
                 getTypesVisitor.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
-            return getTypesVisitor.GetXml();
+            return FormatXml(getTypesVisitor.GetXml());
         }
         
         public string GetTypeDocumentation(string id, params string[] paths)
@@ -121,14 +121,14 @@ namespace Unity.DocTool.XMLDocHandler
 
                         extraContent += AttributesXml(typeSymbol);
 
-                        var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                        var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}""{xmlAttributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         {extraContent}
         <xmldoc>
-            <![CDATA[{ extraMemberRegEx.Replace(typeSymbol.GetDocumentationCommentXml(), "")}]]>
+            { GetCDataDocXml(extraMemberRegEx, typeSymbol)}
         </xmldoc>");
 
                         var members = typeSymbol.GetMembers()
@@ -157,15 +157,15 @@ namespace Unity.DocTool.XMLDocHandler
             <signature>{SignatureFor(member)}</signature>
             {AttributesXml(member)}
             <xmldoc>
-                <![CDATA[{ extraMemberRegEx.Replace(member.GetDocumentationCommentXml(), "")}]]>
+                { GetCDataDocXml(extraMemberRegEx, member) }
             </xmldoc>
         </member>
 ");
                         }
 
                         xml.Append(@"</member></doc>");
-
-                        return xml.ToString();
+                        var formatedXml = FormatXml(xml.ToString());
+                        return formatedXml;
                     }
                 }
             }
@@ -173,9 +173,37 @@ namespace Unity.DocTool.XMLDocHandler
             throw new Exception($"Type not found Id={id}");
         }
 
+        private static string GetCDataDocXml(Regex extraMemberRegEx, ISymbol typeSymbol)
+        {
+            var xml = typeSymbol.GetDocumentationCommentXml();
+            xml = extraMemberRegEx.Replace(xml, "");
+            //escape end of CDATA tags
+            xml = xml.Replace("]]>", "]]]]><![CDATA[>");
+            return $@"<![CDATA[{xml}]]>";
+        }
+
+        private string FormatXml(string xml)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xml);
+            StringBuilder sb = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = "  ",
+                NewLineChars = "\r\n",
+                NewLineHandling = NewLineHandling.Replace
+            };
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
+            {
+                doc.Save(writer);
+            }
+            return sb.ToString();
+        }
+
         private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
         {
-            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp7_2, DocumentationMode.Parse,
+            var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
             var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
@@ -272,7 +300,7 @@ namespace Unity.DocTool.XMLDocHandler
                 return String.Empty;
 
             return $@"<interfaces>
-{String.Join(Environment.NewLine, interfaces.Select(i => $@"<interface typeId=""{i.Id()}"" typeName=""{XmlUtility.EscapeString(i.Name)}""/>"))}
+{String.Join(Environment.NewLine, interfaces.Select(i => TypeReferenceXml(i)))}
 </interfaces>";
         }
 
@@ -467,7 +495,13 @@ namespace Unity.DocTool.XMLDocHandler
                 {
                     string defaultValue;
                     if (parameter.ExplicitDefaultValue == null)
-                        defaultValue = "default";
+                    {
+                        var parameterWithDefault = parameter.DeclaringSyntaxReferences.Select(reference => (ParameterSyntax)reference.GetSyntax()).FirstOrDefault(p => p.Default != null);
+                        if (parameterWithDefault != null)
+                            defaultValue = parameterWithDefault.Default.Value.ToFullString();
+                        else
+                            throw new NotSupportedException("Unsupported default value declaration: " + parameter.ToDisplayString());
+                    }
                     else
                         defaultValue = parameter.ExplicitDefaultValue.ToString();
 

@@ -96,7 +96,6 @@ namespace Unity.DocTool.XMLDocHandler.Extensions
                     case MethodKind.ExplicitInterfaceImplementation:
                         return true;
                     case MethodKind.AnonymousFunction:
-                    case MethodKind.LocalFunction:
                     case MethodKind.DelegateInvoke:
                     case MethodKind.BuiltinOperator:
                     case MethodKind.ReducedExtension:
