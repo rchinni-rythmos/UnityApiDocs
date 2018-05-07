@@ -181,7 +181,14 @@ namespace Unity.DocTool.XMLDocHandler
         {
             var docTrivia = nodeToBeUpdated.GetLeadingTrivia();
 
-            var comment = string.Join("\n", docNode.InnerText.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
+            var initialWhitespace = docTrivia.TakeWhile(t => t.IsKind(SyntaxKind.WhitespaceTrivia) || t.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
+            int lastNewLineIndex = Array.FindLastIndex(initialWhitespace, t => t.Kind() == SyntaxKind.EndOfLineTrivia);
+            if (lastNewLineIndex >= 0)
+                initialWhitespace = initialWhitespace.Skip(lastNewLineIndex + 1).ToArray();
+
+            var rawWhitespace = string.Join("", initialWhitespace.Select(t => t.ToFullString()));
+
+            var comment = string.Join("\r\n" + rawWhitespace, docNode.InnerText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(item => "/// " + item));
 
@@ -200,13 +207,13 @@ namespace Unity.DocTool.XMLDocHandler
                 else if (shouldUpdate)
                 {
                     shouldUpdate = false;
-                    newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
+                    newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.CarriageReturnLineFeed).AddRange(initialWhitespace));
                 }
             }
 
             if (shouldUpdate)
             {
-                newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.LineFeed));
+                newTrivia = newTrivia.AddRange(xmlDocumentNode.GetLeadingTrivia().Add(SyntaxFactory.CarriageReturnLineFeed).AddRange(initialWhitespace));
             }
 
             return nodeToBeUpdated.WithLeadingTrivia(newTrivia);
