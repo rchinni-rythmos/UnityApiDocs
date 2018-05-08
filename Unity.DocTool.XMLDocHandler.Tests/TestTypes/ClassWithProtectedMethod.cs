@@ -2,6 +2,9 @@
 {
     public class ClassWithProtectedMethod
     {
+        
+
+        
         protected void ProtectedMethod()
         {
         }

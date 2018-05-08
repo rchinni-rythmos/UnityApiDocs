@@ -13,6 +13,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
             public string newDocXml;
             public string expectedSource;
             public string sourcePath;
+            public bool compareRaw;
         }
 
         public static IEnumerable<TestCaseData> UpdateTestCases()
@@ -773,7 +774,9 @@ public class ClassInGlobalNamespace
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
     <member name=""ClassWithProtectedMethod"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
-        <xmldoc><![CDATA[New class docs]]></xmldoc>
+        <xmldoc><![CDATA[<summary>
+    New class docs
+</summary>]]></xmldoc>
         <member name=""ProtectedMethod"" type=""Method"">
             <signature>
                 <accessibility>Protected</accessibility>
@@ -783,20 +786,29 @@ public class ClassInGlobalNamespace
                 <parameters>
                 </parameters>
             </signature>
-            <xmldoc><![CDATA[New method docs]]></xmldoc>
+            <xmldoc><![CDATA[<summary>
+    New method docs
+</summary>]]></xmldoc>
         </member>
     </member>
 </doc>",
-                    expectedSource = @"
-    /// New class docs
+                    expectedSource = @"    /// <summary>
+    ///     New class docs
+    /// </summary>
     public class ClassWithProtectedMethod
     {
-        /// New method docs
+        
+
+        
+        /// <summary>
+        ///     New method docs
+        /// </summary>
         protected void ProtectedMethod()
         {
         }
     }",
-                    sourcePath = "TestTypes/ClassWithProtectedMethod.cs"
+                    sourcePath = "TestTypes/ClassWithProtectedMethod.cs",
+                    compareRaw = true
                 }).SetName("Update_Protected_Method");
         }
 
@@ -815,7 +827,7 @@ public class ClassInGlobalNamespace
                 handler.SetType(data.newDocXml, Path.GetFileName(data.sourcePath));
 
                 var actualSource = File.ReadAllText(data.sourcePath);
-                AssertSourceContains(data.expectedSource, actualSource);
+                AssertSourceContains(data.expectedSource, actualSource, !data.compareRaw);
             }
             finally
             {
