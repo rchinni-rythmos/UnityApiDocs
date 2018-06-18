@@ -1,6 +1,6 @@
-﻿using Unity.DocTool.XMLDocHandler.TestUtilities;
+﻿using DocWorks.Integration.XmlDoc.TestUtilities;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public class DefaultExternalEnumParameter
     {

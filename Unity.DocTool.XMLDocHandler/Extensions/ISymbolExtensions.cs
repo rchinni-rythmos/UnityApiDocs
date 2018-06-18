@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Unity.DocTool.XMLDocHandler.Extensions
+namespace DocWorks.Integration.XmlDoc.Extensions
 {
     public static class ISymbolExtensions
     {

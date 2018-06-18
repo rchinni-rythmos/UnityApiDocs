@@ -1,6 +1,6 @@
-﻿using Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes;
+﻿using DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public static class ClassWithExtensionMethods
     {

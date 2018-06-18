@@ -1,6 +1,6 @@
-﻿using Unity.DocTool.XMLDocHandler.TestUtilities;
+﻿using DocWorks.Integration.XmlDoc.TestUtilities;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
 {
     [PublicExternal(true)]
     public class ClassWithExternalAttribute

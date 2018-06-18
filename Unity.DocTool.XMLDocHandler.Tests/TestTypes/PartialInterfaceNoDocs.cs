@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     partial interface PartialInterfaceNoDocs
     {

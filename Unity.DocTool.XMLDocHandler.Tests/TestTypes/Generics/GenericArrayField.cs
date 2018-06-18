@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics
 {
     public class GenericArrayField
     {

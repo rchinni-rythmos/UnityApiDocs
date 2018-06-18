@@ -1,7 +1,7 @@
-﻿using Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes;
-using Unity.DocTool.XMLDocHandler.TestUtilities;
+﻿using DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes;
+using DocWorks.Integration.XmlDoc.TestUtilities;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
 {
     [TestInternal] [TestPublic(50, AnEnum = AClass.AnEnum.Value)]
     public class ClassWithAttributes

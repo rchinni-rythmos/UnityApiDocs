@@ -1,4 +1,4 @@
-﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+﻿namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     /// <summary>
     /// A Delegate

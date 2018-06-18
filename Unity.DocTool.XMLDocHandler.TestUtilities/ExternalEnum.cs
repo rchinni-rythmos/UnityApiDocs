@@ -1,4 +1,4 @@
-﻿namespace Unity.DocTool.XMLDocHandler.TestUtilities
+﻿namespace DocWorks.Integration.XmlDoc.TestUtilities
 {
     public enum ExternalEnum
     {

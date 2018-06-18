@@ -7,9 +7,9 @@ using System.Xml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Unity.DocTool.XMLDocHandler.Extensions;
+using DocWorks.Integration.XmlDoc.Extensions;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     internal class XmlDocReplacerVisitor : CSharpSyntaxRewriter
     {
@@ -188,7 +188,7 @@ namespace Unity.DocTool.XMLDocHandler
 
             var rawWhitespace = string.Join("", initialWhitespace.Select(t => t.ToFullString()));
 
-            var comment = string.Join("\r\n" + rawWhitespace, docNode.InnerText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries)
+            var comment = string.Join("\r\n" + rawWhitespace, docNode.InnerText.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(item => "/// " + item));
 

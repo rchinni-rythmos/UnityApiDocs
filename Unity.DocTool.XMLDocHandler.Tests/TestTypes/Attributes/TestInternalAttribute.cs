@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
 {
     [AttributeUsage(AttributeTargets.All)]
     class TestInternalAttribute : Attribute { }

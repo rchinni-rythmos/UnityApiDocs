@@ -1,4 +1,4 @@
-﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
+﻿namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
 {
     [TestInternal]
     [TestPublic]

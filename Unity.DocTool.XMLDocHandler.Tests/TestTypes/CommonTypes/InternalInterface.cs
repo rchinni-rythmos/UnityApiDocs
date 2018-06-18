@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     interface InternalInterface
     {

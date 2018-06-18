@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     class CecilUtility
     {

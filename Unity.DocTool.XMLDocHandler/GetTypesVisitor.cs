@@ -4,9 +4,9 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Unity.DocTool.XMLDocHandler.Extensions;
+using DocWorks.Integration.XmlDoc.Extensions;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     public class GetTypesVisitor : CSharpSyntaxWalker
     {

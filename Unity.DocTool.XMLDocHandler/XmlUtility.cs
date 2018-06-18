@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     static class XmlUtility
     {

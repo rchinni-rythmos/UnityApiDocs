@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Framework;
 
-namespace Unity.DocTool.XMLDocHandler.Tests
+namespace DocWorks.Integration.XmlDoc.Tests
 {
     [TestFixture]
     class IntegrationTests : XmlDocHandlerTestBase

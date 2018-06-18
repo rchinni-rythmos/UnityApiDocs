@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public class ClassWithOptionalParameters
     {

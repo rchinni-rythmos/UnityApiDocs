@@ -10,10 +10,10 @@ using System.Xml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Unity.DocTool.XMLDocHandler.Extensions;
-using ISymbolExtensions = Unity.DocTool.XMLDocHandler.Extensions.ISymbolExtensions;
+using DocWorks.Integration.XmlDoc.Extensions;
+using ISymbolExtensions = DocWorks.Integration.XmlDoc.Extensions.ISymbolExtensions;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     public class CompilationParameters
     {

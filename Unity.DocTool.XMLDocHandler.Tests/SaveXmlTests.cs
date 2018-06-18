@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 
-namespace Unity.DocTool.XMLDocHandler.Tests
+namespace DocWorks.Integration.XmlDoc.Tests
 {
     [TestFixture]
     class SaveXmlTests : XmlDocHandlerTestBase
@@ -23,7 +23,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""ClassWithProperty"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name=""ClassWithProperty"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
             <member name=""Value"" type=""Property"">
                 <signature>
 <accessibility>Public</accessibility>
@@ -40,7 +40,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests
         </member>
 </member></doc>",
                     expectedSource = @"
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {    
     public class ClassWithProperty
     {
@@ -58,7 +58,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
     <doc version=""3"">
-        <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
 <![CDATA[
 <summary>Updated Doc</summary>
@@ -81,7 +81,7 @@ namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
     <doc version=""3"">
-        <member name=""AnEnum"" type=""Enum"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Enum"">
+        <member name=""AnEnum"" type=""Enum"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"" inherits=""Enum"">
         
         <xmldoc>
 <![CDATA[
@@ -106,7 +106,7 @@ Some Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -132,7 +132,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""GenericClass`1"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"" inherits=""Object"">
+    <member name=""GenericClass`1"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics"" inherits=""Object"">
         <typeParameters>
             <typeParameter name=""T"" />
         </typeParameters>
@@ -153,7 +153,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics
 {
     /// <summary>New Class docs</summary>
     public class GenericClass<T>
@@ -181,7 +181,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"">
+    <member name=""INestedInterface"" type=""Interface"" containingType=""AClass"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"">
         <xmldoc>
             <![CDATA[<summary>
 Updated Docs
@@ -207,12 +207,12 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""ClassWithXmlDocsAndNormalComments"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name=""ClassWithXmlDocsAndNormalComments"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>Only the summary</summary>]]>
         </xmldoc>
 </member></doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     // Type-Prefix
     /// <summary>Only the summary</summary>
@@ -227,12 +227,12 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
     <doc version=""3"">
-        <member name=""ClassWithMultipleXmlDocs"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+        <member name=""ClassWithMultipleXmlDocs"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>Only the summary</summary>]]>
         </xmldoc>
 </member></doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>Only the summary</summary> 
     // after summary
@@ -247,7 +247,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithField"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithField"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <member name=""value"" type=""Field"">
             <signature>
                 <accessibility>Public</accessibility>
@@ -259,7 +259,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public class ClassWithField
     {
@@ -276,7 +276,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithMultipleFieldsOnDeclaration"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithMultipleFieldsOnDeclaration"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <member name=""value2"" type=""Field"">
             <signature>
                 <accessibility>Public</accessibility>
@@ -288,7 +288,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public class ClassWithMultipleFieldsOnDeclaration
     {
@@ -310,7 +310,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithField"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithField"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New ClassWithField Docs</summary>]]>
         </xmldoc>
@@ -325,7 +325,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>New ClassWithField Docs</summary>
     public class ClassWithField
@@ -343,7 +343,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""AClass"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+    <member name=""AClass"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -391,7 +391,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithEvent"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithEvent"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -408,7 +408,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
     public class ClassWithEvent
@@ -427,7 +427,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithEventAddRemove"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithEventAddRemove"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -448,7 +448,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
     public class ClassWithEventAddRemove
@@ -469,7 +469,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithOperator"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithOperator"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -481,7 +481,7 @@ Updated Docs
                 </return>
                 <parameters>
                     <parameter name=""classWithOperator"" >
-                        <type typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" typeName=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.ClassWithOperator"" />
+                        <type typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.ClassWithOperator"" typeName=""DocWorks.Integration.XmlDoc.Tests.TestTypes.ClassWithOperator"" />
                     </parameter>
                     <parameter name=""other"" >
                         <type typeId=""System.Int32"" typeName=""int"" />
@@ -492,7 +492,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
     public class ClassWithOperator
@@ -512,7 +512,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithConstructor"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithConstructor"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -524,7 +524,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>New class docs</summary>
     public class ClassWithConstructor
@@ -541,7 +541,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithExtensionMethods"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""ClassWithExtensionMethods"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[<summary>New class docs</summary>]]>
         </xmldoc>
@@ -577,7 +577,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ADelegate"" type=""Delegate"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
+    <member name=""ADelegate"" type=""Delegate"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
@@ -595,7 +595,7 @@ Updated Docs
         </xmldoc>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     /// New docs
     public delegate int ADelegate(System.Object o);",
@@ -608,7 +608,7 @@ Updated Docs
                     {
                         newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
+    <member name=""Delegate"" type=""Delegate"" containingType=""AClass"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"" inherits=""System.MulticastDelegate"" isSealed=""true"">
         <signature>
             <accessibility>Public
             </accessibility>
@@ -635,7 +635,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""GenericStructWithConstraints`1"" type=""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics"">
+    <member name=""GenericStructWithConstraints`1"" type=""Struct"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics"">
         
         <xmldoc>
             <![CDATA[New class docs]]>
@@ -652,16 +652,16 @@ Updated Docs
                     <parameter name=""t2"">
                         <typeParameter declaringTypeId="""" name=""T2"">
                             <attributes>
-                                <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                                <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"" />
                             </attributes>
                         </typeParameter>
                     </parameter>
                 </parameters>
                 <typeParameters>
                     <typeParameter name=""T2"">
-                        <typeParameter declaringTypeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T"" />
+                        <typeParameter declaringTypeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics.GenericStructWithConstraints`1"" name=""T"" />
                         <attributes>
-                            <attribute typeId=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes.TestPublicAttribute"" />
+                            <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"" />
                         </attributes>
                     </typeParameter>
                 </typeParameters>
@@ -688,7 +688,7 @@ Updated Docs
 </doc>",
                     expectedSource = @"
     /// New class docs
-    public struct GenericStructWithConstraints<T> where T : class, IList<Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass>, new()
+    public struct GenericStructWithConstraints<T> where T : class, IList<DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass>, new()
     {
         /// new GenericMethodWithGenericConstraint`1 docs
         public void GenericMethodWithGenericConstraint<[TestInternal][TestPublic]T2>(T2 t2) where T2 : T
@@ -704,7 +704,7 @@ Updated Docs
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithOverloads"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" id="""">
+    <member name=""ClassWithOverloads"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" id="""">
         <xmldoc>
             <![CDATA[New class docs]]>
         </xmldoc>
@@ -739,7 +739,7 @@ Updated Docs
         </member>
     </member>
 </doc>",
-                    expectedSource = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedSource = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// New class docs
     public class ClassWithOverloads
@@ -773,7 +773,7 @@ public class ClassInGlobalNamespace
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""ClassWithProtectedMethod"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+    <member name=""ClassWithProtectedMethod"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
         <xmldoc><![CDATA[<summary>
     New class docs
 </summary>]]></xmldoc>
@@ -842,12 +842,12 @@ public class ClassInGlobalNamespace
             {
                 newDocXml = @"<?xml version=""1.0"" encoding=""utf -8"" standalone =""yes"" ?>
 <doc version=""3"">
-    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[Doc 1]]>
         </xmldoc>
     </member>
-    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"" inherits=""Object"">
+    <member name=""SimpleClassWithXmlDoc"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"" inherits=""Object"">
         <xmldoc>
             <![CDATA[Doc 2]]>
         </xmldoc>
@@ -890,12 +890,12 @@ public class SimpleClassWithXmlDoc
                     filename2 = "TestTypes/CommonTypes/AFolder/AClass.part2.cs",
                     newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""AClass"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes"" inherits=""Object"">
+    <member name=""AClass"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes"" inherits=""Object"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
     </member>
 </doc>
 ",
-                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+                    expectedFile1Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     public partial class AClass { }
 
@@ -903,7 +903,7 @@ public class SimpleClassWithXmlDoc
     public partial class AClass : IEnumerable, ICloneable
     {
 ",
-                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+                    expectedFile2Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     //Here is a partial for implementation details...
     public partial class AClass
@@ -917,12 +917,12 @@ public class SimpleClassWithXmlDoc
                     filename2 = "TestTypes/PartialInterfaceNoDocs.part2.cs",
                     newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""PartialInterfaceNoDocs"" type=""Interface"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+    <member name=""PartialInterfaceNoDocs"" type=""Interface"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
     </member>
 </doc>
 ",
-                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedFile1Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>new doc</summary>
     partial interface PartialInterfaceNoDocs
@@ -930,7 +930,7 @@ public class SimpleClassWithXmlDoc
     }
 }
 ",
-                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedFile2Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     partial interface PartialInterfaceNoDocs
     {
@@ -945,12 +945,12 @@ public class SimpleClassWithXmlDoc
                     filename2 = "TestTypes/PartialStructWithDocs.part2.cs",
                     newContent = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""PartialStructWithDocs"" type=""Struct"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+    <member name=""PartialStructWithDocs"" type=""Struct"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
         <xmldoc><![CDATA[<summary>new doc</summary>]]></xmldoc>
     </member>
 </doc>
 ",
-                    expectedFile1Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedFile1Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     partial struct PartialStructWithDocs
     {
@@ -961,7 +961,7 @@ public class SimpleClassWithXmlDoc
     }
 }
 ",
-                    expectedFile2Source = @"namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+                    expectedFile2Source = @"namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     partial struct PartialStructWithDocs
     {

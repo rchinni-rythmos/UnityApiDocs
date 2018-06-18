@@ -1,4 +1,4 @@
-﻿namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+﻿namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics
 {
     /// <summary>
     /// Existing Docs for GenericClass-T

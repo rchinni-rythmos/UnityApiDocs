@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes;
+using DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics
 {
     /// <summary>
     /// Existing Docs for GenericStructWithConstraints-T
     /// </summary>
-    public struct GenericStructWithConstraints<T> where T : class, IList<Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes.AClass>, new()
+    public struct GenericStructWithConstraints<T> where T : class, IList<DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass>, new()
     {
         /// <summary>
         /// Existing GenericStructWithConstraints-T.GenericMethodWithGenericConstraint-T2

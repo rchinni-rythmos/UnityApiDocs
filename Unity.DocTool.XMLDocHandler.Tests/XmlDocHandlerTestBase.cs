@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 
-namespace Unity.DocTool.XMLDocHandler.Tests
+namespace DocWorks.Integration.XmlDoc.Tests
 {
     internal class XmlDocHandlerTestBase
     {

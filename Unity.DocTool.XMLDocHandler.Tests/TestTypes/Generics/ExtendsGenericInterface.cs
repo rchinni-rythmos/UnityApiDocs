@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Generics
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics
 {
     /// <summary>
     /// Existing Docs for ExtendsGenericInterface

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.DocTool.XMLDocHandler.TestUtilities
+namespace DocWorks.Integration.XmlDoc.TestUtilities
 {
     public class PublicExternalAttribute : Attribute
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes
 {
     public partial class AClass { }
 

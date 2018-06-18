@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.DocTool.XMLDocHandler
+namespace DocWorks.Integration.XmlDoc
 {
     public class DuplicateMemberException : Exception
     {

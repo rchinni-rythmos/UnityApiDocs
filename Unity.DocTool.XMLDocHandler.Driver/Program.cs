@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Xml;
 using Unity.Options;
 
-namespace Unity.DocTool.XMLDocHandler.Driver
+namespace DocWorks.Integration.XmlDoc.Driver
 {
     class Program
     {
