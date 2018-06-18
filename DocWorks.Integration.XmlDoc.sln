@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27428.2027
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.DocTool.XMLDocHandler", "Unity.DocTool.XMLDocHandler\Unity.DocTool.XMLDocHandler.csproj", "{F66D4EE4-B665-47BF-BF29-FDD05406C7BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocWorks.Integration.XmlDoc", "Unity.DocTool.XMLDocHandler\DocWorks.Integration.XmlDoc.csproj", "{F66D4EE4-B665-47BF-BF29-FDD05406C7BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.Options", "Unity.Options\Unity.Options.csproj", "{931C2778-A9FE-4811-BEC4-02E71CDF71CF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.DocTool.XMLDocHandler.TestUtilities", "Unity.DocTool.XMLDocHandler.TestUtilities\Unity.DocTool.XMLDocHandler.TestUtilities.csproj", "{996628A2-11EF-4C46-B2D0-FAA011DCD753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocWorks.Integration.XmlDoc.TestUtilities", "Unity.DocTool.XMLDocHandler.TestUtilities\DocWorks.Integration.XmlDoc.TestUtilities.csproj", "{996628A2-11EF-4C46-B2D0-FAA011DCD753}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.DocTool.XMLDocHandler.Tests", "Unity.DocTool.XMLDocHandler.Tests\Unity.DocTool.XMLDocHandler.Tests.csproj", "{548CD5E3-DADF-45DA-A359-760D123FE896}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocWorks.Integration.XmlDoc.Tests", "Unity.DocTool.XMLDocHandler.Tests\DocWorks.Integration.XmlDoc.Tests.csproj", "{548CD5E3-DADF-45DA-A359-760D123FE896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.DocTool.XMLDocHandler.Driver", "Unity.DocTool.XMLDocHandler.Driver\Unity.DocTool.XMLDocHandler.Driver.csproj", "{C34495C3-D3B5-4191-86E6-A9843EF52106}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocWorks.Integration.XmlDoc.Driver", "Unity.DocTool.XMLDocHandler.Driver\DocWorks.Integration.XmlDoc.Driver.csproj", "{C34495C3-D3B5-4191-86E6-A9843EF52106}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
