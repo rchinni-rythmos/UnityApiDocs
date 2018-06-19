@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C34495C3-D3B5-4191-86E6-A9843EF52106}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Unity.DocTool.XMLDocHandler.Driver</RootNamespace>
-    <AssemblyName>Unity.DocTool.XMLDocHandler.Driver</AssemblyName>
+    <RootNamespace>DocWorks.Integration.XmlDoc.Driver</RootNamespace>
+    <AssemblyName>DocWorks.Integration.XmlDoc.Driver</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -135,7 +135,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Unity.DocTool.XMLDocHandler\DocWorks.Integration.XmlDoc.csproj">
+    <ProjectReference Include="..\DocWorks.Integration.XmlDoc\DocWorks.Integration.XmlDoc.csproj">
       <Project>{F66D4EE4-B665-47BF-BF29-FDD05406C7BF}</Project>
       <Name>DocWorks.Integration.XmlDoc</Name>
     </ProjectReference>

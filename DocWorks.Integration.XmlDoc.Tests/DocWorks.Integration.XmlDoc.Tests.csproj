@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Unity.DocTool.XMLDocHandler.TestUtilities\DocWorks.Integration.XmlDoc.TestUtilities.csproj" />
-    <ProjectReference Include="..\Unity.DocTool.XMLDocHandler\DocWorks.Integration.XmlDoc.csproj" />
+    <ProjectReference Include="..\DocWorks.Integration.XmlDoc.TestUtilities\DocWorks.Integration.XmlDoc.TestUtilities.csproj" />
+    <ProjectReference Include="..\DocWorks.Integration.XmlDoc\DocWorks.Integration.XmlDoc.csproj" />
   </ItemGroup>
 
   <ItemGroup>
