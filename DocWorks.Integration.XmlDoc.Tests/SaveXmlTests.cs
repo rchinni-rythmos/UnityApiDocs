@@ -810,6 +810,57 @@ public class ClassInGlobalNamespace
                     sourcePath = "TestTypes/ClassWithProtectedMethod.cs",
                     compareRaw = true
                 }).SetName("Update_Protected_Method");
+
+            yield return new TestCaseData(
+                new UpdateTestData
+                {
+                    newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+    <member name=""SingleLineFeed"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+        <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
+        <signature>
+            <accessibility>Public</accessibility>
+            <return>
+                <type typeId=""System.Int32"" typeName=""int"" />
+            </return>
+            <parameters>
+                <parameter name=""i"">
+                    <type typeId = ""System.Int32"" typeName = ""i"" />
+                </parameter>
+            </parameters>
+        </signature>
+        " + "<xmldoc><![CDATA[<summary>\nMethod\n</summary>\n<param name=\"i\">\nvalue\n</param>\n<returns>\nThe same value it receives\n</returns>\n<description>\nMethod Description\n</description>]]>\n" +
+    @"</xmldoc>
+   </member>
+   </member>
+</doc>",
+                    expectedSource = @"
+namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+{
+    public class SingleLineFeed
+    {
+        /// <summary>
+        /// Method
+        /// </summary>
+        /// <param name=""i"">
+        /// value
+        /// </param>
+        /// <returns>
+        /// The same value it receives
+        /// </returns>
+        /// <description>
+        /// Method Description
+        /// </description>
+        public int Method(int i)
+        {
+            return i;
+        }
+    }
+}",
+
+                    sourcePath = "TestTypes/SingleLineFeed.cs",
+                    compareRaw = true
+                }).SetName("SingleLineFeeds");
         }
 
         //TODO: Add tests for: Formating
@@ -1032,7 +1083,7 @@ public class SimpleClassWithXmlDoc
                 expectedSource = Normalize(expectedSource);
             }
 
-            Assert.IsTrue(actualSource.Contains(expectedSource), $"Expected\n {expectedSource}\nbut got\n {actualSource}");
+            Assert.IsTrue(actualSource.Contains(expectedSource), $"Expected\n --\n{expectedSource}\n--\nbut got\n --\n{actualSource}\n--\n");
         }
     }
 }

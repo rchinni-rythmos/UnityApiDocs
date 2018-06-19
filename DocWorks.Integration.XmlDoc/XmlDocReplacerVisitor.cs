@@ -188,7 +188,8 @@ namespace DocWorks.Integration.XmlDoc
 
             var rawWhitespace = string.Join("", initialWhitespace.Select(t => t.ToFullString()));
 
-            var comment = string.Join("\r\n" + rawWhitespace, docNode.InnerText.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+            // break lines (to inject ///) at both CRLF & LF.
+            var comment = string.Join("\r\n" + rawWhitespace, docNode.InnerText.Split(new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(item => "/// " + item));
 
