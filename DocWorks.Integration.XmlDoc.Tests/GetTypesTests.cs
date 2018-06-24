@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Xml;
+﻿using DocWorks.Integration.XmlDoc.TestUtilities;
 using NUnit.Framework;
-using DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes;
-using DocWorks.Integration.XmlDoc.TestUtilities;
+using System;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace DocWorks.Integration.XmlDoc.Tests
 {
@@ -950,7 +946,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         <attributes>
             <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"">
                 <constructorArguments>
-                    <argument value=""&quot;string&quot;"" />
+                    <argument value=""string"" />
                 </constructorArguments>
             </attribute>
         </attributes>
