@@ -282,7 +282,7 @@ namespace DocWorks.Integration.XmlDoc
             if (platformAssembliesString != null)
             {
                 assemblies = platformAssembliesString.Split(Path.PathSeparator)
-                    .Where(p => !p.Contains("XMLDocHandler"));
+                    .Where(p => !p.Contains("DocWorks.Integration"));
             }
             else
                 assemblies = new[] {typeof(object).Assembly.Location};
