@@ -850,10 +850,14 @@ namespace DocWorks.Integration.XmlDoc.Tests
         <attributes>
             <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"">
                 <constructorArguments>
-                    <argument value=""50"" />
+                    <argument value=""50"">
+                        <type typeId=""System.Int32"" typeName=""int"" />
+                    </argument>
                 </constructorArguments>
                 <namedArguments>
-                    <argument name=""AnEnum"" value=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum.Value"" />
+                    <argument name=""AnEnum"" value=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum.Value"">
+                        <type typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum"" typeName=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum"" />
+                    </argument>
                 </namedArguments>
             </attribute>
         </attributes>
@@ -909,7 +913,9 @@ namespace DocWorks.Integration.XmlDoc.Tests
         <attributes>
             <attribute typeId=""DocWorks.Integration.XmlDoc.TestUtilities.PublicExternalAttribute"">
                 <constructorArguments>
-                    <argument value=""true"" />
+                    <argument value=""true"">
+                        <type typeId=""System.Boolean"" typeName=""bool"" />
+                    </argument>
                 </constructorArguments>
             </attribute>
         </attributes>
@@ -946,8 +952,10 @@ namespace DocWorks.Integration.XmlDoc.Tests
         <attributes>
             <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"">
                 <constructorArguments>
-                    <argument value=""string"" />
-                </constructorArguments>
+                    <argument value=""string"">
+                        <type typeId=""System.String"" typeName=""string"" />
+                    </argument>
+               </constructorArguments>
             </attribute>
         </attributes>
         <xmldoc><![CDATA[]]></xmldoc>
