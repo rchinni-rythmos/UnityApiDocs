@@ -257,7 +257,7 @@ namespace DocWorks.Integration.XmlDoc
                     sb.AppendLine("<constructorArguments>");
                     foreach (var argument in constructorArguments)
                     {
-                        sb.AppendLine($@"<argument value='{SymbolDisplay.FormatPrimitive(argument.Value, false, false)}'>");
+                        sb.AppendLine($@"<argument value=""{argument.ToCSharpStringNoStringQuotes()}"">");
                         sb.AppendLine(TypeReferenceXml(argument.Type));
                         sb.AppendLine("</argument>");
                     }
@@ -269,7 +269,7 @@ namespace DocWorks.Integration.XmlDoc
                     sb.AppendLine("<namedArguments>");
                     foreach (var argument in namedArguments)
                     {
-                        sb.AppendLine($@"<argument name=""{argument.Key}"" value='{argument.Value.ToCSharpString()}'>");
+                        sb.AppendLine($@"<argument name=""{argument.Key}"" value=""{argument.Value.ToCSharpStringNoStringQuotes()}"">");
                         sb.AppendLine(TypeReferenceXml(argument.Value.Type));
                         sb.AppendLine("</argument>");
 

@@ -858,6 +858,9 @@ namespace DocWorks.Integration.XmlDoc.Tests
                     <argument name=""AnEnum"" value=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum.Value"">
                         <type typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum"" typeName=""DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass.AnEnum"" />
                     </argument>
+                    <argument name=""AnString"" value=""Foo"">
+                        <type typeId=""System.String"" typeName=""string"" />
+                    </argument>
                 </namedArguments>
             </attribute>
         </attributes>
@@ -901,6 +904,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
     </member>
 </doc>"
                 }).SetName("Class_With_Attributes");
+
             yield return new TestCaseData(
                 new TestIsReportedData
                 {
@@ -1192,6 +1196,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
     </member>
 </doc>"
                 }).SetName("Malformed_Xml");
+
             yield return new TestCaseData(
                 new TestIsReportedData
                 {

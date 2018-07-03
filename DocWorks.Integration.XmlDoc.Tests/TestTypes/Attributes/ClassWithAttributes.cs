@@ -3,7 +3,7 @@ using DocWorks.Integration.XmlDoc.TestUtilities;
 
 namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
 {
-    [TestInternal] [TestPublic(50, AnEnum = AClass.AnEnum.Value)]
+    [TestInternal] [TestPublic(50, AnEnum = AClass.AnEnum.Value, AnString = "Foo")]
     public class ClassWithAttributes
     {
         public void MethodWithParameter([TestInternal][TestPublic]int i)
