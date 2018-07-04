@@ -816,7 +816,7 @@ public class ClassInGlobalNamespace
                 {
                     newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""SingleLineFeed"" type=""Class"" namespace=""Unity.DocTool.XMLDocHandler.Tests.TestTypes"">
+    <member name=""SingleLineFeed"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
         <member name=""Method"" type=""Method"" methodKind=""Ordinary"">
         <signature>
             <accessibility>Public</accessibility>
@@ -835,7 +835,7 @@ public class ClassInGlobalNamespace
    </member>
 </doc>",
                     expectedSource = @"
-namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes
+namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     public class SingleLineFeed
     {

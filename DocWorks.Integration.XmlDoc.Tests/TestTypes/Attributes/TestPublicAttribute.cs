@@ -7,6 +7,8 @@ namespace DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes
     public class TestPublicAttribute : Attribute
     {
         public AClass.AnEnum AnEnum { get; set; }
+        public string AnString { get; set; }
+
         public TestPublicAttribute()
         { }
         public TestPublicAttribute(Object value)
