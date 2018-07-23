@@ -17,5 +17,15 @@ namespace DocWorks.Integration.XmlDoc
                 .Replace("\"", "&quot;")
                 .Replace("'", "&apos;");
         }
+
+        public static string LegalString(string xmlString)
+        {
+            return xmlString
+                .Replace("&amp;", "&")
+                .Replace("&lt;", "<")
+                .Replace("&gt;", ">")
+                .Replace("&quot;", "\"")
+                .Replace("&apos;", "'");
+        }
     }
 }

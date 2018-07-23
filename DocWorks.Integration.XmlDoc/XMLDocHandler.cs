@@ -46,7 +46,7 @@ namespace DocWorks.Integration.XmlDoc
                 throw new ArgumentException($"Directory \"{compilationParametersRootPath}\" does not exist.");
 
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            
+
             var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
                 .Select(Path.GetFullPath)
                 .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
@@ -71,11 +71,11 @@ namespace DocWorks.Integration.XmlDoc
 
             return FormatXml(getTypesVisitor.GetXml());
         }
-        
+
         public string GetTypeDocumentation(string id, params string[] paths)
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths);
+            var compilation = ParseAndCompile(treesForPaths, paths);
             var diagnostics = compilation.GetDiagnostics();
 
             var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
@@ -96,8 +96,8 @@ namespace DocWorks.Integration.XmlDoc
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
-                        var containingType = typeSymbol.ContainingType != null ? 
-                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
+                        var containingType = typeSymbol.ContainingType != null ?
+                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " :
                             string.Empty;
 
 
@@ -165,6 +165,7 @@ namespace DocWorks.Integration.XmlDoc
 
                         xml.Append(@"</member></doc>");
                         var formatedXml = FormatXml(xml.ToString());
+                        formatedXml = XmlUtility.LegalString(formatedXml);
                         return formatedXml;
                     }
                 }
@@ -201,20 +202,49 @@ namespace DocWorks.Integration.XmlDoc
             return sb.ToString();
         }
 
-        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
+        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths, params string[] sourcePaths)
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-
-            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
-                .Select(Path.GetFullPath);
-            var syntaxTrees = csFilePaths.Select(
-                p =>
+            SyntaxTree[] syntaxTrees = new SyntaxTree[sourcePaths.Count()];
+            // List<string> csFilePaths = new List<string>();
+            //Directory.GetFiles(compilationParameters.RootPath + sourcePaths, "*.cs", SearchOption.AllDirectories)
+            //.Select(Path.GetFullPath);
+            int i = 0;
+            foreach (var csFilePath in sourcePaths)
+            {
+                Regex regex = new Regex("([\r\n ]*///(.*?)\r?\n)+");
+                string fullFilePath = Path.GetFullPath(Path.Combine(compilationParameters.RootPath, csFilePath));
+                string csFileContent = File.ReadAllText(fullFilePath);
+                // csFileContent = XmlUtility.EscapeString(csFileContent);
+                MatchCollection matchCollection = regex.Matches(csFileContent);
+                foreach (Match match in matchCollection)
                 {
-                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
-                    treesForPaths[p] = syntaxTree;
-                    return syntaxTree;
-                }).ToArray();
+                    string matchContent = match.Value.Replace("///", "");
+                    matchContent = matchContent.Insert(0, "<xmldoc>").Insert(matchContent.Length - 1, "</xmldoc>");
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(matchContent);
+                    XmlNode cDataNode = doc.DocumentElement;
+                    foreach (XmlNode childElement in cDataNode.ChildNodes.Cast<XmlNode>())
+                    {
+                        string convertedContent = XmlUtility.EscapeString(childElement.Value);
+                        csFileContent.Replace(childElement.Value, convertedContent);
+                    }
+                }
+                var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, fullFilePath);
+                syntaxTrees[i] = syntaxTree;
+                treesForPaths[fullFilePath] = syntaxTree;
+                i++;
+            }
+
+            //var syntaxTrees = csFilePaths.Select(
+            //    p =>
+            //    {
+            //        var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
+            //        treesForPaths[p] = syntaxTree;
+            //        return syntaxTree;
+            //    }).ToArray();
+
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
@@ -292,7 +322,7 @@ namespace DocWorks.Integration.XmlDoc
                     .Where(p => !p.Contains("DocWorks.Integration"));
             }
             else
-                assemblies = new[] {typeof(object).Assembly.Location};
+                assemblies = new[] { typeof(object).Assembly.Location };
 
             return compilationParameters.ReferencedAssemblyPaths.Concat(assemblies).Select(p => MetadataReference.CreateFromFile(p));
         }
@@ -329,7 +359,7 @@ namespace DocWorks.Integration.XmlDoc
                 case SymbolKind.Field:
                     {
 
-                        var field = (IFieldSymbol) member;
+                        var field = (IFieldSymbol)member;
                         var typeXml = TypeReferenceXml(field.Type);
                         var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
@@ -397,7 +427,7 @@ namespace DocWorks.Integration.XmlDoc
                 return "";
 
             return $@"<typeParameters>
-{string.Join((string) "\n", typeParameters.Select(p => TypeParameterXml(p, true, false)))}
+{string.Join((string)"\n", typeParameters.Select(p => TypeParameterXml(p, true, false)))}
 </typeParameters>";
         }
 
@@ -496,7 +526,7 @@ namespace DocWorks.Integration.XmlDoc
             foreach (var typeArgument in typeArguments)
                 typeArgumentsXml += TypeReferenceXml(typeArgument);
 
-            return  $@"<typeArguments>
+            return $@"<typeArguments>
 {typeArgumentsXml}
 </typeArguments>";
         }
@@ -545,7 +575,7 @@ namespace DocWorks.Integration.XmlDoc
         public void SetType(string docXml, params string[] sourcePaths)
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths);
+            var compilation = ParseAndCompile(treesForPaths, sourcePaths);
 
             var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
@@ -651,7 +681,7 @@ namespace DocWorks.Integration.XmlDoc
 
             if (node is BaseFieldDeclarationSyntax baseFieldDeclarationSyntax)
                 VisitBaseFieldDeclaration(baseFieldDeclarationSyntax);
-            else if (node is BaseTypeDeclarationSyntax 
+            else if (node is BaseTypeDeclarationSyntax
                      || node is MemberDeclarationSyntax
                      || (node is VariableDeclaratorSyntax && isVisitingField))
                 DecidePriority(node);
