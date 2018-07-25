@@ -25,7 +25,7 @@ namespace DocWorks.Integration.XmlDoc.Driver
         static void Main(string[] args)
         {
             OptionsParser.Prepare(args, typeof(Program).Assembly);
-            DriverOptions.RootPath = "C: \\Users\\Pavan Kumar Reddy\\Desktop\\ErrorTest";
+            DriverOptions.RootPath = "C:\\Users\\Pavan Kumar Reddy\\Desktop\\ErrorTest2";
             var referencedAssemblies = new List<string>();
             if (DriverOptions.ReferencedAssemblies != null)
                 referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);
@@ -59,41 +59,43 @@ namespace DocWorks.Integration.XmlDoc.Driver
 
                 var random = new Random();
                 string typeXml = handler.GetTypeDocumentation(id, paths.ToArray());
-                XmlDocument getTypeXml = new XmlDocument();
-                getTypeXml.LoadXml(typeXml);
+                Console.Write(typeXml);
+                handler.SetType(typeXml, paths.ToArray());
+                //XmlDocument getTypeXml = new XmlDocument();
+                //getTypeXml.LoadXml(typeXml);
 
-                if (isOutputDirectorySpecified)
-                    File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, FixupFilename(id) + ".xml"), typeXml);
+                //if (isOutputDirectorySpecified)
+                //    File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, FixupFilename(id) + ".xml"), typeXml);
 
-                var xmlDocNodes = getTypeXml.SelectNodes("//xmldoc");
-                HashSet<string> randomComments = new HashSet<string>();
-                foreach (XmlNode xmlDocNode in xmlDocNodes)
-                {
-                    var randomComment = random.Next().ToString();
-                    randomComments.Add(randomComment);
-                    xmlDocNode.ReplaceChild(getTypeXml.CreateCDataSection(randomComment), xmlDocNode.FirstChild);
-                }
+                //var xmlDocNodes = getTypeXml.SelectNodes("//xmldoc");
+                //HashSet<string> randomComments = new HashSet<string>();
+                //foreach (XmlNode xmlDocNode in xmlDocNodes)
+                //{
+                //    var randomComment = random.Next().ToString();
+                //    randomComments.Add(randomComment);
+                //    xmlDocNode.ReplaceChild(getTypeXml.CreateCDataSection(randomComment), xmlDocNode.FirstChild);
+                //}
 
 
-                var tempPaths = paths.ToDictionary(p => p, p =>
-                  {
-                      var tempPath = Path.GetTempFileName();
-                      File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
-                      return tempPath;
-                  });
+                //var tempPaths = paths.ToDictionary(p => p, p =>
+                //  {
+                //      var tempPath = Path.GetTempFileName();
+                //      File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
+                //      return tempPath;
+                //  });
 
-                var getTypeXmlString = getTypeXml.OuterXml;
-                handler.SetType(getTypeXmlString, paths.ToArray());
-                foreach (var path in paths)
-                {
-                    var fullPath = Path.Combine(DriverOptions.RootPath, path);
-                    var content = File.ReadAllText(fullPath);
-                    randomComments.RemoveWhere(comment => content.Contains("/// " + comment));
-                    File.Copy(tempPaths[path], fullPath, true);
-                }
+                //var getTypeXmlString = getTypeXml.OuterXml;
+                //handler.SetType(getTypeXmlString, paths.ToArray());
+                //foreach (var path in paths)
+                //{
+                //    var fullPath = Path.Combine(DriverOptions.RootPath, path);
+                //    var content = File.ReadAllText(fullPath);
+                //    randomComments.RemoveWhere(comment => content.Contains("/// " + comment));
+                //    File.Copy(tempPaths[path], fullPath, true);
+                //}
 
-                if (randomComments.Count > 0)
-                    Console.WriteLine("Did not write all comments back properly. Xml used to set:\n" + getTypeXmlString);
+                //if (randomComments.Count > 0)
+                //    Console.WriteLine("Did not write all comments back properly. Xml used to set:\n" + getTypeXmlString);
             }
         }
 

@@ -165,7 +165,6 @@ namespace DocWorks.Integration.XmlDoc
 
                         xml.Append(@"</member></doc>");
                         var formatedXml = FormatXml(xml.ToString());
-                        formatedXml = XmlUtility.LegalString(formatedXml);
                         return formatedXml;
                     }
                 }
@@ -180,6 +179,7 @@ namespace DocWorks.Integration.XmlDoc
             xml = extraMemberRegEx.Replace(xml, "");
             //escape end of CDATA tags
             xml = xml.Replace("]]>", "]]]]><![CDATA[>");
+            xml = XmlUtility.LegalString(xml);
             return $@"<![CDATA[{xml}]]>";
         }
 
@@ -206,36 +206,9 @@ namespace DocWorks.Integration.XmlDoc
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            SyntaxTree[] syntaxTrees = new SyntaxTree[sourcePaths.Count()];
-            // List<string> csFilePaths = new List<string>();
-            //Directory.GetFiles(compilationParameters.RootPath + sourcePaths, "*.cs", SearchOption.AllDirectories)
-            //.Select(Path.GetFullPath);
-            int i = 0;
-            foreach (var csFilePath in sourcePaths)
-            {
-                Regex regex = new Regex("([\r\n ]*///(.*?)\r?\n)+");
-                string fullFilePath = Path.GetFullPath(Path.Combine(compilationParameters.RootPath, csFilePath));
-                string csFileContent = File.ReadAllText(fullFilePath);
-                // csFileContent = XmlUtility.EscapeString(csFileContent);
-                MatchCollection matchCollection = regex.Matches(csFileContent);
-                foreach (Match match in matchCollection)
-                {
-                    string matchContent = match.Value.Replace("///", "");
-                    matchContent = matchContent.Insert(0, "<xmldoc>").Insert(matchContent.Length - 1, "</xmldoc>");
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml(matchContent);
-                    XmlNode cDataNode = doc.DocumentElement;
-                    foreach (XmlNode childElement in cDataNode.ChildNodes.Cast<XmlNode>())
-                    {
-                        string convertedContent = XmlUtility.EscapeString(childElement.Value);
-                        csFileContent.Replace(childElement.Value, convertedContent);
-                    }
-                }
-                var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, fullFilePath);
-                syntaxTrees[i] = syntaxTree;
-                treesForPaths[fullFilePath] = syntaxTree;
-                i++;
-            }
+
+            //var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
+            //    .Select(Path.GetFullPath);
 
             //var syntaxTrees = csFilePaths.Select(
             //    p =>
@@ -245,6 +218,34 @@ namespace DocWorks.Integration.XmlDoc
             //        return syntaxTree;
             //    }).ToArray();
 
+            SyntaxTree[] syntaxTrees = new SyntaxTree[sourcePaths.Count()];
+
+            int i = 0;
+            foreach (var csFilePath in sourcePaths)
+            {
+                Regex regex = new Regex("([\r\n ]*///(.*?)\r?\n)+");
+                string fullFilePath = Path.GetFullPath(Path.Combine(compilationParameters.RootPath, csFilePath));
+                string csFileContent = File.ReadAllText(fullFilePath);
+                MatchCollection matchCollection = regex.Matches(csFileContent);
+                foreach (Match match in matchCollection)
+                {
+                    string pattern = @"(?<=<([a-z][^>]*?)>)(.*?)(?=<\/[a-z]*>)";
+                    Regex regex1 = new Regex(pattern, RegexOptions.Singleline);
+                    MatchCollection matchCollection1 = regex1.Matches(match.Value);
+                    foreach (Match match1 in matchCollection1)
+                    {
+                        if (!string.IsNullOrEmpty(match1.Value))
+                        {
+                            string convertedContent = XmlUtility.EscapeString(match1.Value);
+                            csFileContent = csFileContent.Replace(match1.Value, convertedContent);
+                        }
+                    }
+                }
+                var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, fullFilePath);
+                syntaxTrees[i] = syntaxTree;
+                treesForPaths[fullFilePath] = syntaxTree;
+                i++;
+            }
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
