@@ -206,34 +206,33 @@ namespace DocWorks.Integration.XmlDoc
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            SyntaxTree[] syntaxTrees = new SyntaxTree[sourcePaths.Count()];
 
-            int i = 0;
-            foreach (var csFilePath in sourcePaths)
-            {
-                Regex regexGetTripleSlashContent = new Regex("([\r\n ]*///(.*?)\r?\n)+");
-                string fullFilePath = Path.GetFullPath(Path.Combine(compilationParameters.RootPath, csFilePath));
-                string csFileContent = File.ReadAllText(fullFilePath);
-                MatchCollection matchCollection = regexGetTripleSlashContent.Matches(csFileContent);
-                foreach (Match match in matchCollection)
+            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath);
+            var syntaxTrees = csFilePaths.Select(
+                p =>
                 {
-                    string pattern = @"(?<=<([a-z][^>]*?)>)(.*?)(?=<\/[a-z]*>)";
-                    Regex regexGetXmlTagContent = new Regex(pattern, RegexOptions.Singleline);
-                    MatchCollection xmlTagMatchCollection = regexGetXmlTagContent.Matches(match.Value);
-                    foreach (Match xmlTagMatch in xmlTagMatchCollection)
+                    Regex regexGetTripleSlashContent = new Regex("([\r\n ]*///(.*?)\r?\n)+");
+                    string csFileContent = File.ReadAllText(p);
+                    MatchCollection matchCollection = regexGetTripleSlashContent.Matches(csFileContent);
+                    foreach (Match match in matchCollection)
                     {
-                        if (!string.IsNullOrEmpty(xmlTagMatch.Value))
+                        string pattern = @"(?<=<([a-z][^>]*?)>)(.*?)(?=<\/[a-z]*>)";
+                        Regex regexGetXmlTagContent = new Regex(pattern, RegexOptions.Singleline);
+                        MatchCollection xmlTagMatchCollection = regexGetXmlTagContent.Matches(match.Value);
+                        foreach (Match xmlTagMatch in xmlTagMatchCollection)
                         {
-                            string convertedContent = XmlUtility.EscapeString(xmlTagMatch.Value);
-                            csFileContent = csFileContent.Replace(xmlTagMatch.Value, convertedContent);
+                            if (!string.IsNullOrEmpty(xmlTagMatch.Value))
+                            {
+                                string convertedContent = XmlUtility.EscapeString(xmlTagMatch.Value);
+                                csFileContent = csFileContent.Replace(xmlTagMatch.Value, convertedContent);
+                            }
                         }
                     }
-                }
-                var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, fullFilePath);
-                syntaxTrees[i] = syntaxTree;
-                treesForPaths[fullFilePath] = syntaxTree;
-                i++;
-            }
+                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, p);
+                    treesForPaths[p] = syntaxTree;
+                    return syntaxTree;
+                }).ToArray();
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
