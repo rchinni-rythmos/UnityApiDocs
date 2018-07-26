@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DocWorks.Integration.XmlDoc
@@ -10,8 +11,9 @@ namespace DocWorks.Integration.XmlDoc
     {
         public static string EscapeString(string xmlString)
         {
+            Regex rgx = new Regex(@"&(?!amp;)(?!lt;)(?!gt;)(?!quot;)(?!apos;)");
+            xmlString = rgx.Replace(xmlString, "&amp;");
             return xmlString
-                .Replace("&", "&amp;")
                 .Replace("<", "&lt;")
                 .Replace(">", "&gt;")
                 .Replace("\"", "&quot;")

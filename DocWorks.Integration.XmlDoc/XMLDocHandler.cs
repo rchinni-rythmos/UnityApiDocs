@@ -206,38 +206,26 @@ namespace DocWorks.Integration.XmlDoc
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-
-            //var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
-            //    .Select(Path.GetFullPath);
-
-            //var syntaxTrees = csFilePaths.Select(
-            //    p =>
-            //    {
-            //        var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
-            //        treesForPaths[p] = syntaxTree;
-            //        return syntaxTree;
-            //    }).ToArray();
-
             SyntaxTree[] syntaxTrees = new SyntaxTree[sourcePaths.Count()];
 
             int i = 0;
             foreach (var csFilePath in sourcePaths)
             {
-                Regex regex = new Regex("([\r\n ]*///(.*?)\r?\n)+");
+                Regex regexGetTripleSlashContent = new Regex("([\r\n ]*///(.*?)\r?\n)+");
                 string fullFilePath = Path.GetFullPath(Path.Combine(compilationParameters.RootPath, csFilePath));
                 string csFileContent = File.ReadAllText(fullFilePath);
-                MatchCollection matchCollection = regex.Matches(csFileContent);
+                MatchCollection matchCollection = regexGetTripleSlashContent.Matches(csFileContent);
                 foreach (Match match in matchCollection)
                 {
                     string pattern = @"(?<=<([a-z][^>]*?)>)(.*?)(?=<\/[a-z]*>)";
-                    Regex regex1 = new Regex(pattern, RegexOptions.Singleline);
-                    MatchCollection matchCollection1 = regex1.Matches(match.Value);
-                    foreach (Match match1 in matchCollection1)
+                    Regex regexGetXmlTagContent = new Regex(pattern, RegexOptions.Singleline);
+                    MatchCollection xmlTagMatchCollection = regexGetXmlTagContent.Matches(match.Value);
+                    foreach (Match xmlTagMatch in xmlTagMatchCollection)
                     {
-                        if (!string.IsNullOrEmpty(match1.Value))
+                        if (!string.IsNullOrEmpty(xmlTagMatch.Value))
                         {
-                            string convertedContent = XmlUtility.EscapeString(match1.Value);
-                            csFileContent = csFileContent.Replace(match1.Value, convertedContent);
+                            string convertedContent = XmlUtility.EscapeString(xmlTagMatch.Value);
+                            csFileContent = csFileContent.Replace(xmlTagMatch.Value, convertedContent);
                         }
                     }
                 }
