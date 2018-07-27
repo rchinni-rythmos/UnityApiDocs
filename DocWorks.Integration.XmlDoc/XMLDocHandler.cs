@@ -177,9 +177,9 @@ namespace DocWorks.Integration.XmlDoc
         {
             var xml = typeSymbol.GetDocumentationCommentXml();
             xml = extraMemberRegEx.Replace(xml, "");
+            xml = XmlUtility.LegalString(xml);
             //escape end of CDATA tags
             xml = xml.Replace("]]>", "]]]]><![CDATA[>");
-            xml = XmlUtility.LegalString(xml);
             return $@"<![CDATA[{xml}]]>";
         }
 
