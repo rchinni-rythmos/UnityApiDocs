@@ -7,9 +7,9 @@
     <PackageId>DocWorks.Integration.XmlDoc</PackageId>
     <Authors>Unity</Authors>
     <Company>Unity</Company>
-    <Product>DocWorks</Product>
+    <Product>DocTool</Product>
     <Description>DocTool</Description>
-    <Version>1.1.0.2-DocToolChanges</Version>
+    <Version>1.1.0.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
