@@ -75,7 +75,7 @@ namespace DocWorks.Integration.XmlDoc
         public string GetTypeDocumentation(string id, params string[] paths)
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths, paths);
+            var compilation = ParseAndCompile(treesForPaths);
             var diagnostics = compilation.GetDiagnostics();
 
             var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
@@ -202,7 +202,7 @@ namespace DocWorks.Integration.XmlDoc
             return sb.ToString();
         }
 
-        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths, params string[] sourcePaths)
+        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
         {
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
@@ -563,7 +563,7 @@ namespace DocWorks.Integration.XmlDoc
         public void SetType(string docXml, params string[] sourcePaths)
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths, sourcePaths);
+            var compilation = ParseAndCompile(treesForPaths);
 
             var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
