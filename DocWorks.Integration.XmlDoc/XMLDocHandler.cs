@@ -46,7 +46,7 @@ namespace DocWorks.Integration.XmlDoc
                 throw new ArgumentException($"Directory \"{compilationParametersRootPath}\" does not exist.");
 
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
-            
+
             var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
                 .Select(Path.GetFullPath)
                 .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
@@ -71,7 +71,7 @@ namespace DocWorks.Integration.XmlDoc
 
             return FormatXml(getTypesVisitor.GetXml());
         }
-        
+
         public string GetTypeDocumentation(string id, params string[] paths)
         {
             Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
@@ -96,8 +96,8 @@ namespace DocWorks.Integration.XmlDoc
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
-                        var containingType = typeSymbol.ContainingType != null ? 
-                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " : 
+                        var containingType = typeSymbol.ContainingType != null ?
+                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " :
                             string.Empty;
 
 
@@ -177,6 +177,7 @@ namespace DocWorks.Integration.XmlDoc
         {
             var xml = typeSymbol.GetDocumentationCommentXml();
             xml = extraMemberRegEx.Replace(xml, "");
+            xml = XmlUtility.LegalString(xml);
             //escape end of CDATA tags
             xml = xml.Replace("]]>", "]]]]><![CDATA[>");
             return $@"<![CDATA[{xml}]]>";
@@ -211,7 +212,24 @@ namespace DocWorks.Integration.XmlDoc
             var syntaxTrees = csFilePaths.Select(
                 p =>
                 {
-                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(p), parserOptions, p);
+                    Regex regexGetTripleSlashContent = new Regex("([\r\n ]*///(.*?)\r?\n)+");
+                    string csFileContent = File.ReadAllText(p);
+                    MatchCollection matchCollection = regexGetTripleSlashContent.Matches(csFileContent);
+                    foreach (Match match in matchCollection)
+                    {
+                        string pattern = @"(?<=<([a-z][^>]*?)>)(.*?)(?=<\/[a-z]*>)";
+                        Regex regexGetXmlTagContent = new Regex(pattern, RegexOptions.Singleline);
+                        MatchCollection xmlTagMatchCollection = regexGetXmlTagContent.Matches(match.Value);
+                        foreach (Match xmlTagMatch in xmlTagMatchCollection)
+                        {
+                            if (!string.IsNullOrEmpty(xmlTagMatch.Value))
+                            {
+                                string convertedContent = XmlUtility.EscapeString(xmlTagMatch.Value);
+                                csFileContent = csFileContent.Replace(xmlTagMatch.Value, convertedContent);
+                            }
+                        }
+                    }
+                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(csFileContent, parserOptions, p);
                     treesForPaths[p] = syntaxTree;
                     return syntaxTree;
                 }).ToArray();
@@ -292,7 +310,7 @@ namespace DocWorks.Integration.XmlDoc
                     .Where(p => !p.Contains("DocWorks.Integration"));
             }
             else
-                assemblies = new[] {typeof(object).Assembly.Location};
+                assemblies = new[] { typeof(object).Assembly.Location };
 
             return compilationParameters.ReferencedAssemblyPaths.Concat(assemblies).Select(p => MetadataReference.CreateFromFile(p));
         }
@@ -329,7 +347,7 @@ namespace DocWorks.Integration.XmlDoc
                 case SymbolKind.Field:
                     {
 
-                        var field = (IFieldSymbol) member;
+                        var field = (IFieldSymbol)member;
                         var typeXml = TypeReferenceXml(field.Type);
                         var accessibilityXml = AccessibilityXml(member.DeclaredAccessibility);
                         return $@"
@@ -397,7 +415,7 @@ namespace DocWorks.Integration.XmlDoc
                 return "";
 
             return $@"<typeParameters>
-{string.Join((string) "\n", typeParameters.Select(p => TypeParameterXml(p, true, false)))}
+{string.Join((string)"\n", typeParameters.Select(p => TypeParameterXml(p, true, false)))}
 </typeParameters>";
         }
 
@@ -496,7 +514,7 @@ namespace DocWorks.Integration.XmlDoc
             foreach (var typeArgument in typeArguments)
                 typeArgumentsXml += TypeReferenceXml(typeArgument);
 
-            return  $@"<typeArguments>
+            return $@"<typeArguments>
 {typeArgumentsXml}
 </typeArguments>";
         }
@@ -651,7 +669,7 @@ namespace DocWorks.Integration.XmlDoc
 
             if (node is BaseFieldDeclarationSyntax baseFieldDeclarationSyntax)
                 VisitBaseFieldDeclaration(baseFieldDeclarationSyntax);
-            else if (node is BaseTypeDeclarationSyntax 
+            else if (node is BaseTypeDeclarationSyntax
                      || node is MemberDeclarationSyntax
                      || (node is VariableDeclaratorSyntax && isVisitingField))
                 DecidePriority(node);

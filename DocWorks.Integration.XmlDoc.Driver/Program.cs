@@ -25,15 +25,14 @@ namespace DocWorks.Integration.XmlDoc.Driver
         static void Main(string[] args)
         {
             OptionsParser.Prepare(args, typeof(Program).Assembly);
-
             var referencedAssemblies = new List<string>();
             if (DriverOptions.ReferencedAssemblies != null)
                 referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);
 
             var handler = new XMLDocHandler(new CompilationParameters(
                 DriverOptions.RootPath ?? ".",
-                DriverOptions.ExcludedPaths ?? new string[0], 
-                DriverOptions.Defines ?? new string[0], 
+                DriverOptions.ExcludedPaths ?? new string[0],
+                DriverOptions.Defines ?? new string[0],
                 referencedAssemblies));
 
             string typesXml = handler.GetTypesXml();
@@ -59,6 +58,7 @@ namespace DocWorks.Integration.XmlDoc.Driver
 
                 var random = new Random();
                 string typeXml = handler.GetTypeDocumentation(id, paths.ToArray());
+                Console.Write(typeXml);
                 XmlDocument getTypeXml = new XmlDocument();
                 getTypeXml.LoadXml(typeXml);
 
@@ -75,12 +75,12 @@ namespace DocWorks.Integration.XmlDoc.Driver
                 }
 
 
-                var tempPaths = paths.ToDictionary(p=>p, p =>
-                {
-                    var tempPath = Path.GetTempFileName();
-                    File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
-                    return tempPath;
-                });
+                var tempPaths = paths.ToDictionary(p => p, p =>
+                  {
+                      var tempPath = Path.GetTempFileName();
+                      File.Copy(Path.Combine(DriverOptions.RootPath, p), tempPath, true);
+                      return tempPath;
+                  });
 
                 var getTypeXmlString = getTypeXml.OuterXml;
                 handler.SetType(getTypeXmlString, paths.ToArray());
