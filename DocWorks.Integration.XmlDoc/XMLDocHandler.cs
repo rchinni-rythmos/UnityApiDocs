@@ -96,11 +96,7 @@ namespace DocWorks.Integration.XmlDoc
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
                     if (id == typeSymbol.QualifiedName(true, true))
                     {
-                        var containingType = typeSymbol.ContainingType != null ?
-                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " :
-                            string.Empty;
-
-
+                        var containingType = $@"containingType=""{typeSymbol.ContainingType?.FullyQualifiedName(false, true)}"" " ?? string.Empty;
 
                         string xmlAttributes = "";
                         var baseType = BaseType(typeSymbol);
