@@ -1207,7 +1207,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
   <member name=""EscapeCharactersXml"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
     <xmldoc><![CDATA[
     <summary>
-    <> & ' "" ><
+    <> & ' ""
     </summary>
 ]]></xmldoc>
   </member>
