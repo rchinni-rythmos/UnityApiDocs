@@ -25,7 +25,6 @@ namespace DocWorks.Integration.XmlDoc.Driver
         static void Main(string[] args)
         {
             OptionsParser.Prepare(args, typeof(Program).Assembly);
-            DriverOptions.RootPath = "C:\\Users\\Pavan Kumar Reddy\\Desktop\\ErrorTest2";
             var referencedAssemblies = new List<string>();
             if (DriverOptions.ReferencedAssemblies != null)
                 referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);

@@ -99,6 +99,8 @@ namespace DocWorks.Integration.XmlDoc
                         var containingType = typeSymbol.ContainingType != null ?
                             $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " :
                             string.Empty;
+
+
                         
                         string xmlAttributes = "";
                         var baseType = BaseType(typeSymbol);
@@ -207,7 +209,6 @@ namespace DocWorks.Integration.XmlDoc
 
             var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
                 .Select(Path.GetFullPath);
-
             var syntaxTrees = csFilePaths.Select(
                 p =>
                 {
