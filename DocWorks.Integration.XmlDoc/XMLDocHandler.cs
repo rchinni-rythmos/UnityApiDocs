@@ -101,7 +101,7 @@ namespace DocWorks.Integration.XmlDoc
                             string.Empty;
 
 
-
+                        
                         string xmlAttributes = "";
                         var baseType = BaseType(typeSymbol);
                         if (!string.IsNullOrEmpty(baseType))

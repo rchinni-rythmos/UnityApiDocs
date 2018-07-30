@@ -188,7 +188,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         public void GetType_Documentation_ReturnsCorrectXml()
         {
             var handler = new XMLDocHandler(MakeCompilationParameters("TestTypes/CommonTypes/"));
-            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass",  "AClass.cs", "AFolder/AClass.part2.cs");
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.GetTypes.AClass", "AClass.cs", "AFolder/AClass.part2.cs");
             Console.WriteLine(actualXml);
 
             var expectedXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
@@ -269,7 +269,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         [Test]
         public void GetTypes_ExcludeDirectories()
         {
-            var handler = new XMLDocHandler(new CompilationParameters("TestTypes/", new []{ "TestTypes/CommonTypes" }, new string[0], new[] {typeof(object).Assembly.Location}));
+            var handler = new XMLDocHandler(new CompilationParameters("TestTypes/", new[] { "TestTypes/CommonTypes" }, new string[0], new[] { typeof(object).Assembly.Location }));
             string actualXml = handler.GetTypesXml();
             Assert.That(actualXml, !Contains.Substring("AClass"));
         }
@@ -279,7 +279,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         {
             Assert.Inconclusive("Not implementated yet");
         }
-        
+
         public struct TestIsReportedData
         {
             public string typeId;
@@ -928,7 +928,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         </xmldoc>
     </member>
 </doc>",
-                    referencedAssemblyPaths = new[] {typeof(PublicExternalAttribute).Assembly.Location}
+                    referencedAssemblyPaths = new[] { typeof(PublicExternalAttribute).Assembly.Location }
                 }).SetName("Class_With_External_Attribute_With_Reference");
             yield return new TestCaseData(
                 new TestIsReportedData
@@ -1196,6 +1196,23 @@ namespace DocWorks.Integration.XmlDoc.Tests
     </member>
 </doc>"
                 }).SetName("Malformed_Xml");
+
+            yield return new TestCaseData(
+                new TestIsReportedData
+                {
+                    sourceFile = "TestTypes/EscapeCharactersXml.cs",
+                    typeId = "DocWorks.Integration.XmlDoc.Tests.TestTypes.EscapeCharactersXml",
+                    expectedXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+  <member name=""EscapeCharactersXml"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
+    <xmldoc><![CDATA[
+    <summary>
+    <> & ' ""
+    </summary>
+]]></xmldoc>
+  </member>
+</doc>"
+                }).SetName("EscapeCharacters_Xml");
 
             yield return new TestCaseData(
                 new TestIsReportedData
