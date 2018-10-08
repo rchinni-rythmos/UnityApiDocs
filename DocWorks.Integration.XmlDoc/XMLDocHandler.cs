@@ -594,7 +594,8 @@ namespace DocWorks.Integration.XmlDoc
 
                 if (result != syntaxTree.GetRoot())
                 {
-                    File.WriteAllText(syntaxTree.FilePath, result.ToFullString());
+                    string fileContent = XmlUtility.LegalString(result.ToFullString());
+                    File.WriteAllText(syntaxTree.FilePath, fileContent);
                 }
             }
         }
