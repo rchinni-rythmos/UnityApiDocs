@@ -46,6 +46,9 @@
     <Compile Update="TestTypes\Attributes\TestPublicAttribute.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Update="TestTypes\CameraEditor.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="TestTypes\ClassImplementingGenericInterface.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
