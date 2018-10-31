@@ -989,6 +989,71 @@ namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
         }
 
         [Test]
+        public void Test_DuplicateMemberDocumentation_InDifferentClass_whenPropertyNameIsSame()
+        {
+            UpdateTestData data = new UpdateTestData
+            {
+                newDocXml = @"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<doc version=""3"">
+	<member name=""TakeInfo"" type=""Struct"" namespace=""UnityEditor"">
+		<xmldoc>
+			<![CDATA[]]>
+		</xmldoc>
+		<member name=""name"" type=""Field"">
+			<signature>
+				<accessibility>Public</accessibility>
+				<type typeId=""System.String"" typeName=""string"" />
+			</signature>
+			<xmldoc>
+				<![CDATA[<summary>Take name as define from imported file.</summary>]]>
+			</xmldoc>
+		</member>
+	</member>
+</doc>",
+                expectedSource = @"using System.Runtime.InteropServices;
+using System;
+
+
+namespace UnityEditor
+{
+    public partial struct ClipAnimationInfoCurve
+    {
+        public string name;
+    }
+    
+    public partial struct TakeInfo
+    {
+        /// <summary>Take name as define from imported file.</summary>
+        public string name;
+        public string defaultClipName;
+        public float startTime;
+        public float stopTime;
+        public float bakeStartTime;
+        public float bakeStopTime;
+        public float sampleRate;
+    }
+}",
+                sourcePath = "TestTypes/ModelImporterBindingFake.cs"
+            };
+            var testFilePath = Path.GetTempFileName();
+
+            File.Copy(data.sourcePath, testFilePath, true);
+            try
+            {
+                var handler = new XMLDocHandler(MakeCompilationParameters(Path.GetDirectoryName(data.sourcePath)));
+
+                handler.SetType(data.newDocXml, Path.GetFileName(data.sourcePath));
+
+                var actualSource = File.ReadAllText(data.sourcePath);
+                AssertSourceContains(data.expectedSource, actualSource, !data.compareRaw);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+        [Test]
         public void Update_Duplicate_Member_Throws()
         {
             var updateTestData = new UpdateTestData
