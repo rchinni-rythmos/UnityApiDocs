@@ -101,6 +101,14 @@ namespace DocWorks.Integration.XmlDoc.Tests
         }
 
         [Test]
+        public void GetException_For_SpecificInputType_InGetTypeDocumentation()
+        {
+            var testFileDirectory = "TestTypes";
+            var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
+            Assert.DoesNotThrow(()=> handler.GetTypeDocumentation("UnityEditor.Experimental.Animations.GameObjectRecorder", new string[] { "GameObjectRecorder.bindings.cs" }));
+        }
+
+        [Test]
         public void GetTypes_Generics_ReturnsCorrectXml()
         {
             var testFileDirectory = "TestTypes/Generics/";
