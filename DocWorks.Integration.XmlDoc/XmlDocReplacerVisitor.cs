@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -67,7 +66,7 @@ namespace DocWorks.Integration.XmlDoc
             try
             {
                 var symbol = _semanticModel.GetDeclaredSymbol(node.Declaration.Variables[0]);
-                var docNodes = _xmlDoc.SelectNodes($"descendant::member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
+                var docNodes = XmlDocNodeForMember(symbol);
                 var updatedNode = base.Visit(node);
                 return AddOrUpdateXmlDoc(node, updatedNode, docNodes, symbol);
             }
@@ -82,12 +81,12 @@ namespace DocWorks.Integration.XmlDoc
             if (!isVisitingField)
                 return node;
 
-            var typeSymbol = _semanticModel.GetDeclaredSymbol(node);
-            Debug.Assert(typeSymbol != null, "No symbol found for field");
+            var symbol = _semanticModel.GetDeclaredSymbol(node);
+            Debug.Assert(symbol != null, "No symbol found for field");
 
-            var docNodes = _xmlDoc.SelectNodes($"descendant::member[@name='{typeSymbol.MemberNameUnescaped()}']/xmldoc");
+            var docNodes = XmlDocNodeForMember(symbol);
 
-            var updatedNode = AddOrUpdateXmlDoc(node, node, docNodes, typeSymbol);
+            var updatedNode = AddOrUpdateXmlDoc(node, node, docNodes, symbol);
             return updatedNode;
         }
 
@@ -219,5 +218,11 @@ namespace DocWorks.Integration.XmlDoc
 
             return nodeToBeUpdated.WithLeadingTrivia(newTrivia);
         }
+
+        private XmlNodeList XmlDocNodeForMember(ISymbol symbol)
+        {
+            return _xmlDoc.SelectNodes($"descendant::member[@name='{symbol.ContainingType.Name}']/member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
+        }
+
     }
 }
