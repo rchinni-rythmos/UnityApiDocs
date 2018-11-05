@@ -105,7 +105,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         {
             var testFileDirectory = "TestTypes";
             var handler = new XMLDocHandler(MakeCompilationParameters(testFileDirectory));
-            Assert.DoesNotThrow(()=> handler.GetTypeDocumentation("UnityEditor.Experimental.Animations.GameObjectRecorder", new string[] { "GameObjectRecorder.bindings.cs" }));
+            Assert.DoesNotThrow(()=> handler.GetTypeDocumentation("UnityEditor.Experimental.Animations.GameObjectRecorder", new string[] { "SpecificTypeWithSymbolException.cs" }));
         }
 
         [Test]
