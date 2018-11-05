@@ -52,6 +52,10 @@
     <Compile Update="TestTypes\EscapeCharactersXml.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    
+    <Compile Update="TestTypes\SpecificTypeWithSymbolException.cs">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="TestTypes\ModelImporterBindingFake.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
