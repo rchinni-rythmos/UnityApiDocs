@@ -7,7 +7,7 @@ using System.Xml;
 namespace DocWorks.Integration.XmlDoc.Tests
 {
     [TestFixture]
-    class XmlDocHandlerTest : XmlDocHandlerTestBase
+    public class XmlDocHandlerTest : XmlDocHandlerTestBase
     {
         [Test]
         public void GetTypes_Returns_Relative_Path_When_Given_Path_Without_Trailing_Slash()
@@ -783,8 +783,27 @@ namespace DocWorks.Integration.XmlDoc.Tests
         OptionalDefaultStruct
         </summary>]]>
     </xmldoc>
-</member>"
+</member>
+    <member name=""OptionalStringWithNonValidXMLChars"" type=""Method"" methodKind=""Ordinary"">
+      <signature>
+        <accessibility>Public</accessibility>
+        <return>
+          <type typeId=""System.Void"" typeName=""void"" />
+        </return>
+        <parameters>
+          <parameter name=""s"" isOptional=""true"" defaultValue=""&lt;&gt;&amp;&quot;"">
+            <type typeId=""System.String"" typeName=""string"" />
+          </parameter>
+        </parameters>
+      </signature>
+      <xmldoc><![CDATA[
+    <summary>
+    OptionalStringInvalidXmlChars
+    </summary>
+
+]]></xmldoc>",
                 }).SetName("Optional_Parameter_Is_Reported");
+
             yield return new TestCaseData(
                 new TestIsReportedData
                 {
