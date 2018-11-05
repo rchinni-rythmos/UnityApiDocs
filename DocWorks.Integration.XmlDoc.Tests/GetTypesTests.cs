@@ -970,7 +970,25 @@ namespace DocWorks.Integration.XmlDoc.Tests
                </constructorArguments>
             </attribute>
         </attributes>
-        <xmldoc><![CDATA[]]></xmldoc>
+        <xmldoc><![CDATA[]]></xmldoc><member name=""Foo"" type=""Method"" methodKind=""Ordinary"">
+      <signature>
+        <accessibility>Public</accessibility>
+        <return>
+          <type typeId=""System.Void"" typeName=""void"" />
+        </return>
+        <parameters></parameters>
+      </signature>
+      <attributes>
+        <attribute typeId=""DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes.TestPublicAttribute"">
+          <constructorArguments>
+            <argument value=""&amp; &gt; &lt; &quot; '"">
+              <type typeId=""System.String"" typeName=""string"" />
+            </argument>
+          </constructorArguments>
+        </attribute>
+      </attributes>
+      <xmldoc><![CDATA[]]></xmldoc>
+    </member>
     </member>
 </doc>",
                     exact = true
