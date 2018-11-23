@@ -527,6 +527,7 @@ namespace DocWorks.Integration.XmlDoc
                 string paramsAttribute = parameter.IsParams ? @" isParams=""true""" : "";
                 string optionalAttribute = parameter.IsOptional ? @" isOptional=""true""" : "";
                 string defaultValueAttribute;
+                ParameterSyntax theParameter;
                 if (parameter.HasExplicitDefaultValue)
                 {
                     string defaultValue;
@@ -540,6 +541,10 @@ namespace DocWorks.Integration.XmlDoc
                     }
                     else
                         defaultValue = parameter.ExplicitDefaultValue.ToString();
+
+                    var isString = parameter.Type.SpecialType == SpecialType.System_String;
+                    if (isString)
+                        defaultValue = XmlUtility.EscapeString(defaultValue);
 
                     defaultValueAttribute = $@" defaultValue=""{defaultValue}""";
                 }

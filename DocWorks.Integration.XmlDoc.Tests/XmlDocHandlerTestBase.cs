@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace DocWorks.Integration.XmlDoc.Tests
 {
-    internal class XmlDocHandlerTestBase
+    public class XmlDocHandlerTestBase
     {
         private string originalCurrentDirectory;
 

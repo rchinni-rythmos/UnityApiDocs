@@ -30,5 +30,11 @@ namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
         /// </summary>
         public void OptionalDefaultStruct(AStruct s = default(AStruct))
         { }
+
+        /// <summary>
+        /// OptionalStringInvalidXmlChars
+        /// </summary>
+        public void OptionalStringWithNonValidXMLChars(string s = "<>&\"")
+        { }
     }
 }

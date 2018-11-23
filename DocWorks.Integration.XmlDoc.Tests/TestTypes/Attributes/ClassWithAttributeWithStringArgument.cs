@@ -3,5 +3,7 @@
     [TestPublic("string")]
     public class ClassWithAttributeWithStringArgument
     {
+        [TestPublic("& > < \" '")]
+        public void Foo() { }
     }
 }
