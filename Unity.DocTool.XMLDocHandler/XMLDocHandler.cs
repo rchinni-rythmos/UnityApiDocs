@@ -257,7 +257,7 @@ namespace Unity.DocTool.XMLDocHandler
                 {
                     sb.AppendLine("<constructorArguments>");
                     foreach (var argument in constructorArguments)
-                        sb.AppendLine($@"<argument value='{argument.ToCSharpString()}'/>");
+                        sb.AppendLine($@"<argument value='{XmlUtility.EscapeString(argument.ToCSharpString())}'/>");
 
                     sb.AppendLine("</constructorArguments>");
                 }
@@ -265,7 +265,7 @@ namespace Unity.DocTool.XMLDocHandler
                 {
                     sb.AppendLine("<namedArguments>");
                     foreach (var argument in namedArguments)
-                        sb.AppendLine($@"<argument name=""{argument.Key}"" value='{argument.Value.ToCSharpString()}'/>");
+                        sb.AppendLine($@"<argument name=""{argument.Key}"" value='{XmlUtility.EscapeString(argument.Value.ToCSharpString())}'/>");
 
                     sb.AppendLine("</namedArguments>");
                 }

@@ -17,11 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FindMissingDocs\FindMissingDocs.csproj" />
     <ProjectReference Include="..\Unity.DocTool.XMLDocHandler.TestUtilities\Unity.DocTool.XMLDocHandler.TestUtilities.csproj" />
     <ProjectReference Include="..\Unity.DocTool.XMLDocHandler\Unity.DocTool.XMLDocHandler.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="TestTypes\Attributes\ClassWithAttributeWithGenericTypeof.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="TestTypes\Attributes\ClassWithAttributes.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
