@@ -1171,7 +1171,7 @@ public class SimpleClassWithXmlDoc
             var tempPath = Path.GetTempFileName();
             var tempScriptPath = tempPath + ".cs";
             File.Move(tempPath, tempScriptPath);
-            Assert.Throws(typeof(ArgumentException), ()=> handler.SetType(@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?><doc />", tempScriptPath));
+            Assert.Throws(typeof(ArgumentException), () => handler.SetType(@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?><doc />", tempScriptPath));
         }
 
         [Test]
@@ -1197,6 +1197,28 @@ public class SimpleClassWithXmlDoc
             }
 
             Assert.IsTrue(actualSource.Contains(expectedSource), $"Expected\n --\n{expectedSource}\n--\nbut got\n --\n{actualSource}\n--\n");
+        }
+
+        [Test]
+        public void ImportDocumentation_ShouldUpdateSuccessfully()
+        {
+            string sourcePath = "TestTypes/UpdateEnums.cs";
+            var testFilePath = Path.GetTempFileName();
+            File.Copy(sourcePath, testFilePath, true);
+            try
+            {
+                var handler = new XMLDocHandler(new CompilationParameters(Path.GetDirectoryName(sourcePath), new string[0], new string[] { "Win64", "MacOs"}, new string[0]));
+                string newDocXml = "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?><doc version=\"3\"><member name=\"TextureImporterFormat\" type=\"Enum\" namespace=\"UnityEditor\" inherits=\"System.Enum\"><xmldoc><![CDATA[<summary>\r\nImported texture format for TextureImporter.\r\n</summary>\r\n<description>\r\nMost of the values match the ones in TextureFormat, with addition of the \"Automatic\" ones that pick the best format based\non platform and texture type or usage.\n\nSA: TextureImporter.textureFormat.\r\n</description>\r\n]]></xmldoc><member name=\"Automatic\" type=\"Field\"><signature><accessibility>Public</accessibility><type typeId=\"UnityEditor.TextureImporterFormat\" typeName=\"UnityEditor.TextureImporterFormat\" /></signature><xmldoc><![CDATA[<summary>\r\nChoose texture format automatically based on the texture parameters.\r\n</summary>\r\n]]></xmldoc></member><member name=\"AutomaticCompressed\" type=\"Field\"><signature><accessibility>Public</accessibility><type typeId=\"UnityEditor.TextureImporterFormat\" typeName=\"UnityEditor.TextureImporterFormat\" /></signature><attributes><attribute typeId=\"System.ObsoleteAttribute\"><constructorArguments><argument value=\"Use textureCompression property instead\"><type typeId=\"System.String\" typeName=\"string\" /></argument></constructorArguments></attribute></attributes><xmldoc><![CDATA[<summary>\r\nChoose a compressed format automatically.\r\n</summary>\r\n<description>\r\nSA: TextureImporter.textureFormat.\r\n</description>\r\n]]></xmldoc></member><member name=\"Automatic16bit\" type=\"Field\"><signature><accessibility>Public</accessibility><type typeId=\"UnityEditor.TextureImporterFormat\" typeName=\"UnityEditor.TextureImporterFormat\" /></signature><attributes><attribute typeId=\"System.ObsoleteAttribute\"><constructorArguments><argument value=\"Use textureCompression property instead\"><type typeId=\"System.String\" typeName=\"string\" /></argument></constructorArguments></attribute></attributes><xmldoc><![CDATA[<summary>\r\nChoose a 16 bit format automatically.\r\n</summary>\r\n<description>\r\nSA: TextureImporter.textureFormat.\r\n</description>\r\n]]></xmldoc></member></member></doc>";
+                string expectedSource = "using System;\n\nnamespace UnityEditor\n{\n    // Imported texture format for [[TextureImporter]].\n    /// <summary>\n    /// Imported texture format for TextureImporter.\n    /// </summary>\n    /// <description>\n    /// Most of the values match the ones in TextureFormat, with addition of the \"Automatic\" ones that pick the best format based\n    /// on platform and texture type or usage.\n    /// SA: TextureImporter.textureFormat.\n    /// </description>\n    public enum TextureImporterFormat\n    {\n        /// <summary>\n        /// Choose texture format automatically based on the texture parameters.\n        /// </summary>\n        Automatic = -1,\n#if Win64\n        // Choose a compressed format automatically.\n        /// <summary>\n        /// Choose a compressed format automatically.\n        /// </summary>\n        /// <description>\n        /// SA: TextureImporter.textureFormat.\n        /// </description>\n        [System.Obsolete(\"Use textureCompression property instead\")]\n        AutomaticCompressed = -1,\n#endif\n#if MacOs\n        // Choose a 16 bit format automatically.\n        /// <summary>\n        /// Choose a 16 bit format automatically.\n        /// </summary>\n        /// <description>\n        /// SA: TextureImporter.textureFormat.\n        /// </description>\n        [System.Obsolete(\"Use textureCompression property instead\")]\n        Automatic16bit = -2,\n#endif\n    }\n}\n";
+                handler.SetType(newDocXml, Path.GetFileName(sourcePath));
+
+                var actualSource = File.ReadAllText(sourcePath);
+                AssertSourceContains(expectedSource, actualSource);
+            }
+            finally
+            {
+                File.Copy(testFilePath, sourcePath, true);
+            }
         }
     }
 }
