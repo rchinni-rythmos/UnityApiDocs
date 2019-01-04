@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using DocWorks.Integration.XmlDoc;
 using Unity.Options;
 
 [assembly: InternalsVisibleTo("Unity.DocTool.XMLDocHandler.Tests")]
 
-namespace Unity.DocTool.XMLDocHandler.FindMissingDocs
+namespace DocWorks.Integration.FindMissingDocs
 {
     class Program
     {

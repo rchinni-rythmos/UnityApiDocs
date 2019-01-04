@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3483AAB8-449D-44F3-AF42-93FDEE7700D3}</ProjectGuid>
+    <ProjectGuid>{C34495C3-D3B5-4191-86E6-A9843EF52106}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Unity.DocTool.XMLDocHandler.FindMissingDocs</RootNamespace>
-    <AssemblyName>FindMissingDocs</AssemblyName>
+    <RootNamespace>DocWorks.Integration.XmlDoc.Driver</RootNamespace>
+    <AssemblyName>DocWorks.Integration.XmlDoc.Driver</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -138,10 +138,6 @@
     <ProjectReference Include="..\DocWorks.Integration.XmlDoc\DocWorks.Integration.XmlDoc.csproj">
       <Project>{F66D4EE4-B665-47BF-BF29-FDD05406C7BF}</Project>
       <Name>DocWorks.Integration.XmlDoc</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Unity.DocTool.XMLDocHandler\Unity.DocTool.XMLDocHandler.csproj">
-      <Project>{a5967f93-9f26-45bf-9e6f-77a90d45b8b6}</Project>
-      <Name>Unity.DocTool.XMLDocHandler</Name>
     </ProjectReference>
     <ProjectReference Include="..\Unity.Options\Unity.Options.csproj">
       <Project>{783f0782-fa64-49fb-9b89-8b4a56003a70}</Project>
