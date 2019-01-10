@@ -180,11 +180,15 @@ namespace DocWorks.Integration.XmlDoc
         {
             var docTrivia = nodeToBeUpdated.GetLeadingTrivia();
 
-            var initialWhitespace = docTrivia.TakeWhile(t => t.IsKind(SyntaxKind.WhitespaceTrivia) || t.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
+            var initialWhitespace = docTrivia.Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia) || t.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
             int lastNewLineIndex = Array.FindLastIndex(initialWhitespace, t => t.Kind() == SyntaxKind.EndOfLineTrivia);
             if (lastNewLineIndex >= 0)
                 initialWhitespace = initialWhitespace.Skip(lastNewLineIndex + 1).ToArray();
 
+            if (nodeToBeUpdated.ContainsDirectives)
+            {
+                initialWhitespace = initialWhitespace.Take(1).ToArray();
+            }
             var rawWhitespace = string.Join("", initialWhitespace.Select(t => t.ToFullString()));
 
             // break lines (to inject ///) at both CRLF & LF.
