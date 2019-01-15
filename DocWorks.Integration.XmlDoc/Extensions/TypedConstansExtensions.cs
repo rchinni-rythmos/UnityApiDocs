@@ -7,7 +7,7 @@ namespace DocWorks.Integration.XmlDoc.Extensions
     {
         public static string ToCSharpStringNoStringQuotes(this TypedConstant constant)
         {
-            if (constant.Type.QualifiedName(true, true) == "System.String")
+            if (constant.Type.QualifiedName(true, NameFormat.MetadataName) == "System.String")
                 return XmlUtility.EscapeString(SymbolDisplay.FormatPrimitive(constant.Value, false, false));
 
             return constant.ToCSharpString();
