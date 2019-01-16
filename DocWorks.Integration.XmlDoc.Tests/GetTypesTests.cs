@@ -169,6 +169,36 @@ namespace DocWorks.Integration.XmlDoc.Tests
             </relativeFilePaths>
         </type>
         <type>
+          <id>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics.GenericClassWithField`1</id>
+          <parentId></parentId>
+          <name>GenericClassWithField</name>
+          <kind>Class</kind>
+          <namespace>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics</namespace>
+          <relativeFilePaths>
+            <path>GenericClassWithField.cs</path>
+          </relativeFilePaths>
+        </type>
+        <type>
+          <id>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics.GenericDelegate`1</id>
+          <parentId></parentId>
+          <name>GenericDelegate</name>
+          <kind>Delegate</kind>
+          <namespace>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics</namespace>
+          <relativeFilePaths>
+            <path>GenericDelegate.cs</path>
+          </relativeFilePaths>
+        </type>
+        <type>
+          <id>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics.GenericMethod</id>
+          <parentId></parentId>
+          <name>GenericMethod</name>
+          <kind>Class</kind>
+          <namespace>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics</namespace>
+          <relativeFilePaths>
+            <path>GenericMethod.cs</path>
+          </relativeFilePaths>
+        </type>
+        <type>
             <id>DocWorks.Integration.XmlDoc.Tests.TestTypes.Generics.GenericMethodParameter</id>
             <parentId></parentId>
             <name>GenericMethodParameter</name>

@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DocWorks.Integration.XmlDoc.Extensions
 {
+    public enum NameFormat
+    {
+        Name,
+        MetadataName,
+        NameWithGenericArguments
+    }
     public static class ISymbolExtensions
     {
-        public static string QualifiedName(this ISymbol symbol, bool includeNamespace, bool useMetadataName)
+        public static string QualifiedName(this ISymbol symbol, bool includeNamespace, NameFormat nameFormat)
         {
             if (symbol == null)
                 return null;
@@ -15,63 +22,106 @@ namespace DocWorks.Integration.XmlDoc.Extensions
             if (symbol is IArrayTypeSymbol)
             {
                 var arraySymbol = (IArrayTypeSymbol) symbol;
-                var elementName = QualifiedName(arraySymbol.ElementType, includeNamespace, useMetadataName);
+                var elementName = QualifiedName(arraySymbol.ElementType, includeNamespace, nameFormat);
                 return $"{elementName}[{string.Join(" ", Enumerable.Repeat(',', arraySymbol.Rank - 1))}]";
             }
 
             if (symbol is IPointerTypeSymbol)
             {
                 var pointerSymbol = (IPointerTypeSymbol)symbol;
-                return $"{pointerSymbol.PointedAtType.QualifiedName(includeNamespace, useMetadataName)}*";
+                return $"{pointerSymbol.PointedAtType.QualifiedName(includeNamespace, nameFormat)}*";
             }
 
             if (symbol is INamespaceSymbol && ((INamespaceSymbol) symbol).IsGlobalNamespace)
                 return string.Empty;
 
             string name;
-            if (useMetadataName)
+            switch (nameFormat)
             {
-                var methodSymbol = symbol as IMethodSymbol;
-                if (methodSymbol != null)
-                    name = methodSymbol.MemberName();
-                else
-                    name = symbol.MetadataName;
+                case NameFormat.Name:
+                    name = symbol.Name;
+                    break;
+                case NameFormat.MetadataName:
+                {
+                    if (symbol is IMethodSymbol methodSymbol)
+                        name = methodSymbol.MemberName();
+                    else
+                        name = symbol.MetadataName;
+
+                    break;
+                }
+                case NameFormat.NameWithGenericArguments:
+                {
+                    var typeArguments = GetTypeArguments(symbol);
+
+                    name = symbol.Name;
+                    if (!typeArguments.IsDefaultOrEmpty)
+                        name += $@"<{string.Join(", ", typeArguments)}>";
+
+                    break;
+                }
+                default:
+                    throw new NotSupportedException("Unsupported NameFormat");
             }
-            else
-                name = symbol.Name;
 
             string prefix = null;
             if (symbol.ContainingType != null)
-                prefix = QualifiedName(symbol.ContainingType, includeNamespace, useMetadataName);
+                prefix = QualifiedName(symbol.ContainingType, includeNamespace, nameFormat);
             else if (includeNamespace && !symbol.ContainingNamespace.IsGlobalNamespace)
-                prefix = QualifiedName(symbol.ContainingNamespace, includeNamespace, useMetadataName);
+                prefix = QualifiedName(symbol.ContainingNamespace, includeNamespace, nameFormat);
 
             string separator = symbol is IMethodSymbol ? "::" : ".";
 
             return prefix != null ? prefix + separator + name : name;
         }
 
+        internal static ImmutableArray<ITypeSymbol> GetTypeArguments(this ISymbol symbol)
+        {
+            ImmutableArray<ITypeSymbol> typeArguments;
+            if (symbol is IMethodSymbol methodSymbol)
+                typeArguments = methodSymbol.TypeArguments;
+            else if (symbol is INamedTypeSymbol namedTypeSymbol)
+                typeArguments = namedTypeSymbol.TypeArguments;
+            else
+                typeArguments = default(ImmutableArray<ITypeSymbol>);
+            return typeArguments;
+        }
+
+        internal static ImmutableArray<ITypeParameterSymbol> GetTypeParameters(this ISymbol symbol)
+        {
+            ImmutableArray<ITypeParameterSymbol> typeParameters;
+            if (symbol is IMethodSymbol methodSymbol)
+                typeParameters = methodSymbol.TypeParameters;
+            else if (symbol is INamedTypeSymbol namedTypeSymbol)
+                typeParameters = namedTypeSymbol.TypeParameters;
+            else
+                typeParameters = default(ImmutableArray<ITypeParameterSymbol>);
+            return typeParameters;
+        }
+
 
         internal static string Id(this ISymbol symbol)
         {
-            if (symbol is IMethodSymbol)
-                return Id((IMethodSymbol)symbol);
+            if (symbol is IMethodSymbol methodSymbol)
+                return Id(methodSymbol);
+            if (symbol is IPropertySymbol propertySymbol && !propertySymbol.Parameters.IsDefaultOrEmpty)
+                return $"{FullyQualifiedName(symbol, true, NameFormat.MetadataName)}[{string.Join(", ", propertySymbol.Parameters.Select(p => p.Type.Id()))}]";
 
-            return FullyQualifiedName(symbol, true, true);
+            return FullyQualifiedName(symbol, true, NameFormat.MetadataName);
         }
 
         internal static string Id(this IMethodSymbol symbol)
         {
-            string id = $@"{symbol.ReturnType.Id()} {FullyQualifiedName(symbol, true, true)}({string.Join(", ", symbol.Parameters.Select(p => p.Type.Id()))})";
+            string id = $@"{FullyQualifiedName(symbol.ReturnType, true, NameFormat.NameWithGenericArguments)} {FullyQualifiedName(symbol, true, NameFormat.NameWithGenericArguments)}({string.Join(", ", symbol.Parameters.Select(p => FullyQualifiedName(p.Type, true, NameFormat.NameWithGenericArguments)))})";
             if (symbol.IsStatic)
                 id = "static " + id;
 
             return id;
         }
 
-        internal static string FullyQualifiedName(this ISymbol t, bool includeNamespace, bool useMetadataName)
+        internal static string FullyQualifiedName(this ISymbol t, bool includeNamespace, NameFormat nameFormat)
         {
-            return t.QualifiedName(includeNamespace, useMetadataName);
+            return t.QualifiedName(includeNamespace, nameFormat);
         }
 
         internal static bool MayHaveXmlDoc(this ISymbol symbol)
@@ -125,15 +175,12 @@ namespace DocWorks.Integration.XmlDoc.Extensions
 
         public static string MemberNameUnescaped(this ISymbol member)
         {
-            var memberName = member.Name;
-            if (member.Kind == SymbolKind.Method)
-            {
-                var methodSymbol = (IMethodSymbol)member;
-                if (methodSymbol.TypeParameters.Length > 0)
-                    memberName += "`" + methodSymbol.TypeParameters.Length;
-            }
+            var name = member.Name;
+            var typeParameters = member.GetTypeParameters();
+            if (!typeParameters.IsDefaultOrEmpty)
+                name += "`" + typeParameters.Length;
 
-            return memberName;
+            return name;
         }
     }
 }
