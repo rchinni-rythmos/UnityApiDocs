@@ -71,6 +71,8 @@ namespace DocWorks.Integration.XmlDoc
                 getTypesVisitor.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
+            EnsureCompiled();
+
             return FormatXml(getTypesVisitor.GetXml());
         }
 
@@ -101,7 +103,7 @@ namespace DocWorks.Integration.XmlDoc
                             string.Empty;
 
 
-                        
+
                         string xmlAttributes = "";
                         var baseType = BaseType(typeSymbol);
                         if (!string.IsNullOrEmpty(baseType))
