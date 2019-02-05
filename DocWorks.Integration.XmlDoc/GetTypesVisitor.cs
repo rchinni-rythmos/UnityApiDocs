@@ -56,7 +56,7 @@ namespace DocWorks.Integration.XmlDoc
 
         public string GetXml()
         {
-            var groups = types.GroupBy(t => t.FullyQualifiedName(true, true));
+            var groups = types.GroupBy(t => t.FullyQualifiedName(true, NameFormat.MetadataName));
             StringBuilder output = new StringBuilder();
 
             output.Append(@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
@@ -101,7 +101,7 @@ namespace DocWorks.Integration.XmlDoc
             if (t.ContainingNamespace.IsGlobalNamespace)
                 return string.Empty;
 
-            return t.ContainingNamespace.FullyQualifiedName(true, false);
+            return t.ContainingNamespace.FullyQualifiedName(true, NameFormat.MetadataName);
         }
 
         internal void Visit(SyntaxNode syntaxNode, SemanticModel semanticModel)

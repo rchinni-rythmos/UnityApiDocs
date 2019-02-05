@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -108,9 +109,9 @@ namespace DocWorks.Integration.XmlDoc
         private XmlNode SelectTypeNode(INamedTypeSymbol typeSymbol)
         {
             var selector =
-                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}'");
+                new StringBuilder($"@name='{typeSymbol.MetadataName}' and @namespace='{typeSymbol.ContainingNamespace.FullyQualifiedName(true, NameFormat.MetadataName)}'");
             if (typeSymbol.ContainingType != null)
-                selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, true)}'");
+                selector.Append($" and @containingType='{typeSymbol.ContainingType.FullyQualifiedName(false, NameFormat.MetadataName)}'");
 
             var docNodes = _xmlDoc.SelectNodes($"descendant::member[{selector}]");
             if (docNodes.Count > 1)
@@ -138,17 +139,27 @@ namespace DocWorks.Integration.XmlDoc
                 return nodeToUpdate;
 
             var constraints = "";
-            var methodSymbol = symbol as IMethodSymbol;
-            if (methodSymbol != null)
+
+            ImmutableArray<IParameterSymbol> parameters = default(ImmutableArray<IParameterSymbol>);
+            if (symbol is IMethodSymbol)
+                parameters = ((IMethodSymbol) symbol).Parameters;
+
+            if (symbol is IPropertySymbol)
+                parameters = ((IPropertySymbol) symbol).Parameters;
+
+            if (!parameters.IsDefault)
             {
                 int xpathIdx = 1;
-                foreach (var parameter in methodSymbol.Parameters)
+                foreach (var parameter in parameters)
                 {
                     var parameterType = parameter.Type;
                     if (parameterType is ITypeParameterSymbol)
                         constraints += $@" and signature/parameters/parameter[{xpathIdx}]/typeParameter/@name='{parameterType.Name}'";
                     else
-                        constraints += $@" and signature/parameters/parameter[{xpathIdx}]/type/@typeId='{parameterType.Id()}'";
+                    {
+                        var constraintPrefix = $@" and signature/parameters/parameter[{xpathIdx}]/";
+                        constraints = AddTypeConstraints(constraints, constraintPrefix, parameterType);
+                    }
 
                     xpathIdx++;
                 }
@@ -158,6 +169,26 @@ namespace DocWorks.Integration.XmlDoc
             var docNodes = parentNode.SelectNodes($"member[@name='{symbol.MemberNameUnescaped()}'{constraints}]/xmldoc");
 
             return AddOrUpdateXmlDoc(originalNode, nodeToUpdate, docNodes, symbol);
+        }
+
+        private static string AddTypeConstraints(string constraints, string constraintPrefix, ITypeSymbol parameterType)
+        {
+            var isTypeParameter = parameterType is ITypeParameterSymbol;
+            if (isTypeParameter)
+                constraints += $@"{constraintPrefix}typeParameter/@name='{parameterType.Name}'";
+            else
+                constraints += $@"{constraintPrefix}type/@typeId='{parameterType.Id()}'";
+
+            if (parameterType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType)
+            {
+                foreach (var typeParameterSymbol in namedTypeSymbol.TypeArguments)
+                {
+                    var subTypeConstraintPrefix = $@"{constraintPrefix}type[@typeId='{parameterType.Id()}']/typeArguments/";
+                    constraints = AddTypeConstraints(constraints, subTypeConstraintPrefix, typeParameterSymbol);
+                }
+            }
+
+            return constraints;
         }
 
         private SyntaxNode AddOrUpdateXmlDoc(SyntaxNode originalNode, SyntaxNode nodeToBeUpdated, XmlNodeList matchingDocNodes, ISymbol symbol)
@@ -180,11 +211,15 @@ namespace DocWorks.Integration.XmlDoc
         {
             var docTrivia = nodeToBeUpdated.GetLeadingTrivia();
 
-            var initialWhitespace = docTrivia.TakeWhile(t => t.IsKind(SyntaxKind.WhitespaceTrivia) || t.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
+            var initialWhitespace = docTrivia.Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia) || t.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
             int lastNewLineIndex = Array.FindLastIndex(initialWhitespace, t => t.Kind() == SyntaxKind.EndOfLineTrivia);
             if (lastNewLineIndex >= 0)
                 initialWhitespace = initialWhitespace.Skip(lastNewLineIndex + 1).ToArray();
 
+            if (nodeToBeUpdated.ContainsDirectives)
+            {
+                initialWhitespace = initialWhitespace.Take(1).ToArray();
+            }
             var rawWhitespace = string.Join("", initialWhitespace.Select(t => t.ToFullString()));
 
             // break lines (to inject ///) at both CRLF & LF.
@@ -221,7 +256,7 @@ namespace DocWorks.Integration.XmlDoc
 
         private XmlNodeList XmlDocNodeForMember(ISymbol symbol)
         {
-            return _xmlDoc.SelectNodes($"descendant::member[@name='{symbol.ContainingType.Name}']/member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
+            return _xmlDoc.SelectNodes($"descendant::member[@name='{symbol.ContainingType.MetadataName}']/member[@name='{symbol.MemberNameUnescaped()}']/xmldoc");
         }
 
     }

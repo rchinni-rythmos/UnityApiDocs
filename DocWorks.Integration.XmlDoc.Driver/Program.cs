@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +19,7 @@ namespace DocWorks.Integration.XmlDoc.Driver
             public static string[] ReferencedAssemblies;
             public static string[] Defines;
             public static string OutputDirectory;
+            public static bool Verbose;
         }
 
         private static string TestFileDirectory = "TestFiles";
@@ -29,6 +31,7 @@ namespace DocWorks.Integration.XmlDoc.Driver
             if (DriverOptions.ReferencedAssemblies != null)
                 referencedAssemblies.AddRange(DriverOptions.ReferencedAssemblies);
 
+            var stopwatch = Stopwatch.StartNew();
             var handler = new XMLDocHandler(new CompilationParameters(
                 DriverOptions.RootPath ?? ".",
                 DriverOptions.ExcludedPaths ?? new string[0],
@@ -46,11 +49,17 @@ namespace DocWorks.Integration.XmlDoc.Driver
             XmlDocument getTypesXml = new XmlDocument();
 
             getTypesXml.LoadXml(typesXml);
+            var loadXmlMilliseconds = stopwatch.ElapsedMilliseconds;
+
+            long getTypeTotalMilliseconds = 0;
 
             foreach (XmlNode typeNode in getTypesXml.SelectNodes("//type"))
             {
+                stopwatch.Restart();
                 var id = typeNode.SelectSingleNode("id").InnerText;
-                Console.WriteLine("Processing type " + id);
+                if (DriverOptions.Verbose)
+                    Console.WriteLine("Processing type " + id);
+
                 var pathNodes = typeNode.SelectNodes("relativeFilePaths/path");
                 var paths = new List<string>();
                 foreach (XmlNode pathNode in pathNodes)
@@ -58,12 +67,18 @@ namespace DocWorks.Integration.XmlDoc.Driver
 
                 var random = new Random();
                 string typeXml = handler.GetTypeDocumentation(id, paths.ToArray());
-                Console.Write(typeXml);
+                if (DriverOptions.Verbose)
+                    Console.Write(typeXml);
+
                 XmlDocument getTypeXml = new XmlDocument();
                 getTypeXml.LoadXml(typeXml);
 
                 if (isOutputDirectorySpecified)
                     File.WriteAllText(Path.Combine(DriverOptions.OutputDirectory, FixupFilename(id) + ".xml"), typeXml);
+
+                var getTypeMilliseconds = stopwatch.ElapsedMilliseconds;
+                getTypeTotalMilliseconds += getTypeMilliseconds;
+                Console.WriteLine($"Processing type {id} took {getTypeMilliseconds} ms");
 
                 var xmlDocNodes = getTypeXml.SelectNodes("//xmldoc");
                 HashSet<string> randomComments = new HashSet<string>();
@@ -95,6 +110,9 @@ namespace DocWorks.Integration.XmlDoc.Driver
                 if (randomComments.Count > 0)
                     Console.WriteLine("Did not write all comments back properly. Xml used to set:\n" + getTypeXmlString);
             }
+
+            Console.WriteLine($"LoadXml took {loadXmlMilliseconds} ms");
+            Console.WriteLine($"Combined calls to getType took {getTypeTotalMilliseconds} ms");
         }
 
         private static string FixupFilename(string id)

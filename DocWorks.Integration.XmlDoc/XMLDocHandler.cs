@@ -33,6 +33,8 @@ namespace DocWorks.Integration.XmlDoc
     public class XMLDocHandler
     {
         private CompilationParameters compilationParameters;
+        private CSharpCompilation csharpCompilation;
+        private Dictionary<string, SyntaxTree> treesForPaths;
 
         public XMLDocHandler(CompilationParameters compilationParameters)
         {
@@ -69,14 +71,14 @@ namespace DocWorks.Integration.XmlDoc
                 getTypesVisitor.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
+            EnsureCompiled();
+
             return FormatXml(getTypesVisitor.GetXml());
         }
 
         public string GetTypeDocumentation(string id, params string[] paths)
         {
-            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths);
-            var diagnostics = compilation.GetDiagnostics();
+            EnsureCompiled();
 
             var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
@@ -87,21 +89,21 @@ namespace DocWorks.Integration.XmlDoc
                 if (!treesForPaths.TryGetValue(path, out syntaxTree))
                     throw new ArgumentException("File \"" + path + "\" does not exist or was not found under root \"" + compilationParameters.RootPath + "\"");
 
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var semanticModel = csharpCompilation.GetSemanticModel(syntaxTree);
 
                 var descendants = syntaxTree.GetRoot().DescendantNodes();
                 var res = descendants.OfType<BaseTypeDeclarationSyntax>().Cast<MemberDeclarationSyntax>().Concat(descendants.OfType<DelegateDeclarationSyntax>()).ToArray();
                 foreach (var typeDeclaration in res)
                 {
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
-                    if (id == typeSymbol.QualifiedName(true, true))
+                    if (id == typeSymbol.QualifiedName(true, NameFormat.MetadataName))
                     {
                         var containingType = typeSymbol.ContainingType != null ?
-                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, true)}"" " :
+                            $@"containingType=""{typeSymbol.ContainingType.FullyQualifiedName(false, NameFormat.MetadataName)}"" " :
                             string.Empty;
 
 
-                        
+
                         string xmlAttributes = "";
                         var baseType = BaseType(typeSymbol);
                         if (!string.IsNullOrEmpty(baseType))
@@ -123,7 +125,7 @@ namespace DocWorks.Integration.XmlDoc
 
                         var xml = new StringBuilder($@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
 <doc version=""3"">
-    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace.FullyQualifiedName(true, true)}""{xmlAttributes}>
+    <member name=""{typeSymbol.MetadataName}"" type=""{typeSymbol.TypeKind}"" {containingType}namespace=""{typeSymbol.ContainingNamespace.FullyQualifiedName(true, NameFormat.MetadataName)}""{xmlAttributes}>
         {InterfaceList(typeSymbol)}
         {TypeParametersXmlForDeclaration(typeSymbol.TypeParameters)}
         {extraContent}
@@ -202,8 +204,12 @@ namespace DocWorks.Integration.XmlDoc
             return sb.ToString();
         }
 
-        private CSharpCompilation ParseAndCompile(Dictionary<string, SyntaxTree> treesForPaths)
+        private void EnsureCompiled()
         {
+            if (treesForPaths != null)
+                return;
+
+            treesForPaths = new Dictionary<string, SyntaxTree>();
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
@@ -236,8 +242,7 @@ namespace DocWorks.Integration.XmlDoc
 
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             compilerOptions = compilerOptions.WithAllowUnsafe(true);
-            var compilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
-            return compilation;
+            csharpCompilation = CSharpCompilation.Create("Test", syntaxTrees, GetMetadataReferences(), compilerOptions);
         }
 
         private static string AttributesXml(ISymbol typeSymbol)
@@ -320,7 +325,7 @@ namespace DocWorks.Integration.XmlDoc
             if (typeSymbol.TypeKind == TypeKind.Interface || typeSymbol.TypeKind == TypeKind.Struct)
                 return null;
 
-            if (typeSymbol.BaseType.FullyQualifiedName(true, true) == "System.Object")
+            if (typeSymbol.BaseType.FullyQualifiedName(true, NameFormat.MetadataName) == "System.Object")
                 return null;
 
             return typeSymbol.BaseType.Id();
@@ -567,8 +572,7 @@ namespace DocWorks.Integration.XmlDoc
 
         public void SetType(string docXml, params string[] sourcePaths)
         {
-            Dictionary<string, SyntaxTree> treesForPaths = new Dictionary<string, SyntaxTree>();
-            var compilation = ParseAndCompile(treesForPaths);
+            EnsureCompiled();
 
             var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
 
@@ -586,7 +590,7 @@ namespace DocWorks.Integration.XmlDoc
                 if (!treesForPaths.TryGetValue(fullPath, out syntaxTree))
                     throw new ArgumentException(fullPath + " is not contained in root path " + compilationParameters.RootPath);
 
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var semanticModel = csharpCompilation.GetSemanticModel(syntaxTree);
                 partialInfoCollector.Visit(syntaxTree.GetRoot(), semanticModel);
             }
 
@@ -594,7 +598,7 @@ namespace DocWorks.Integration.XmlDoc
             foreach (var fullPath in fullPaths)
             {
                 var syntaxTree = treesForPaths[fullPath];
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var semanticModel = csharpCompilation.GetSemanticModel(syntaxTree);
                 var result = docUpdater.Visit(syntaxTree.GetRoot(), semanticModel);
 
                 if (result != syntaxTree.GetRoot())
@@ -744,7 +748,7 @@ namespace DocWorks.Integration.XmlDoc
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             var symbol = _semanticModel.GetDeclaredSymbol(node);
-            var symbolId = symbol.QualifiedName(true, true);
+            var symbolId = symbol.QualifiedName(true, NameFormat.MetadataName);
             if (symbolId == _id)
             {
 
