@@ -126,7 +126,7 @@ namespace Unity.Options
                     if (!fieldInfo.GetCustomAttributes(typeof(HideFromHelpAttribute), false).Any())
                     {
                         if (helpAttrs.Length == 0)
-                            helpTable.Add(argName, new HelpInformation {Summary = null, FieldInfo = fieldInfo });
+                            helpTable.Add(argName, new HelpInformation { Summary = null, FieldInfo = fieldInfo });
                         else
                         {
                             var helpAttr = ((HelpDetailsAttribute)helpAttrs[0]);
@@ -156,16 +156,12 @@ namespace Unity.Options
 
         public static void DisplayHelp(TextWriter writer, Type[] types)
         {
-            writer.WriteLine();
             writer.WriteLine("Options:");
 
             var helpTable = ParseHelpTable(types);
 
             foreach (var entry in helpTable)
             {
-                if (!entry.Value.HasSummary)
-                    continue;
-
                 string left;
 
                 if (entry.Value.FieldInfo.FieldType == typeof(bool))
@@ -179,7 +175,10 @@ namespace Unity.Options
                     throw new InvalidOperationException(string.Format("Option to long for current padding : {0}, shorten name/value or increase padding if necessary. Over by {1}", entry.Key, left.Length - HelpOutputColumnPadding));
 
                 left = left.PadRight(HelpOutputColumnPadding);
-                writer.WriteLine("{0}{1}", left, entry.Value.Summary);
+                if (entry.Value.HasSummary)
+                    writer.WriteLine("{0}{1}", left, entry.Value.Summary);
+                else
+                    writer.WriteLine(left);
             }
         }
 
@@ -200,7 +199,7 @@ namespace Unity.Options
 
         public static bool HelpRequested(string[] commandLine)
         {
-            return commandLine.Count(v => v == "--h" || v == "--help" || v == "-help") > 0;
+            return commandLine.Count(v => v == "-h" || v == "--h" || v == "--help" || v == "-help") > 0;
         }
 
         private static IEnumerable<FieldInfo> GetOptionFields(Type optionType)
@@ -439,12 +438,12 @@ namespace Unity.Options
             if (array != null)
             {
                 var oldArray = array;
-                array = (Array)Activator.CreateInstance(arrayType, new object[] {oldArray.Length + values.Length});
+                array = (Array)Activator.CreateInstance(arrayType, new object[] { oldArray.Length + values.Length });
                 Array.Copy(oldArray, array, oldArray.Length);
                 index = oldArray.Length;
             }
             else
-                array = (Array)Activator.CreateInstance(arrayType, new object[] {values.Length});
+                array = (Array)Activator.CreateInstance(arrayType, new object[] { values.Length });
 
             foreach (var v in values)
                 array.SetValue(ParseValue(arrayType.GetElementType(), v, customValueParser), index++);
