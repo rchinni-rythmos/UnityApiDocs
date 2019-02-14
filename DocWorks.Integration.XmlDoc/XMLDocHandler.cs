@@ -177,10 +177,6 @@ namespace DocWorks.Integration.XmlDoc
 
         private static string GetCDataDocXml(Regex extraMemberRegEx, ISymbol typeSymbol)
         {
-            if (typeSymbol.Name == "targetOSVersionString")
-            {
-
-            }
             var xml = typeSymbol.GetDocumentationCommentXml();
             xml = extraMemberRegEx.Replace(xml, "");
             //xml = XmlUtility.LegalString(xml);
