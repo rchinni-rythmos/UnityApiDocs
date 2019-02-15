@@ -1250,10 +1250,10 @@ namespace DocWorks.Integration.XmlDoc.Tests
     <member name=""ClassWithCDataXml"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
         <xmldoc><![CDATA[
             <summary>
-            <![CDATA[
+            &lt;![CDATA[
             Some
-            <CData>
-            ]]]]><![CDATA[>
+            &lt;CData&gt;
+            ]]&gt;
             </summary>
 ]]></xmldoc>
     </member>
@@ -1282,7 +1282,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
   <member name=""EscapeCharactersXml"" type=""Class"" namespace=""DocWorks.Integration.XmlDoc.Tests.TestTypes"">
     <xmldoc><![CDATA[
     <summary>
-    <> & ' ""
+    &lt;&gt; &amp; &apos; &quot;
     </summary>
 ]]></xmldoc>
   </member>
