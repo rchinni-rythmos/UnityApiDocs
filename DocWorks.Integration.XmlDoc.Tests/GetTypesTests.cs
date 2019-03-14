@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 
 namespace DocWorks.Integration.XmlDoc.Tests
@@ -1325,6 +1326,19 @@ namespace DocWorks.Integration.XmlDoc.Tests
                 AssertXml(data.expectedXml, actualXml);
             else
                 AssertXmlContains(data.expectedXml, actualXml);
+        }
+
+        [Test]
+        public void GetTypeDocumentation_Should_Not_Include_Members_From_Excluded_Directories()
+        {
+            string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
+            CompilationParameters compilationParameters = new CompilationParameters(".", new string[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
+            var handler = new XMLDocHandler(compilationParameters);
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.ClassWithField", "TestTypes/ClassWithField.cs");
+            var doc = new XmlDocument();
+            doc.LoadXml(actualXml);
+            int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
+            Assert.True(nodeCount == 1);
         }
 
         private void AssertValidXml(string actualXml)
