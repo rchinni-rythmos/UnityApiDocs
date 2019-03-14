@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="TestTypes\Excluded\ClassWithField.cs"></Compile>
+    <Compile Remove="TestTypes\Excluded\DuplicateClass.cs"></Compile>
     <Compile Update="TestTypes\Attributes\ClassWithAttributes.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -61,9 +61,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestTypes\EscapeCharactersXml.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="TestTypes\Excluded\ClassWithField.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestTypes\Generics\GenericClassWithField.cs">

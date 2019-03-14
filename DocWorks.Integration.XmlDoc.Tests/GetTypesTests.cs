@@ -1329,16 +1329,16 @@ namespace DocWorks.Integration.XmlDoc.Tests
         }
 
         [Test]
-        public void GetTypeDocumentation_Should_Not_Include_Members_From_Excluded_Directories()
+        public void GivenDuplicateTypes_WithOneTypeDefinitionExcluded_GetTypeDocumentation_ShouldReturn_OneMember()
         {
-            string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
+            string excludePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
             CompilationParameters compilationParameters = new CompilationParameters(".", new string[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
             var handler = new XMLDocHandler(compilationParameters);
-            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.ClassWithField", "TestTypes/ClassWithField.cs");
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
             var doc = new XmlDocument();
             doc.LoadXml(actualXml);
             int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
-            Assert.True(nodeCount == 1);
+            Assert.That(nodeCount, Is.EqualTo(1));
         }
 
         private void AssertValidXml(string actualXml)
