@@ -213,6 +213,10 @@
     <Compile Update="TestTypes\UpdateEnums.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+  
+    <Compile Update="TestTypes\DuplicateClass.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>

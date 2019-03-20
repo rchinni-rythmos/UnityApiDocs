@@ -1331,14 +1331,14 @@ namespace DocWorks.Integration.XmlDoc.Tests
         [Test]
         public void GivenDuplicateTypes_WithOneTypeDefinitionExcluded_GetTypeDocumentation_ShouldReturn_OneMember()
         {
-            string excludePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
-            CompilationParameters compilationParameters = new CompilationParameters(".", new string[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
-            var handler = new XMLDocHandler(compilationParameters);
-            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
-            var doc = new XmlDocument();
+            string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
+            CompilationParameters compilationParameters = new CompilationParameters(AppContext.BaseDirectory, new[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
+            XMLDocHandler handler = new XMLDocHandler(compilationParameters);
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs", "TestTypes/Excluded/DuplicateClass.cs");
+            XmlDocument doc = new XmlDocument();
             doc.LoadXml(actualXml);
-            int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
-            Assert.That(nodeCount, Is.EqualTo(1));
+            int nodeCount = doc.GetElementsByTagName("member").Count;
+            Assert.That(nodeCount, Is.EqualTo(2));
         }
 
         private void AssertValidXml(string actualXml)
