@@ -1334,7 +1334,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
             string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
             CompilationParameters compilationParameters = new CompilationParameters(AppContext.BaseDirectory, new[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
             XMLDocHandler handler = new XMLDocHandler(compilationParameters);
-            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs", "TestTypes/Excluded/DuplicateClass.cs");
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(actualXml);
             int nodeCount = doc.GetElementsByTagName("member").Count;
