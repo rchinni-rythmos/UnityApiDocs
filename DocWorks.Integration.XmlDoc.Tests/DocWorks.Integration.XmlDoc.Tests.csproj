@@ -22,6 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="TestTypes\Excluded\**" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestTypes\Excluded\DuplicateClass.cs"></Compile>
     <Compile Update="TestTypes\Attributes\ClassWithAttributes.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -206,6 +211,10 @@
     </Compile>
   
     <Compile Update="TestTypes\UpdateEnums.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  
+    <Compile Update="TestTypes\DuplicateClass.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
