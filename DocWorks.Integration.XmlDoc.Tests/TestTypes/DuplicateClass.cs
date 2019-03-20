@@ -10,7 +10,7 @@ namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
     public class DuplicateClass
     {
         /// <summary>
-        /// value 2
+        /// value 1
         /// </summary>
         public int value;
     }

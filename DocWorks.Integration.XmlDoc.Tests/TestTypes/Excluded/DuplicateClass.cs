@@ -5,7 +5,7 @@ using System.Text;
 namespace DocWorks.Integration.XmlDoc.Tests.TestTypes
 {
     /// <summary>
-    /// class 2
+    /// class 1
     /// </summary>
     public class DuplicateClass
     {
