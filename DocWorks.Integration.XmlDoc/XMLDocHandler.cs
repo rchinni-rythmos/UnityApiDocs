@@ -49,9 +49,7 @@ namespace DocWorks.Integration.XmlDoc
 
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
-            var filePaths = Directory.GetFiles(compilationParametersRootPath, "*.cs", SearchOption.AllDirectories)
-                .Select(Path.GetFullPath)
-                .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
+            var filePaths = GetFullPathsFromDirectory(compilationParametersRootPath);
 
             var startIndex = compilationParametersRootPath.Length + (compilationParametersRootPath.EndsWith("\\") || compilationParametersRootPath.EndsWith("/") ? 0 : 1);
             var syntaxTrees = filePaths.Select(
@@ -80,7 +78,7 @@ namespace DocWorks.Integration.XmlDoc
         {
             EnsureCompiled();
 
-            var fullPaths = paths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
+            var fullPaths = GetFullPathsFromRelativePath(paths);
 
             var extraMemberRegEx = new Regex("\\<member name=[^\\>]+\\>|\\</member\\>", RegexOptions.Compiled);
             foreach (var path in fullPaths)
@@ -213,9 +211,7 @@ namespace DocWorks.Integration.XmlDoc
             var parserOptions = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse,
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
-            var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
-                .Select(Path.GetFullPath)
-                .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
+            var csFilePaths = GetFullPathsFromDirectory(compilationParameters.RootPath);
             
             var syntaxTrees = csFilePaths.Select(
                 p =>
@@ -576,7 +572,7 @@ namespace DocWorks.Integration.XmlDoc
         {
             EnsureCompiled();
 
-            var fullPaths = sourcePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p)));
+            var fullPaths = GetFullPathsFromRelativePath(sourcePaths);
 
             var nonExistantFile = fullPaths.FirstOrDefault(p => !File.Exists(p));
             if (nonExistantFile != null)
@@ -609,6 +605,18 @@ namespace DocWorks.Integration.XmlDoc
                     File.WriteAllText(syntaxTree.FilePath, fileContent);
                 }
             }
+        }
+        
+        private IEnumerable<string> GetFullPathsFromRelativePath(string[] relativeFilePaths)
+        {
+            return relativeFilePaths.Select(p => Path.GetFullPath(Path.Combine(compilationParameters.RootPath, p))).Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
+        }
+
+        private IEnumerable<string> GetFullPathsFromDirectory(string rootDirectory)
+        {
+            return Directory.GetFiles(rootDirectory, "*.cs", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath)
+                .Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
         }
     }
 

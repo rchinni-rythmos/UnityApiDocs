@@ -26,7 +26,8 @@ namespace DocWorks.Integration.XmlDoc.Tests
 
         protected static CompilationParameters MakeCompilationParameters(string testFileDirectory, string[] referencedAssemblyPaths = null)
         {
-            return new CompilationParameters(testFileDirectory, new string[0], new string[0], referencedAssemblyPaths ?? new string[0]);
+            string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
+            return new CompilationParameters(testFileDirectory, new[] { excludePath }, new string[0], referencedAssemblyPaths ?? new string[0]);
         }
 
         protected static string Normalize(string source)
