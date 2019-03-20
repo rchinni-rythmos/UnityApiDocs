@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 
 namespace DocWorks.Integration.XmlDoc.Tests
@@ -1325,6 +1326,59 @@ namespace DocWorks.Integration.XmlDoc.Tests
                 AssertXml(data.expectedXml, actualXml);
             else
                 AssertXmlContains(data.expectedXml, actualXml);
+        }
+
+        [Test]
+        public void GivenType_WithAMember_HavingRefArgument_GetTypeDocumentation_ShouldReturn_SomeIndicatorForRef()
+        {
+            var fileContent = File.ReadAllText("TestTypes\\Graphics\\CubemapArray.xml");
+            string[] filePaths = { "TestTypes\\Graphics\\Texture.bindings.cs", "TestTypes\\Graphics\\Texture.cs" };
+            CompilationParameters compilationParameters = new CompilationParameters(".", Array.Empty<string>(), new List<string>() {
+              "Win64",
+              "MacOx",
+              "Linux",
+              "CACHE_SERVER_INTEGRITY_CHECK",
+              "DEBUG_AVATARPREVIEW",
+              "DEBUG_PLOT_GAIN",
+              "DOLOG",
+              "ENABLE_AR",
+              "ENABLE_CLOTH",
+              "ENABLE_CLOUD_HUB",
+              "!ENABLE_CLOUD_PROJECT_ID",
+              "ENABLE_CLOUD_PROJECT_ID",
+              "ENABLE_CLOUD_SERVICES",
+              "ENABLE_CLOUD_SERVICES_COLLAB",
+              "ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS",
+              "ENABLE_CLOUD_SERVICES_CRASH_REPORTING",
+              "ENABLE_CRUNCH_TEXTURE_COMPRESSION",
+              "ENABLE_CUSTOM_RENDER_TEXTURE",
+              "ENABLE_DATALESS_PLAYER_GUI",
+              "ENABLE_LINQPAD",
+              "ENABLE_LOCALIZATION",
+              "ENABLE_MULTIPLE_DISPLAYS",
+              "ENABLE_NETWORK",
+              "ENABLE_PACKMAN",
+              "ENABLE_SAVE_PLAYMODE_CHANGES_FEATURE",
+              "ENABLE_SELECTIONHISTORY",
+              "ENABLE_SORTINGLAYER_ALL_RENDERERS",
+              "ENABLE_TERRAIN",
+              "ENABLE_TEXTURE_STREAMING",
+              "ENABLE_TILEMAP",
+              "ENABLE_UNET",
+              "ENABLE_UNLOCKED_DIAGNOSTIC_SWITCHES",
+              "ENABLE_VIDEO",
+              "ENABLE_YAML_MERGE_GUI",
+              "FOR_REFERENCE_ONLY_OVERRIDES_CALLED_FROM_NATIVE_CODE",
+              "INCLUDE_GI",
+              "INCLUDE_IL2CPP_PUBLIC",
+              "NETFX_CORE",
+              "PERF_PROFILE",
+              "(UNITY_EDITOR)",
+              "UNITY_EDITOR"
+            }, Array.Empty<string>());
+            var handler = new XMLDocHandler(compilationParameters);
+            handler.SetType(fileContent, filePaths);
+            //Assert.That(nodes[0].InnerXml, Is.Not.EqualTo(nodes[1].InnerXml));
         }
 
         private void AssertValidXml(string actualXml)
