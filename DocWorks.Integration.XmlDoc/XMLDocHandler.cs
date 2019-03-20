@@ -214,7 +214,7 @@ namespace DocWorks.Integration.XmlDoc
                 SourceCodeKind.Regular, compilationParameters.DefinedSymbols);
 
             var csFilePaths = Directory.GetFiles(compilationParameters.RootPath, "*.cs", SearchOption.AllDirectories)
-                .Select(Path.GetFullPath);
+                .Select(Path.GetFullPath).Where(p => !compilationParameters.ExcludedPaths.Any(p.StartsWith));
             var syntaxTrees = csFilePaths.Select(
                 p =>
                 {

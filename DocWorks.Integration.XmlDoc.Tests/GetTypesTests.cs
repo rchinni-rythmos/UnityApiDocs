@@ -1337,8 +1337,8 @@ namespace DocWorks.Integration.XmlDoc.Tests
             string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(actualXml);
-            int nodeCount = doc.GetElementsByTagName("member").Count;
-            Assert.That(nodeCount, Is.EqualTo(2));
+            int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
+            Assert.That(nodeCount, Is.EqualTo(1));
         }
 
         private void AssertValidXml(string actualXml)
