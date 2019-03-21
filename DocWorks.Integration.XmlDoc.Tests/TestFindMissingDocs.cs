@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using Unity.DocTool.XMLDocHandler.FindMissingDocs;
+using DocWorks.Integration.FindMissingDocs;
 
 namespace Unity.DocTool.XMLDocHandler.Tests
 {

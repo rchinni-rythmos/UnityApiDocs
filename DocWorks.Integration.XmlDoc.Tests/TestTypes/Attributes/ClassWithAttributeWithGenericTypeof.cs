@@ -1,5 +1,4 @@
-﻿using Unity.DocTool.XMLDocHandler.Tests.TestTypes.GetTypes;
-using Unity.DocTool.XMLDocHandler.TestUtilities;
+﻿using DocWorks.Integration.XmlDoc.Tests.TestTypes.Attributes;
 
 namespace Unity.DocTool.XMLDocHandler.Tests.TestTypes.Attributes
 {

@@ -5,7 +5,7 @@ using System.Xml;
 using DocWorks.Integration.XmlDoc;
 using Unity.Options;
 
-[assembly: InternalsVisibleTo("Unity.DocTool.XMLDocHandler.Tests")]
+[assembly: InternalsVisibleTo("DocWorks.Integration.XmlDoc.Tests")]
 
 namespace DocWorks.Integration.FindMissingDocs
 {

@@ -67,7 +67,7 @@ namespace DocWorks.Integration.XmlDoc.Extensions
             string prefix = null;
             if (symbol.ContainingType != null)
                 prefix = QualifiedName(symbol.ContainingType, includeNamespace, nameFormat);
-            else if (includeNamespace && !symbol.ContainingNamespace.IsGlobalNamespace)
+            else if (includeNamespace && symbol.ContainingNamespace  != null && !symbol.ContainingNamespace.IsGlobalNamespace)
                 prefix = QualifiedName(symbol.ContainingNamespace, includeNamespace, nameFormat);
 
             string separator = symbol is IMethodSymbol ? "::" : ".";
