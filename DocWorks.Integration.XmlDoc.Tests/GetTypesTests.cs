@@ -1366,8 +1366,6 @@ namespace DocWorks.Integration.XmlDoc.Tests
                     "TestTypes\\Graphics\\Texture.deprecated.cs",
                 };
 
-            // D:\AllGit\CMSRepos\UnityApiDocs\DocWorks.Integration.XmlDoc.Tests\bin\Debug\netcoreapp2.0\TestTypes\Graphics\Texture.bindings.cs
-
             CompilationParameters compilationParameters = new CompilationParameters(".", Array.Empty<string>(), new List<string>() {
               "Win64",
               "MacOx",
