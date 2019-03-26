@@ -1332,7 +1332,6 @@ namespace DocWorks.Integration.XmlDoc.Tests
         public void GivenType_WithAMember_HavingRefArgument_GetTypeDocumentation_ShouldReturn_SomeIndicatorForRef()
         {
             var fileContent = File.ReadAllText("TestTypes\\Graphics\\CubemapArray.xml");
-            //string[] filePaths = Directory.GetFiles(@"D:\AllGit\CMSRepos\UnityApiDocs\DocWorks.Integration.XmlDoc.Tests\TestTypes\Graphics", "*.cs");
             string[] filePaths = new string[]
                 {
                     "TestTypes\\Graphics\\AsyncGPUReadback.bindings.cs",
