@@ -1332,7 +1332,42 @@ namespace DocWorks.Integration.XmlDoc.Tests
         public void GivenType_WithAMember_HavingRefArgument_GetTypeDocumentation_ShouldReturn_SomeIndicatorForRef()
         {
             var fileContent = File.ReadAllText("TestTypes\\Graphics\\CubemapArray.xml");
-            string[] filePaths = { "TestTypes\\Graphics\\Texture.bindings.cs", "TestTypes\\Graphics\\Texture.cs" };
+            //string[] filePaths = Directory.GetFiles(@"D:\AllGit\CMSRepos\UnityApiDocs\DocWorks.Integration.XmlDoc.Tests\TestTypes\Graphics", "*.cs");
+            string[] filePaths = new string[]
+                {
+                    "TestTypes\\Graphics\\AsyncGPUReadback.bindings.cs",
+                    "TestTypes\\Graphics\\BeforeRenderHelper.cs",
+                    "TestTypes\\Graphics\\BillboardRenderer.bindings.cs",
+                    "TestTypes\\Graphics\\Display.bindings.cs",
+                    "TestTypes\\Graphics\\GPUFence.deprecated.cs",
+                    "TestTypes\\Graphics\\Graphics_BindingsOverloads.cs",
+                    "TestTypes\\Graphics\\GraphicsBuffer.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsComponents.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsEnums.cs",
+                    "TestTypes\\Graphics\\GraphicsFence.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsFormatUtility.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsManagers.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsRenderers.bindings.cs",
+                    "TestTypes\\Graphics\\GraphicsSettings.bindings.cs",
+                    "TestTypes\\Graphics\\Light.bindings.cs",
+                    "TestTypes\\Graphics\\Light.deprecated.cs",
+                    "TestTypes\\Graphics\\LightProbeGroup.bindings.cs",
+                    "TestTypes\\Graphics\\LightProbeProxyVolume.bindings.cs",
+                    "TestTypes\\Graphics\\LineUtility.cs",
+                    "TestTypes\\Graphics\\LOD.bindings.cs",
+                    "TestTypes\\Graphics\\Mesh.bindings.cs",
+                    "TestTypes\\Graphics\\Mesh.cs",
+                    "TestTypes\\Graphics\\RenderingCommandBuffer.bindings.cs",
+                    "TestTypes\\Graphics\\RenderingCommandBuffer.cs",
+                    "TestTypes\\Graphics\\RenderingCommandBuffer.deprecated.cs",
+                    "TestTypes\\Graphics\\SplashScreen.bindings.cs",
+                    "TestTypes\\Graphics\\Texture.bindings.cs",
+                    "TestTypes\\Graphics\\Texture.cs",
+                    "TestTypes\\Graphics\\Texture.deprecated.cs",
+                };
+
+            // D:\AllGit\CMSRepos\UnityApiDocs\DocWorks.Integration.XmlDoc.Tests\bin\Debug\netcoreapp2.0\TestTypes\Graphics\Texture.bindings.cs
+
             CompilationParameters compilationParameters = new CompilationParameters(".", Array.Empty<string>(), new List<string>() {
               "Win64",
               "MacOx",
@@ -1377,8 +1412,8 @@ namespace DocWorks.Integration.XmlDoc.Tests
               "UNITY_EDITOR"
             }, Array.Empty<string>());
             var handler = new XMLDocHandler(compilationParameters);
-            handler.SetType(fileContent, filePaths);
-            //Assert.That(nodes[0].InnerXml, Is.Not.EqualTo(nodes[1].InnerXml));
+
+            Assert.Throws<System.NullReferenceException>(() => handler.SetType(fileContent, filePaths));
         }
 
         private void AssertValidXml(string actualXml)

@@ -10,15 +10,40 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace UnityEngine
 {
+    /// <summary>
+    /// This struct contains all the information required to create a RenderTexture. It can be copied, cached, and reused to easily create RenderTextures that all share the same properties.
+    /// </summary>
     public struct RenderTextureDescriptor
     {
+        /// <summary>
+        /// The width of the render texture in pixels.
+        /// </summary>
         public int width { get; set; }
+        /// <summary>
+        /// The height of the render texture in pixels.
+        /// </summary>
         public int height { get; set; }
+        /// <summary>
+        /// The multisample antialiasing level for the RenderTexture.
+        /// See [[RenderTexture.antiAliasing]].
+        /// </summary>
         public int msaaSamples { get; set; }
+        /// <summary>
+        /// Volume extent of a 3D render texture.
+        /// </summary>
+        /// <description>
+        /// For volumetric render textures (see dimension), this variable determines the volume extent.
+        /// Ignored for non-3D textures. The valid range for 3D textures is 1 to 2000.
+        /// </description>
         public int volumeDepth { get; set; }
-        public int mipCount { get; set; }
 
         private GraphicsFormat _graphicsFormat;// { get; set; }
+        /// <summary>
+        /// The color format for the RenderTexture.
+        /// </summary>
+        /// <description>
+        /// See Also: [[GraphicsFormat]].
+        /// </description>
         public GraphicsFormat graphicsFormat
         {
             get
@@ -33,6 +58,9 @@ namespace UnityEngine
             }
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public RenderTextureFormat colorFormat
         {
             get { return GraphicsFormatUtility.GetRenderTextureFormat(graphicsFormat); }
@@ -41,6 +69,10 @@ namespace UnityEngine
 
         private int _depthBufferBits;
         private static int[] depthFormatBits = new int[] { 0, 16, 24 };
+        /// <summary>
+        /// The precision of the render texture's depth buffer in bits (0, 16, 24/32 are supported).
+        /// See [[RenderTexture.depth]].
+        /// </summary>
         public int depthBufferBits
         {
             get { return depthFormatBits[_depthBufferBits]; }
@@ -55,39 +87,76 @@ namespace UnityEngine
             }
         }
 
+        /// <summary>
+        /// Dimensionality (type) of the render texture.
+        /// See [[RenderTexture.dimension]].
+        /// </summary>
         public Rendering.TextureDimension dimension { get; set; }
+        /// <summary>
+        /// Determines how the RenderTexture is sampled if it is used as a shadow map.
+        /// See [[ShadowSamplingMode]] for more details.
+        /// </summary>
         public Rendering.ShadowSamplingMode shadowSamplingMode { get; set; }
+        /// <summary>
+        /// If this RenderTexture is a VR eye texture used in stereoscopic rendering, this property decides what special rendering occurs, if any. Instead of setting this manually, use the value returned by [[XR.XRSettings.eyeTextureDesc|eyeTextureDesc]] or other VR functions returning a [[RenderTextureDescriptor]].
+        /// </summary>
         public VRTextureUsage vrUsage { get; set; }
         private RenderTextureCreationFlags _flags;
+        /// <summary>
+        /// A set of [[RenderTextureCreationFlags]] that control how the texture is created.
+        /// </summary>
         public RenderTextureCreationFlags flags { get { return _flags; } }
+        /// <summary>
+        /// The render texture memoryless mode property.
+        /// </summary>
+        /// <description>
+        /// Use this property to set or return the render texture memoryless modes.
+        /// SA. [[RenderTextureMemoryless]].
+        /// </description>
         public RenderTextureMemoryless memoryless { get; set; }
-
-        public RenderTextureDescriptor(int width, int height)
-            : this(width, height, SystemInfo.GetGraphicsFormat(DefaultFormat.LDR), 0, Texture.GenerateAllMips)
-        {
-        }
-
-        public RenderTextureDescriptor(int width, int height, RenderTextureFormat colorFormat)
-            : this(width, height, colorFormat, 0)
-        {
-        }
-
-        public RenderTextureDescriptor(int width, int height, RenderTextureFormat colorFormat, int depthBufferBits)
-            : this(width, height, SystemInfo.GetCompatibleFormat(GraphicsFormatUtility.GetGraphicsFormat(colorFormat, false), FormatUsage.Render), depthBufferBits)
-        {
-        }
-
-        public RenderTextureDescriptor(int width, int height, GraphicsFormat colorFormat, int depthBufferBits)
-            : this(width, height, colorFormat, depthBufferBits, Texture.GenerateAllMips)
-        {
-        }
-
-        public RenderTextureDescriptor(int width, int height, RenderTextureFormat colorFormat, int depthBufferBits, int mipCount)
-            : this(width, height, SystemInfo.GetCompatibleFormat(GraphicsFormatUtility.GetGraphicsFormat(colorFormat, false), FormatUsage.Render), depthBufferBits, mipCount)
-        {
-        }
-
-        public RenderTextureDescriptor(int width, int height, GraphicsFormat colorFormat, int depthBufferBits, int mipCount) : this()
+        /// <summary>
+        /// Create a RenderTextureDescriptor with default values, or a certain width, height, and format.
+        /// </summary>
+        /// <param name="width">
+        /// Width of the RenderTexture in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of the RenderTexture in pixels.
+        /// </param>
+        public RenderTextureDescriptor(int width, int height) : this(width, height, SystemInfo.GetGraphicsFormat(DefaultFormat.LDR), 0) {}
+        /// <summary>
+        /// Create a RenderTextureDescriptor with default values, or a certain width, height, and format.
+        /// </summary>
+        /// <param name="width">
+        /// Width of the RenderTexture in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of the RenderTexture in pixels.
+        /// </param>
+        /// <param name="colorFormat">
+        /// The color format for the RenderTexture.
+        /// </param>
+        public RenderTextureDescriptor(int width, int height, RenderTextureFormat colorFormat) : this(width, height, colorFormat, 0) {}
+        /// <summary>
+        /// Create a RenderTextureDescriptor with default values, or a certain width, height, and format.
+        /// </summary>
+        /// <param name="width">
+        /// Width of the RenderTexture in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of the RenderTexture in pixels.
+        /// </param>
+        /// <param name="colorFormat">
+        /// The color format for the RenderTexture.
+        /// </param>
+        /// <param name="depthBufferBits">
+        /// The number of bits to use for the depth buffer.
+        /// </param>
+        public RenderTextureDescriptor(int width, int height, RenderTextureFormat colorFormat, int depthBufferBits) : this(width, height, SystemInfo.GetCompatibleFormat(GraphicsFormatUtility.GetGraphicsFormat(colorFormat, false), FormatUsage.Render), depthBufferBits) {}
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
+        public RenderTextureDescriptor(int width, int height, GraphicsFormat colorFormat, int depthBufferBits) : this()
         {
             this.width = width;
             this.height = height;
@@ -95,7 +164,6 @@ namespace UnityEngine
             msaaSamples = 1;
             this.graphicsFormat = colorFormat;
             this.depthBufferBits = depthBufferBits;
-            this.mipCount = mipCount;
             this.sRGB = GraphicsFormatUtility.IsSRGBFormat(colorFormat);
             dimension = Rendering.TextureDimension.Tex2D;
             shadowSamplingMode = Rendering.ShadowSamplingMode.None;
@@ -116,6 +184,12 @@ namespace UnityEngine
             }
         }
 
+        /// <summary>
+        /// This flag causes the render texture uses sRGB read/write conversions.
+        /// </summary>
+        /// <description>
+        /// See [[RenderTexture.sRGB]].
+        /// </description>
         public bool sRGB
         {
             get { return (_flags & RenderTextureCreationFlags.SRGB) != 0; }
@@ -129,24 +203,41 @@ namespace UnityEngine
             }
         }
 
+        /// <summary>
+        /// Render texture has mipmaps when this flag is set.
+        /// See [[RenderTexture.useMipMap]].
+        /// </summary>
         public bool useMipMap
         {
             get { return (_flags & RenderTextureCreationFlags.MipMap) != 0; }
             set { SetOrClearRenderTextureCreationFlag(value, RenderTextureCreationFlags.MipMap); }
         }
 
+        /// <summary>
+        /// Mipmap levels are generated automatically when this flag is set.
+        /// </summary>
+        /// <description>
+        /// See [[RenderTexture.autoGenerateMips]].
+        /// </description>
         public bool autoGenerateMips
         {
             get { return (_flags & RenderTextureCreationFlags.AutoGenerateMips) != 0; }
             set { SetOrClearRenderTextureCreationFlag(value, RenderTextureCreationFlags.AutoGenerateMips); }
         }
 
+        /// <summary>
+        /// Enable random access write into this render texture on Shader Model 5.0 level shaders.
+        /// See [[RenderTexture.enableRandomWrite]].
+        /// </summary>
         public bool enableRandomWrite
         {
             get { return (_flags & RenderTextureCreationFlags.EnableRandomWrite) != 0; }
             set { SetOrClearRenderTextureCreationFlag(value, RenderTextureCreationFlags.EnableRandomWrite); }
         }
 
+        /// <summary>
+        /// If true and msaaSamples is greater than 1, the render texture will not be resolved by default.  Use this if the render texture needs to be bound as a multisampled texture in a shader.
+        /// </summary>
         public bool bindMS
         {
             get { return (_flags & RenderTextureCreationFlags.BindMS) != 0; }
@@ -159,6 +250,10 @@ namespace UnityEngine
             set { SetOrClearRenderTextureCreationFlag(value, RenderTextureCreationFlags.CreatedFromScript); }
         }
 
+        /// <summary>
+        /// Set to true to enable dynamic resolution scaling on this render texture.
+        /// SA [[RenderTexture.useDynamicScale]].
+        /// </summary>
         public bool useDynamicScale
         {
             get { return (_flags & RenderTextureCreationFlags.DynamicallyScalable) != 0; }
@@ -173,6 +268,18 @@ namespace UnityEngine
         {
         }
 
+        /// <summary>
+        /// Creates a new RenderTexture object.
+        /// </summary>
+        /// <param name="desc">
+        /// Create the RenderTexture with the settings in the RenderTextureDescriptor.
+        /// </param>
+        /// <description>
+        /// The render texture is created with /width/ by /height/ size, with a depth buffer
+        /// of /depth/ bits (depth can be 0, 16 or 24), and in /format/ format and with sRGB read / write on or off.
+        /// Note that constructing a RenderTexture object does not create the hardware representation immediately.
+        /// The actual render texture is created upon first use or when Create is called manually. So after
+        /// constructing the render texture, it is possible to set additional variables, like format,
         public RenderTexture(RenderTextureDescriptor desc)
         {
             ValidateRenderTextureDesc(desc);
@@ -180,6 +287,18 @@ namespace UnityEngine
             SetRenderTextureDescriptor(desc);
         }
 
+        /// <summary>
+        /// Creates a new RenderTexture object.
+        /// </summary>
+        /// <param name="textureToCopy">
+        /// Copy the settings from another RenderTexture.
+        /// </param>
+        /// <description>
+        /// The render texture is created with /width/ by /height/ size, with a depth buffer
+        /// of /depth/ bits (depth can be 0, 16 or 24), and in /format/ format and with sRGB read / write on or off.
+        /// Note that constructing a RenderTexture object does not create the hardware representation immediately.
+        /// The actual render texture is created upon first use or when Create is called manually. So after
+        /// constructing the render texture, it is possible to set additional variables, like format,
         public RenderTexture(RenderTexture textureToCopy)
         {
             if (textureToCopy == null)
@@ -190,11 +309,17 @@ namespace UnityEngine
             SetRenderTextureDescriptor(textureToCopy.descriptor);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public RenderTexture(int width, int height, int depth, DefaultFormat format)
             : this(width, height, depth, SystemInfo.GetGraphicsFormat(format))
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public RenderTexture(int width, int height, int depth, GraphicsFormat format)
         {
             if (!ValidateFormat(format, FormatUsage.Render))
@@ -206,44 +331,56 @@ namespace UnityEngine
             SetSRGBReadWrite(GraphicsFormatUtility.IsSRGBFormat(format));
         }
 
-        public RenderTexture(int width, int height, int depth, GraphicsFormat format, int mipCount)
-        {
-            // Note: the code duplication here is because you can't set a descriptor with
-            // zero width/height, which our own code (and possibly existing user code) relies on.
-            if (!ValidateFormat(format, FormatUsage.Render))
-                return;
-
-            Internal_Create(this);
-            this.width = width; this.height = height; this.depth = depth; this.graphicsFormat = format;
-
-            descriptor = new RenderTextureDescriptor(width, height, format, depth, mipCount);
-
-            SetSRGBReadWrite(GraphicsFormatUtility.IsSRGBFormat(format));
-        }
-
+        /// <summary>
+        /// Creates a new RenderTexture object.
+        /// </summary>
+        /// <param name="width">
+        /// Texture width in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Texture height in pixels.
+        /// </param>
+        /// <param name="depth">
+        /// Number of bits in depth buffer (0, 16 or 24). Note that only 24 bit depth has stencil buffer.
+        /// </param>
+        /// <param name="format">
+        /// Texture color format.
+        /// </param>
+        /// <param name="readWrite">
+        /// How or if color space conversions should be done on texture read/write.
+        /// </param>
+        /// <description>
+        /// The render texture is created with /width/ by /height/ size, with a depth buffer
+        /// of /depth/ bits (depth can be 0, 16 or 24), and in /format/ format and with sRGB read / write on or off.
+        /// Note that constructing a RenderTexture object does not create the hardware representation immediately.
+        /// The actual render texture is created upon first use or when Create is called manually. So after
+        /// constructing the render texture, it is possible to set additional variables, like format,
         public RenderTexture(int width, int height, int depth, [uei.DefaultValue("RenderTextureFormat.Default")] RenderTextureFormat format, [uei.DefaultValue("RenderTextureReadWrite.Default")] RenderTextureReadWrite readWrite)
             : this(width, height, depth, GraphicsFormatUtility.GetGraphicsFormat(format, readWrite))
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public RenderTexture(int width, int height, int depth, RenderTextureFormat format)
             : this(width, height, depth, GraphicsFormatUtility.GetGraphicsFormat(format, RenderTextureReadWrite.Default))
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public RenderTexture(int width, int height, int depth)
             : this(width, height, depth, GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default, RenderTextureReadWrite.Default))
         {
         }
 
-        [uei.ExcludeFromDocs]
-        public RenderTexture(int width, int height, int depth, RenderTextureFormat format, int mipCount)
-            : this(width, height, depth, GraphicsFormatUtility.GetGraphicsFormat(format, RenderTextureReadWrite.Default), mipCount)
-        {
-        }
-
+        /// <summary>
+        /// This struct contains all the information required to create a RenderTexture. It can be copied, cached, and reused to easily create RenderTextures that all share the same properties.
+        /// </summary>
         public RenderTextureDescriptor descriptor
         {
             get { return GetDescriptor(); }
@@ -286,6 +423,28 @@ namespace UnityEngine
             }
         }
 
+        /// <summary>
+        /// Allocate a temporary render texture.
+        /// </summary>
+        /// <param name="desc">
+        /// Use this RenderTextureDesc for the settings when creating the temporary RenderTexture.
+        /// </param>
+        /// <description>
+        /// This function is optimized for when you need a quick RenderTexture to do some temporary calculations.
+        /// Release it using ReleaseTemporary as soon as you're done with it, so another call can
+        /// start reusing it if needed.
+        /// Internally Unity keeps a pool of temporary render textures, so a call to GetTemporary most often
+        /// just returns an already created one (if the size and format matches). These temporary render textures
+        /// are actually destroyed when they aren't used for a couple of frames.
+        /// If you are doing a series of post-processing "blits", it's best for performance to get and release
+        /// a temporary render texture for each blit, instead of getting one or two render textures upfront and reusing
+        /// them. This is mostly beneficial for mobile (tile-based) and multi-GPU systems: GetTemporary will internally
+        /// do a DiscardContents call which helps to avoid costly restore operations on the previous
+        /// render texture contents.
+        /// You can not depend on any particular contents of the RenderTexture you get from GetTemporary function.
+        /// It might be garbage, or it might be cleared to some color, depending on the platform.
+        /// SA: ReleaseTemporary.
+        /// </description>
         public static RenderTexture GetTemporary(RenderTextureDescriptor desc)
         {
             ValidateRenderTextureDesc(desc); desc.createdFromScript = true;
@@ -310,6 +469,9 @@ namespace UnityEngine
         }
 
         // most detailed overload: use it to specify default values for docs
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, GraphicsFormat format,
             [uei.DefaultValue("1")] int antiAliasing,
@@ -321,24 +483,36 @@ namespace UnityEngine
         }
 
         // the rest will be excluded from docs (to "pretend" we have one method with default args)
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, GraphicsFormat format, int antiAliasing, RenderTextureMemoryless memorylessMode, VRTextureUsage vrUsage)
         {
             return GetTemporaryImpl(width, height, depthBuffer, format, antiAliasing, memorylessMode, vrUsage);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, GraphicsFormat format, int antiAliasing, RenderTextureMemoryless memorylessMode)
         {
             return GetTemporaryImpl(width, height, depthBuffer, format, antiAliasing, memorylessMode);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, GraphicsFormat format, int antiAliasing)
         {
             return GetTemporaryImpl(width, height, depthBuffer, format, antiAliasing);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, GraphicsFormat format)
         {
@@ -346,6 +520,46 @@ namespace UnityEngine
         }
 
         // most detailed overload: use it to specify default values for docs
+        /// <summary>
+        /// Allocate a temporary render texture.
+        /// </summary>
+        /// <param name="width">
+        /// Width in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height in pixels.
+        /// </param>
+        /// <param name="depthBuffer">
+        /// Depth buffer bits (0, 16 or 24). Note that only 24 bit depth has stencil buffer.
+        /// </param>
+        /// <param name="format">
+        /// Render texture format.
+        /// </param>
+        /// <param name="readWrite">
+        /// Color space conversion mode.
+        /// </param>
+        /// <param name="antiAliasing">
+        /// Number of antialiasing samples to store in the texture. Valid values are 1, 2, 4, and 8. Throws an exception if any other value is passed.
+        /// </param>
+        /// <param name="memorylessMode">
+        /// Render texture memoryless mode.
+        /// </param>
+        /// <description>
+        /// This function is optimized for when you need a quick RenderTexture to do some temporary calculations.
+        /// Release it using ReleaseTemporary as soon as you're done with it, so another call can
+        /// start reusing it if needed.
+        /// Internally Unity keeps a pool of temporary render textures, so a call to GetTemporary most often
+        /// just returns an already created one (if the size and format matches). These temporary render textures
+        /// are actually destroyed when they aren't used for a couple of frames.
+        /// If you are doing a series of post-processing "blits", it's best for performance to get and release
+        /// a temporary render texture for each blit, instead of getting one or two render textures upfront and reusing
+        /// them. This is mostly beneficial for mobile (tile-based) and multi-GPU systems: GetTemporary will internally
+        /// do a DiscardContents call which helps to avoid costly restore operations on the previous
+        /// render texture contents.
+        /// You can not depend on any particular contents of the RenderTexture you get from GetTemporary function.
+        /// It might be garbage, or it might be cleared to some color, depending on the platform.
+        /// SA: ReleaseTemporary.
+        /// </description>
         public static RenderTexture GetTemporary(int width, int height,
             [uei.DefaultValue("0")] int depthBuffer, [uei.DefaultValue("RenderTextureFormat.Default")] RenderTextureFormat format,
             [uei.DefaultValue("RenderTextureReadWrite.Default")] RenderTextureReadWrite readWrite, [uei.DefaultValue("1")] int antiAliasing,
@@ -357,42 +571,63 @@ namespace UnityEngine
         }
 
         // the rest will be excluded from docs (to "pretend" we have one method with default args)
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, RenderTextureFormat format, RenderTextureReadWrite readWrite, int antiAliasing, RenderTextureMemoryless memorylessMode, VRTextureUsage vrUsage)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(format, readWrite), antiAliasing, memorylessMode, vrUsage);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, RenderTextureFormat format, RenderTextureReadWrite readWrite, int antiAliasing, RenderTextureMemoryless memorylessMode)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(format, readWrite), antiAliasing, memorylessMode);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, RenderTextureFormat format, RenderTextureReadWrite readWrite, int antiAliasing)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(format, readWrite), antiAliasing);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, RenderTextureFormat format, RenderTextureReadWrite readWrite)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(format, readWrite));
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer, RenderTextureFormat format)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(format, RenderTextureReadWrite.Default));
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height, int depthBuffer)
         {
             return GetTemporaryImpl(width, height, depthBuffer, GetCompatibleFormat(RenderTextureFormat.Default, RenderTextureReadWrite.Default));
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [uei.ExcludeFromDocs]
         public static RenderTexture GetTemporary(int width, int height)
         {
@@ -455,8 +690,6 @@ namespace UnityEngine
 
     public partial class Texture : Object
     {
-        public static readonly int GenerateAllMips = -1;
-
         internal bool ValidateFormat(RenderTextureFormat format)
         {
             if (SystemInfo.SupportsRenderTextureFormat(format))
@@ -512,10 +745,10 @@ namespace UnityEngine
 
     public partial class Texture2D : Texture
     {
-        internal Texture2D(int width, int height, GraphicsFormat format, TextureCreationFlags flags, int mipCount, IntPtr nativeTex)
+        internal Texture2D(int width, int height, GraphicsFormat format, TextureCreationFlags flags, IntPtr nativeTex)
         {
             if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, height, mipCount, format, flags, nativeTex);
+                Internal_Create(this, width, height, format, flags, nativeTex);
         }
 
         public Texture2D(int width, int height, DefaultFormat format, TextureCreationFlags flags)
@@ -524,44 +757,36 @@ namespace UnityEngine
         }
 
         public Texture2D(int width, int height, GraphicsFormat format, TextureCreationFlags flags)
-            : this(width, height, format, flags, Texture.GenerateAllMips, IntPtr.Zero)
+            : this(width, height, format, flags, IntPtr.Zero)
         {
         }
 
-        public Texture2D(int width, int height, GraphicsFormat format, int mipCount, TextureCreationFlags flags)
-            : this(width, height, format, flags, mipCount, IntPtr.Zero)
-        {
-        }
-
-        internal Texture2D(int width, int height, TextureFormat textureFormat, int mipCount, bool linear, IntPtr nativeTex)
+        internal Texture2D(int width, int height, TextureFormat textureFormat, bool mipChain, bool linear, IntPtr nativeTex)
         {
             if (!ValidateFormat(textureFormat))
                 return;
 
             GraphicsFormat format = GraphicsFormatUtility.GetGraphicsFormat(textureFormat, !linear);
-            TextureCreationFlags flags = (mipCount != 1) ? TextureCreationFlags.MipChain : TextureCreationFlags.None;
+            TextureCreationFlags flags = TextureCreationFlags.None;
+            if (mipChain)
+                flags |= TextureCreationFlags.MipChain;
             if (GraphicsFormatUtility.IsCrunchFormat(textureFormat))
                 flags |= TextureCreationFlags.Crunch;
-            Internal_Create(this, width, height, mipCount, format, flags, nativeTex);
-        }
-
-        public Texture2D(int width, int height, [uei.DefaultValue("TextureFormat.RGBA32")] TextureFormat textureFormat, [uei.DefaultValue("-1")] int mipCount, [uei.DefaultValue("false")] bool linear)
-            : this(width, height, textureFormat, mipCount, linear, IntPtr.Zero)
-        {
+            Internal_Create(this, width, height, format, flags, nativeTex);
         }
 
         public Texture2D(int width, int height, [uei.DefaultValue("TextureFormat.RGBA32")] TextureFormat textureFormat, [uei.DefaultValue("true")] bool mipChain, [uei.DefaultValue("false")] bool linear)
-            : this(width, height, textureFormat, mipChain ? -1 : 1, linear, IntPtr.Zero)
+            : this(width, height, textureFormat, mipChain, linear, IntPtr.Zero)
         {
         }
 
         public Texture2D(int width, int height, TextureFormat textureFormat, bool mipChain)
-            : this(width, height, textureFormat, mipChain ? -1 : 1, false, IntPtr.Zero)
+            : this(width, height, textureFormat, mipChain, false, IntPtr.Zero)
         {
         }
 
         public Texture2D(int width, int height)
-            : this(width, height, TextureFormat.RGBA32, Texture.GenerateAllMips, false, IntPtr.Zero)
+            : this(width, height, TextureFormat.RGBA32, true, false, IntPtr.Zero)
         {
         }
 
@@ -569,7 +794,7 @@ namespace UnityEngine
         {
             if (nativeTex == IntPtr.Zero)
                 throw new ArgumentException("nativeTex can not be null");
-            return new Texture2D(width, height, format, mipChain ? -1 : 1, linear, nativeTex);
+            return new Texture2D(width, height, format, mipChain, linear, nativeTex);
         }
 
         public void SetPixel(int x, int y, Color color)
@@ -750,66 +975,105 @@ namespace UnityEngine
             return GetPixels(0);
         }
 
+        /// <summary>
+        /// Flags used to control the encoding to an EXR file.
+        /// </summary>
+        /// <description>
+        /// SA: ImageConversion.EncodeToEXR.
+        /// </description>
         [Flags]
         public enum EXRFlags
         {
+            /// <summary>
+            /// No flag. This will result in an uncompressed 16-bit float EXR file.
+            /// </summary>
             None = 0,
+            /// <summary>
+            /// The texture will be exported as a 32-bit float EXR file (default is 16-bit).
+            /// </summary>
             OutputAsFloat = 1 << 0, // Default is Half
             // Compression are mutually exclusive.
+            /// <summary>
+            /// The texture will use the EXR ZIP compression format.
+            /// </summary>
             CompressZIP = 1 << 1,
+            /// <summary>
+            /// The texture will use RLE (Run Length Encoding) EXR compression format (similar to Targa RLE compression).
+            /// </summary>
             CompressRLE = 1 << 2,
+            /// <summary>
+            /// This texture will use Wavelet compression. This is best used for grainy images.
+            /// </summary>
             CompressPIZ = 1 << 3,
         }
     }
 
     public sealed partial class Cubemap : Texture
     {
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public Cubemap(int width, DefaultFormat format, TextureCreationFlags flags)
             : this(width, SystemInfo.GetGraphicsFormat(format), flags)
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [RequiredByNativeCode] // used to create builtin textures
         public Cubemap(int width, GraphicsFormat format, TextureCreationFlags flags)
         {
             if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, Texture.GenerateAllMips, format, flags, IntPtr.Zero);
+                Internal_Create(this, width, format, flags, IntPtr.Zero);
         }
 
-        public Cubemap(int width, TextureFormat format, int mipCount)
-            : this(width, format, mipCount, IntPtr.Zero)
-        {
-        }
-
-        public Cubemap(int width, GraphicsFormat format, TextureCreationFlags flags, int mipCount)
-        {
-            if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, mipCount, format, flags, IntPtr.Zero);
-        }
-
-        internal Cubemap(int width, TextureFormat textureFormat, int mipCount, IntPtr nativeTex)
+        internal Cubemap(int width, TextureFormat textureFormat, bool mipChain, IntPtr nativeTex)
         {
             if (!ValidateFormat(textureFormat))
                 return;
 
             GraphicsFormat format = GraphicsFormatUtility.GetGraphicsFormat(textureFormat, false);
-            TextureCreationFlags flags = (mipCount != 1) ? TextureCreationFlags.MipChain : TextureCreationFlags.None;
+            TextureCreationFlags flags = TextureCreationFlags.None;
+            if (mipChain)
+                flags |= TextureCreationFlags.MipChain;
             if (GraphicsFormatUtility.IsCrunchFormat(textureFormat))
                 flags |= TextureCreationFlags.Crunch;
 
-            Internal_Create(this, width, mipCount, format, flags, nativeTex);
+            Internal_Create(this, width, format, flags, nativeTex);
         }
 
-        internal Cubemap(int width, TextureFormat textureFormat, bool mipChain, IntPtr nativeTex)
-            : this(width, textureFormat, mipChain ? -1 : 1, nativeTex)
-        {
-        }
-
+        /// <summary>
+        /// Create a new empty cubemap texture.
+        /// </summary>
+        /// <description>
+        /// The texture will be /size/ on each side and can be created with or without mipmaps.
+        /// Usually you will want to set the colors of the texture after creating it, using
         public Cubemap(int width, TextureFormat textureFormat, bool mipChain)
-            : this(width, textureFormat, mipChain ? -1 : 1, IntPtr.Zero)
+            : this(width, textureFormat, mipChain, IntPtr.Zero)
         {
         }
 
+        /// <summary>
+        /// Creates a Unity cubemap out of externally created native cubemap object.
+        /// </summary>
+        /// <param name="format">
+        /// Format of underlying cubemap object.
+        /// </param>
+        /// <param name="mipmap">
+        /// Does the cubemap have mipmaps?
+        /// </param>
+        /// <param name="nativeTex">
+        /// Native cubemap texture object.
+        /// </param>
+        /// <description>
+        /// This method is mostly useful for [[wiki:NativePluginInterface|native code plugins]] that create platform specific cubemap texture
+        /// objects outside of Unity, and need to use these cubemaps in Unity Scenes.
+        /// Parameters passed to CreateExternalTexture should match what the texture actually is; and the underlying texture should be a Cubemap (2D textures will not work).
+        /// Native texture object on Direct3D-like devices is a pointer to the base type, from which a texture can be created
+        /// (ID3D11ShaderResourceView on D3D11). On OpenGL/OpenGL ES it is GLuint. On Metal it is id<MTLTexture>.
+        /// SA: UpdateExternalTexture, [[Texture.GetNativeTexturePtr]].
+        /// </description>
         public static Cubemap CreateExternalTexture(int width, TextureFormat format, bool mipmap, IntPtr nativeTex)
         {
             if (nativeTex == IntPtr.Zero)
@@ -817,18 +1081,54 @@ namespace UnityEngine
             return new Cubemap(width, format, mipmap, nativeTex);
         }
 
+        /// <summary>
+        /// Sets pixel color at coordinates (face, x, y).
+        /// </summary>
+        /// <description>
+        /// Call Apply to actually upload the changed pixels to the graphics card.
+        /// Uploading is an expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// This method works only on /RGBA32/, /ARGB32/, /RGB24/ and /Alpha8/ texture formats.
+        /// For other formats /SetPixel/ is ignored.
+        /// SA: Apply method.
+        /// </description>
         public void SetPixel(CubemapFace face, int x, int y, Color color)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             SetPixelImpl((int)face, x, y, color);
         }
 
+        /// <summary>
+        /// Returns pixel color at coordinates (face, x, y).
+        /// </summary>
+        /// <description>
+        /// If the pixel coordinates are out of bounds (larger than width/height or small than 0),
+        /// they will be clamped or repeat based on the texture's wrap mode.
+        /// The texture must have the __Is Readable__ flag set in the import settings, otherwise this method will fail. GetPixel is not available on Textures using Crunch texture compression.
+        /// </description>
         public Color GetPixel(CubemapFace face, int x, int y)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             return GetPixelImpl((int)face, x, y);
         }
 
+        /// <summary>
+        /// Actually apply all previous SetPixel and SetPixels changes.
+        /// </summary>
+        /// <param name="updateMipmaps">
+        /// When set to true, mipmap levels are recalculated.
+        /// </param>
+        /// <param name="makeNoLongerReadable">
+        /// When set to true, system memory copy of a texture is released.
+        /// </param>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// SA: SetPixel, SetPixels functions.
+        /// </description>
         public void Apply([uei.DefaultValue("true")] bool updateMipmaps, [uei.DefaultValue("false")] bool makeNoLongerReadable)
         {
 #if !UNITY_EDITOR
@@ -837,85 +1137,235 @@ namespace UnityEngine
             ApplyImpl(updateMipmaps, makeNoLongerReadable);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public void Apply(bool updateMipmaps) { Apply(updateMipmaps, false); }
+        /// <summary>
+        /// Actually apply all previous SetPixel and SetPixels changes.
+        /// </summary>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// SA: SetPixel, SetPixels functions.
+        /// </description>
         public void Apply() { Apply(true, false); }
     }
 
     public sealed partial class Texture3D : Texture
     {
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public Texture3D(int width, int height, int depth, DefaultFormat format, TextureCreationFlags flags)
             : this(width, height, depth, SystemInfo.GetGraphicsFormat(format), flags)
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [RequiredByNativeCode] // used to create builtin textures
         public Texture3D(int width, int height, int depth, GraphicsFormat format, TextureCreationFlags flags)
-            : this(width, height, depth, format, flags, Texture.GenerateAllMips)
-        {
-        }
-
-        public Texture3D(int width, int height, int depth, GraphicsFormat format, TextureCreationFlags flags, int mipCount)
         {
             if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, height, depth, mipCount, format, flags);
+                Internal_Create(this, width, height, depth, format, flags);
         }
 
-        public Texture3D(int width, int height, int depth, TextureFormat textureFormat, int mipCount)
+        /// <summary>
+        /// Create a new empty 3D Texture.
+        /// </summary>
+        /// <param name="width">
+        /// Width of texture in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of texture in pixels.
+        /// </param>
+        /// <param name="depth">
+        /// Depth of texture in pixels.
+        /// </param>
+        /// <param name="textureFormat">
+        /// Texture data format.
+        /// </param>
+        /// <param name="mipChain">
+        /// Determines whether the texture has mipmaps or not. A value of 1 (true) means the texture does have mipmaps, and a value of 0 (false) means the texture doesn't have mipmaps.
+        /// </param>
+        /// <description>
+        /// 3D textures can be thought of as a box of pixels, with width, height and depth. Note that large textures can consume a lot of memory, for example a 1024x512x256 texture with [[TextureFormat.ARGB32]] format and no mipmaps will consume 512MB of memory.
+        /// SA: SetPixel, SetPixels, SetPixels32, Apply functions.
+        /// </description>
+        public Texture3D(int width, int height, int depth, TextureFormat textureFormat, bool mipChain)
         {
             if (!ValidateFormat(textureFormat))
                 return;
 
             GraphicsFormat format = GraphicsFormatUtility.GetGraphicsFormat(textureFormat, false);
-            TextureCreationFlags flags = (mipCount != 1) ? TextureCreationFlags.MipChain : TextureCreationFlags.None;
+            TextureCreationFlags flags = TextureCreationFlags.None;
+            if (mipChain)
+                flags |= TextureCreationFlags.MipChain;
             if (GraphicsFormatUtility.IsCrunchFormat(textureFormat))
                 flags |= TextureCreationFlags.Crunch;
-            Internal_Create(this, width, height, depth, mipCount, format, flags);
+            Internal_Create(this, width, height, depth, format, flags);
         }
 
-        public Texture3D(int width, int height, int depth, TextureFormat textureFormat, bool mipChain)
-            : this(width, height, depth, textureFormat, mipChain ? -1 : 1)
-        {
-        }
-
+        /// <summary>
+        /// Actually apply all previous SetPixels changes.
+        /// </summary>
+        /// <param name="updateMipmaps">
+        /// When set to true, mipmap levels are recalculated.
+        /// </param>
+        /// <param name="makeNoLongerReadable">
+        /// When set to true, system memory copy of a texture is released.
+        /// </param>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// If /makeNoLongerReadable/ is /true/, texture will be marked as no longer readable
+        /// and memory will be freed after uploading to GPU.
+        /// By default /makeNoLongerReadable/ is set to /false/.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// Alternatively, if you don't need to access the pixels on the CPU, you could use [[Graphics.CopyTexture]]
+        /// for fast GPU-side texture data copies. Note that calling /Apply/ may undo the results of previous calls to [[Graphics.CopyTexture]].
+        /// SA: SetPixels, [[Graphics.CopyTexture]].
+        /// </description>
         public void Apply([uei.DefaultValue("true")] bool updateMipmaps, [uei.DefaultValue("false")] bool makeNoLongerReadable)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             ApplyImpl(updateMipmaps, makeNoLongerReadable);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public void Apply(bool updateMipmaps) { Apply(updateMipmaps, false); }
+        /// <summary>
+        /// Actually apply all previous SetPixels changes.
+        /// </summary>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// If /makeNoLongerReadable/ is /true/, texture will be marked as no longer readable
+        /// and memory will be freed after uploading to GPU.
+        /// By default /makeNoLongerReadable/ is set to /false/.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// Alternatively, if you don't need to access the pixels on the CPU, you could use [[Graphics.CopyTexture]]
+        /// for fast GPU-side texture data copies. Note that calling /Apply/ may undo the results of previous calls to [[Graphics.CopyTexture]].
+        /// SA: SetPixels, [[Graphics.CopyTexture]].
+        /// </description>
         public void Apply() { Apply(true, false); }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public void SetPixel(int x, int y, int z, Color color)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             SetPixelImpl(0, x, y, z, color);
         }
 
+        /// <summary>
+        /// Sets the pixel color that represents one mip level of the 3D texture at coordinates (x,y,z).
+        /// </summary>
+        /// <param name="x">
+        /// X coordinate to access a pixel.
+        /// </param>
+        /// <param name="y">
+        /// Y coordinate to access a pixel.
+        /// </param>
+        /// <param name="z">
+        /// Z coordinate to access a pixel.
+        /// </param>
+        /// <param name="color">
+        /// The colors to set the pixels to.
+        /// </param>
+        /// <param name="mipLevel">
+        /// The mipmap level to be affected by the new colors.
+        /// </param>
+        /// <description>
+        /// This function works only on RGBA32, ARGB32, RGB24 and Alpha8 texture formats. For other formats, SetPixel is ignored. The texture also has to have the Read/Write Enabled flag set in the Import Settings.
+        /// SA: GetPixel, GetPixelBilinear, GetPixels, GetPixels32, SetPixels, SetPixels32, Apply functions.
+        /// </description>
         public void SetPixel(int x, int y, int z, Color color, int mipLevel)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             SetPixelImpl(mipLevel, x, y, z, color);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public Color GetPixel(int x, int y, int z)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             return GetPixelImpl(0, x, y, z);
         }
 
+        /// <summary>
+        /// Returns the pixel color that represents one mip level of the 3D texture at coordinates (x,y,z).
+        /// </summary>
+        /// <param name="x">
+        /// X coordinate to access a pixel.
+        /// </param>
+        /// <param name="y">
+        /// Y coordinate to access a pixel.
+        /// </param>
+        /// <param name="z">
+        /// Z coordinate to access a pixel.
+        /// </param>
+        /// <param name="mipLevel">
+        /// The mipmap level to be accessed.
+        /// </param>
+        /// <returns>
+        /// The color of the pixel.
+        /// </returns>
+        /// <description>
+        /// The texture must have the Read/Write Enabled flag set in the Import Settings, otherwise this function will fail. GetPixel is not available on Textures using Crunch texture compression.
+        /// SA: SetPixel, SetPixels, SetPixels32, GetPixelBilinear, GetPixels, GetPixels32, Apply functions.
+        /// </description>
         public Color GetPixel(int x, int y, int z, int mipLevel)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             return GetPixelImpl(mipLevel, x, y, z);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public Color GetPixelBilinear(float u, float v, float w)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             return GetPixelBilinearImpl(0, u, v, w);
         }
 
+        /// <summary>
+        /// Returns the filtered pixel color that represents one mip level of the 3D texture at normalized coordinates (u,v,w).
+        /// </summary>
+        /// <param name="u">
+        /// U normalized coordinate to access a pixel.
+        /// </param>
+        /// <param name="v">
+        /// V normalized coordinate to access a pixel.
+        /// </param>
+        /// <param name="w">
+        /// W normalized coordinate to access a pixel.
+        /// </param>
+        /// <param name="mipLevel">
+        /// The mipmap level to be accessed.
+        /// </param>
+        /// <returns>
+        /// The colors to return by bilinear filtering.
+        /// </returns>
+        /// <description>
+        /// Coordinates /u/, /v/, and /w/ go from 0.0 to 1.0. Texture3D.GetPixelBilinear works in a similar way to Texture2D.GetPixelBilinear(), but with an extra /w/ coordinate. Also, the bounds are expanded to width, height, and depth.
+        /// SA: SetPixel, SetPixels, SetPixels32, GetPixel, GetPixels, GetPixels32, Apply functions.
+        /// </description>
         public Color GetPixelBilinear(float u, float v, float w, int mipLevel)
         {
             if (!isReadable) throw CreateNonReadableException(this);
@@ -925,52 +1375,126 @@ namespace UnityEngine
 
     public sealed partial class Texture2DArray : Texture
     {
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public Texture2DArray(int width, int height, int depth, DefaultFormat format, TextureCreationFlags flags)
             : this(width, height, depth, SystemInfo.GetGraphicsFormat(format), flags)
         {
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         [RequiredByNativeCode] // used to create builtin textures
         public Texture2DArray(int width, int height, int depth, GraphicsFormat format, TextureCreationFlags flags)
-            : this(width, height, depth, format, flags, Texture.GenerateAllMips)
-        {
-        }
-
-        public Texture2DArray(int width, int height, int depth, GraphicsFormat format, TextureCreationFlags flags, int mipCount)
         {
             if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, height, depth, mipCount, format, flags);
+                Internal_Create(this, width, height, depth, format, flags);
         }
 
-        public Texture2DArray(int width, int height, int depth, TextureFormat textureFormat, int mipCount, [uei.DefaultValue("true")] bool linear)
+        /// <summary>
+        /// Create a new texture array.
+        /// </summary>
+        /// <param name="width">
+        /// Width of texture array in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of texture array in pixels.
+        /// </param>
+        /// <param name="depth">
+        /// Number of elements in the texture array.
+        /// </param>
+        /// <param name="linear">
+        /// Does the texture contain non-color data (i.e. don't do any color space conversions when sampling)? Default is false.
+        /// </param>
+        /// <description>
+        /// Usually you will want to set the colors of the texture after creating it.
+        /// Use SetPixels, SetPixels32 or [[Graphics.CopyTexture]] functions for that.
+        /// </description>
+        public Texture2DArray(int width, int height, int depth, TextureFormat textureFormat, bool mipChain, [uei.DefaultValue("true")] bool linear)
         {
             if (!ValidateFormat(textureFormat))
                 return;
 
             GraphicsFormat format = GraphicsFormatUtility.GetGraphicsFormat(textureFormat, !linear);
-            TextureCreationFlags flags = (mipCount != 1) ? TextureCreationFlags.MipChain : TextureCreationFlags.None;
+            TextureCreationFlags flags = TextureCreationFlags.None;
+            if (mipChain)
+                flags |= TextureCreationFlags.MipChain;
             if (GraphicsFormatUtility.IsCrunchFormat(textureFormat))
                 flags |= TextureCreationFlags.Crunch;
-            Internal_Create(this, width, height, depth, mipCount, format, flags);
+            Internal_Create(this, width, height, depth, format, flags);
         }
 
-        public Texture2DArray(int width, int height, int depth, TextureFormat textureFormat, bool mipChain, [uei.DefaultValue("true")] bool linear)
-            : this(width, height, depth, textureFormat, mipChain ? -1 : 1, linear)
-        {
-        }
-
+        /// <summary>
+        /// Create a new texture array.
+        /// </summary>
+        /// <param name="width">
+        /// Width of texture array in pixels.
+        /// </param>
+        /// <param name="height">
+        /// Height of texture array in pixels.
+        /// </param>
+        /// <param name="depth">
+        /// Number of elements in the texture array.
+        /// </param>
+        /// <description>
+        /// Usually you will want to set the colors of the texture after creating it.
+        /// Use SetPixels, SetPixels32 or [[Graphics.CopyTexture]] functions for that.
+        /// </description>
         public Texture2DArray(int width, int height, int depth, TextureFormat textureFormat, bool mipChain)
-            : this(width, height, depth, textureFormat, mipChain ? -1 : 1, false)
+            : this(width, height, depth, textureFormat, mipChain, false)
         {
         }
 
+        /// <summary>
+        /// Actually apply all previous SetPixels changes.
+        /// </summary>
+        /// <param name="updateMipmaps">
+        /// When set to true, mipmap levels are recalculated.
+        /// </param>
+        /// <param name="makeNoLongerReadable">
+        /// When set to true, system memory copy of a texture is released.
+        /// </param>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// If /makeNoLongerReadable/ is /true/, texture will be marked as no longer readable
+        /// and memory will be freed after uploading to GPU.
+        /// By default /makeNoLongerReadable/ is set to /false/.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// Alternatively, if you don't need to access the pixels on the CPU, you could use [[Graphics.CopyTexture]]
+        /// for fast GPU-side texture data copies. Note that calling /Apply/ may undo the results of previous calls to [[Graphics.CopyTexture]].
+        /// SA: SetPixels, [[Graphics.CopyTexture]].
+        /// </description>
         public void Apply([uei.DefaultValue("true")] bool updateMipmaps, [uei.DefaultValue("false")] bool makeNoLongerReadable)
         {
             if (!isReadable) throw CreateNonReadableException(this);
             ApplyImpl(updateMipmaps, makeNoLongerReadable);
         }
 
+        /// <summary>
+        /// There is currently no documentation for this api.
+        /// </summary>
         public void Apply(bool updateMipmaps) { Apply(updateMipmaps, false); }
+        /// <summary>
+        /// Actually apply all previous SetPixels changes.
+        /// </summary>
+        /// <description>
+        /// If /updateMipmaps/ is /true/, the mipmap levels are recalculated as well, using
+        /// the base level as a source. Usually you want to use /true/ in all cases except when
+        /// you've modified the mip levels yourself using SetPixels.
+        /// If /makeNoLongerReadable/ is /true/, texture will be marked as no longer readable
+        /// and memory will be freed after uploading to GPU.
+        /// By default /makeNoLongerReadable/ is set to /false/.
+        /// Apply is a potentially expensive operation, so you'll want to change as many pixels
+        /// as possible between /Apply/ calls.
+        /// Alternatively, if you don't need to access the pixels on the CPU, you could use [[Graphics.CopyTexture]]
+        /// for fast GPU-side texture data copies. Note that calling /Apply/ may undo the results of previous calls to [[Graphics.CopyTexture]].
+        /// SA: SetPixels, [[Graphics.CopyTexture]].
+        /// </description>
         public void Apply() { Apply(true, false); }
     }
 
@@ -983,35 +1507,27 @@ namespace UnityEngine
 
         [RequiredByNativeCode]
         public CubemapArray(int width, int cubemapCount, GraphicsFormat format, TextureCreationFlags flags)
-            : this(width, cubemapCount, format, flags, Texture.GenerateAllMips)
-        {
-        }
-
-        public CubemapArray(int width, int cubemapCount, GraphicsFormat format, TextureCreationFlags flags, int mipCount)
         {
             if (ValidateFormat(format, FormatUsage.Sample))
-                Internal_Create(this, width, cubemapCount, mipCount, format, flags);
+                Internal_Create(this, width, cubemapCount, format, flags);
         }
 
-        public CubemapArray(int width, int cubemapCount, TextureFormat textureFormat, int mipCount, [uei.DefaultValue("true")] bool linear)
+        public CubemapArray(int width, int cubemapCount, TextureFormat textureFormat, bool mipChain, [uei.DefaultValue("true")] bool linear)
         {
             if (!ValidateFormat(textureFormat))
                 return;
 
             GraphicsFormat format = GraphicsFormatUtility.GetGraphicsFormat(textureFormat, !linear);
-            TextureCreationFlags flags = (mipCount != 1) ? TextureCreationFlags.MipChain : TextureCreationFlags.None;
+            TextureCreationFlags flags = TextureCreationFlags.None;
+            if (mipChain)
+                flags |= TextureCreationFlags.MipChain;
             if (GraphicsFormatUtility.IsCrunchFormat(textureFormat))
                 flags |= TextureCreationFlags.Crunch;
-            Internal_Create(this, width, cubemapCount, mipCount, format, flags);
-        }
-
-        public CubemapArray(int width, int cubemapCount, TextureFormat textureFormat, bool mipChain, [uei.DefaultValue("true")] bool linear)
-            : this(width, cubemapCount, textureFormat, mipChain ? -1 : 1, linear)
-        {
+            Internal_Create(this, width, cubemapCount, format, flags);
         }
 
         public CubemapArray(int width, int cubemapCount, TextureFormat textureFormat, bool mipChain)
-            : this(width, cubemapCount, textureFormat, mipChain ? -1 : 1, false)
+            : this(width, cubemapCount, textureFormat, mipChain, false)
         {
         }
 

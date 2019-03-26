@@ -26,8 +26,38 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="TestTypes\Graphics\AsyncGPUReadback.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\BeforeRenderHelper.cs" />
+    <Compile Remove="TestTypes\Graphics\BillboardRenderer.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Display.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GPUFence.deprecated.cs" />
+    <Compile Remove="TestTypes\Graphics\Graphics.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Graphics.cs" />
+    <Compile Remove="TestTypes\Graphics\Graphics.deprecated.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsBuffer.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsComponents.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsEnums.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsFence.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsFormatUtility.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsManagers.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsRenderers.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\GraphicsSettings.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Graphics_BindingsOverloads.cs" />
+    <Compile Remove="TestTypes\Graphics\Light.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Light.deprecated.cs" />
+    <Compile Remove="TestTypes\Graphics\LightProbeGroup.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\LightProbeProxyVolume.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\LineUtility.cs" />
+    <Compile Remove="TestTypes\Graphics\LOD.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Mesh.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\Mesh.cs" />
+    <Compile Remove="TestTypes\Graphics\RenderingCommandBuffer.bindings.cs" />
+    <Compile Remove="TestTypes\Graphics\RenderingCommandBuffer.cs" />
+    <Compile Remove="TestTypes\Graphics\RenderingCommandBuffer.deprecated.cs" />
+    <Compile Remove="TestTypes\Graphics\SplashScreen.bindings.cs" />
     <Compile Remove="TestTypes\Graphics\Texture.cs"></Compile>
     <Compile Remove="TestTypes\Graphics\Texture.bindings.cs"></Compile>
+    <Compile Remove="TestTypes\Graphics\Texture.deprecated.cs" />
     <Compile Update="TestTypes\Attributes\ClassWithAttributes.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -214,6 +244,12 @@
     <Compile Update="TestTypes\UpdateEnums.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestTypes\Graphics\CubemapArray.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
