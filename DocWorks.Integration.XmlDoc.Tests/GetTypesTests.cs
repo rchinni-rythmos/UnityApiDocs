@@ -1329,7 +1329,7 @@ namespace DocWorks.Integration.XmlDoc.Tests
         }
 
         [Test]
-        public void GivenType_WithAMember_HavingRefArgument_GetTypeDocumentation_ShouldReturn_SomeIndicatorForRef()
+        public void SetType_Should_Throw_Exception_For_The_Following_Files()
         {
             var fileContent = File.ReadAllText("TestTypes\\Graphics\\CubemapArray.xml");
             string[] filePaths = new string[]
