@@ -1413,6 +1413,32 @@ namespace DocWorks.Integration.XmlDoc.Tests
             Assert.Throws<System.NullReferenceException>(() => handler.SetType(fileContent, filePaths));
         }
 
+        [Test]
+        public void GivenDuplicateTypes_WithOneTypeDefinitionExcluded_ExclusionPathIsAbsolute_GetTypeDocumentation_ShouldReturn_OneMember()
+        {
+            string excludePath = Path.Combine(AppContext.BaseDirectory, "TestTypes", "Excluded");
+            CompilationParameters compilationParameters = new CompilationParameters(AppContext.BaseDirectory, new[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
+            XMLDocHandler handler = new XMLDocHandler(compilationParameters);
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(actualXml);
+            int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
+            Assert.That(nodeCount, Is.EqualTo(1));
+        }
+        
+        [Test]
+        public void GivenDuplicateTypes_WithOneTypeDefinitionExcluded_ExclusionPathIsRelative_GetTypeDocumentation_ShouldReturn_OneMember()
+        {
+            string excludePath = Path.Combine("TestTypes", "Excluded");
+            CompilationParameters compilationParameters = new CompilationParameters(AppContext.BaseDirectory, new[] { excludePath }, Array.Empty<string>(), Array.Empty<string>());
+            XMLDocHandler handler = new XMLDocHandler(compilationParameters);
+            string actualXml = handler.GetTypeDocumentation("DocWorks.Integration.XmlDoc.Tests.TestTypes.DuplicateClass", "TestTypes/DuplicateClass.cs");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(actualXml);
+            int nodeCount = doc.DocumentElement.SelectNodes("member/member").Count;
+            Assert.That(nodeCount, Is.EqualTo(1));
+        }
+
         private void AssertValidXml(string actualXml)
         {
             var doc = new XmlDocument();

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FindMissingDocs\FindMissingDocs.csproj" />
     <ProjectReference Include="..\DocWorks.Integration.XmlDoc.TestUtilities\DocWorks.Integration.XmlDoc.TestUtilities.csproj" />
     <ProjectReference Include="..\DocWorks.Integration.XmlDoc\DocWorks.Integration.XmlDoc.csproj" />
   </ItemGroup>
@@ -58,6 +59,14 @@
     <Compile Remove="TestTypes\Graphics\Texture.cs"></Compile>
     <Compile Remove="TestTypes\Graphics\Texture.bindings.cs"></Compile>
     <Compile Remove="TestTypes\Graphics\Texture.deprecated.cs" />
+    <None Include="TestTypes\Excluded\**" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestTypes\Excluded\DuplicateClass.cs"></Compile>
+    <Compile Update="TestTypes\Attributes\ClassWithAttributeWithGenericTypeof.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="TestTypes\Attributes\ClassWithAttributes.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -242,6 +251,10 @@
     </Compile>
   
     <Compile Update="TestTypes\UpdateEnums.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  
+    <Compile Update="TestTypes\DuplicateClass.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
